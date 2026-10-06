@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Termodinamik ish — 9-sinf fizika</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f3f7fc;--cd:#fff;--tx:#1d2733;--mu:#5b6b7c;--pr:#2f6fed;--ln:#d9e2ee;--ok:#2e9e5b;--or:#e8832a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161d;--cd:#19222c;--tx:#e6edf5;--mu:#98a8ba;--ln:#2b3745}}
+:root[data-theme="dark"]{--bg:#10161d;--cd:#19222c;--tx:#e6edf5;--mu:#98a8ba;--ln:#2b3745}
+html,body{height:auto}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:12px}
+h1{font-size:1.4rem;margin:8px 0}h2{font-size:1.15rem;margin:0 0 8px}
+.card{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:14px;margin:12px 0}
+#tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+#tabs button{flex:0 0 auto;border:1px solid var(--ln);background:var(--cd);color:var(--tx);border-radius:20px;padding:6px 12px;font-size:.85rem;cursor:pointer}
+#tabs button.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+.f{background:rgba(47,111,237,.12);border-left:4px solid var(--pr);padding:8px 10px;border-radius:6px}
+.try{color:var(--mu);font-size:.92rem}
+summary{cursor:pointer;color:var(--pr)}
+.sim{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+canvas{max-width:100%;height:auto;border:1px solid var(--ln);border-radius:10px}
+.ctl label{display:block;margin:8px 0}.ctl input{width:100%}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.btns button{flex:1;border:0;border-radius:10px;padding:10px;color:#fff;font-size:1rem;cursor:pointer}
+#b1{background:var(--ok)}#b2{background:var(--or)}#b3{background:#7a8797}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.res div{background:rgba(47,111,237,.08);border-radius:10px;padding:8px;font-size:.9rem}
+.res b{display:block;font-size:1.05rem}
+#msg{margin-top:8px;font-weight:600}
+ol li{margin:8px 0}
+</style></head><body><main>
+<h1>🔥 Termodinamik ish <small style="font-weight:400;color:var(--mu)">· 9-sinf, 16-mavzu</small></h1>
+<div id="tabs"></div>
+<section class="card"><h2 id="rt"></h2><div id="info"></div></section>
+<section class="card"><h2>🧪 Simulyatsiya</h2>
+<div class="sim"><canvas id="cc" width="300" height="300"></canvas><canvas id="gc" width="340" height="300"></canvas></div>
+<div class="ctl">
+<label>Bosim p (kPa): <b id="lp"></b><input type="range" id="sp" min="50" max="300" step="5"></label>
+<label>Hajm V (litr): <b id="lv"></b><input type="range" id="sv" min="0.5" max="5" step="0.1"></label>
+<label>Temperatura T (K): <b id="lt"></b><input type="range" id="stt"></label></div>
+<div class="btns"><button id="b1">▶ Boshlash</button><button id="b2">⏸ To'xtatish</button><button id="b3">↺ Qayta o'rnatish</button></div>
+<div class="res">
+<div>Hozirgi p<b id="rp"></b></div><div>Hozirgi V<b id="rv"></b></div><div>Hozirgi T<b id="rT"></b></div>
+<div>ΔV<b id="rdv"></b></div><div>Gaz bajargan ish A′<b id="rap"></b></div><div>Gaz ustida bajarilgan ish A<b id="ra"></b></div>
+<div>ΔU<b id="rdu"></b></div><div>Q<b id="rq"></b></div></div>
+<div id="msg"></div>
+<p class="try">p–V grafikda bo'yalgan yuza = gaz bajargan ish (yashil: kengayish, to'q sariq: siqilish). Hisoblar: ν·R = 1 J/K (ν ≈ 0,12 mol, bir atomli ideal gaz).</p>
+</section>
+<section class="card"><h2>✅ Mustahkamlash: 5 ta test</h2><ol>
+<li>Gaz p = 2·10⁵ Pa bosimda 0,5·10⁻³ m³ ga kengaydi. Gaz bajargan ish qancha?<details><summary>Javob</summary>A′ = p·ΔV = 2·10⁵ · 0,5·10⁻³ = 100 J.</details></li>
+<li>Gaz siqilganda (ΔV &lt; 0) uning bajargan ishi qanday ishorali?<details><summary>Javob</summary>Manfiy (A′ &lt; 0). Gaz ustida bajarilgan ish esa musbat (A = −A′ &gt; 0).</details></li>
+<li>Gazga 300 J issiqlik berildi va gaz 100 J ish bajardi. Ichki energiya qanchaga o'zgardi?<details><summary>Javob</summary>ΔU = Q + A = 300 + (−100) = 200 J (ortdi).</details></li>
+<li>p–V grafikda termodinamik ish nimaga teng?<details><summary>Javob</summary>Grafik chizig'i ostidagi yuzaga teng.</details></li>
+<li>Hajm o'zgarmasa (V = const) gaz qancha ish bajaradi va berilgan issiqlik nimaga sarflanadi?<details><summary>Javob</summary>Ish nolga teng (ΔV = 0). Q butunlay ichki energiyani oshirishga ketadi: Q = ΔU.</details></li>
+</ol></section>
+</main>
+<script>
+const modes=[
+{t:"heat",n:"Ichki energiya",title:"Reja 1. Ichki energiya va uni o'zgartirish usullari",d:{T2:450},h:`
+<p>Jismdagi barcha molekulalarning kinetik va o'zaro ta'sir potensial energiyalari yig'indisi <b>ichki energiya</b> (U) deyiladi. Ideal gazda molekulalar bir-biri bilan ta'sirlashmaydi, shuning uchun U faqat temperaturaga bog'liq. Temperatura ortsa, molekulalar tezroq harakatlanadi va U ortadi. Ichki energiyani ikki usulda o'zgartirish mumkin: <b>issiqlik uzatish</b> (Q) va <b>ish bajarish</b> (A).</p>
+<p class="f">ΔU = (3/2)·ν·R·ΔT<br>ΔU — ichki energiya o'zgarishi (J); ν — modda miqdori (mol); R = 8,31 J/(mol·K); ΔT — temperatura o'zgarishi (K).</p>
+<p><b>Misol:</b> choynakdagi suv olovda qiziydi (issiqlik uzatish); qo'llarni bir-biriga ishqalasak ham isiydi (ish bajarish).</p>
+<p><b>Masala:</b> ν = 0,12 mol bir atomli gaz 300 K dan 400 K gacha qizdirildi. ΔU = ?<details><summary>Yechimi</summary>ΔU = 1,5 · 0,12 · 8,31 · 100 ≈ 150 J.</details></p>
+<p class="try">🔎 Temperatura slayderini siljitib "Boshlash"ni bosing: hajm o'zgarmaydi, molekulalar tezlashadi, A = 0, Q = ΔU.</p>`},
+{t:"isobar",n:"Termodinamik ish",title:"Reja 2. Termodinamik ish tushunchasi",d:{P:150,V2:3.5},h:`
+<p>Gaz kengayganda porshenni suradi va <b>ish bajaradi</b>. Porshen gazni siqsa, <b>gaz ustida ish bajariladi</b>. Gaz hajmi o'zgarganda bajariladigan ish <b>termodinamik ish</b> deyiladi. Hajm o'zgarmasa (ΔV = 0), ish ham nolga teng. Mexanikadagi A = F·s dan foydalanamiz: gaz porshenga F = p·S kuch bilan ta'sir qiladi, porshen h masofaga siljiydi, S·h = ΔV.</p>
+<p class="f">A′ = F·h = p·S·h = p·ΔV<br>A′ — gaz bajargan ish (J); p — bosim (Pa); ΔV — hajm o'zgarishi (m³).</p>
+<p><b>Misol:</b> velosiped shinasini to'ldirayotganda nasos porsheni havoni siqadi; bug' qozonida bug' porshenni itaradi.</p>
+<p><b>Masala:</b> Gaz porshenni F = 200 N kuch bilan 0,1 m ga siljitdi. Ish qancha?<details><summary>Yechimi</summary>A′ = F·s = 200 · 0,1 = 20 J.</details></p>
+<p class="try">🔎 Hajm slayderini kattaroq qiling: gaz kengayadi va ish bajaradi.</p>`},
+{t:"isobar",n:"A = p·ΔV",title:"Reja 3. Gazning kengayishi va siqilishida bajarilgan ish (A = p·ΔV)",d:{P:150,V2:4},h:`
+<p>Bosim o'zgarmaydigan jarayon <b>izobarik</b> jarayon deyiladi. Unda ish A′ = p·(V₂ − V₁) formula bilan topiladi. p–V grafikda izobara gorizontal chiziq bo'ladi. Ish shu chiziq ostidagi <b>to'g'ri to'rtburchak yuzasiga</b> teng: balandligi p, kengligi ΔV. Bosim qanchalik katta va hajm o'zgarishi qanchalik ko'p bo'lsa, ish shunchalik katta.</p>
+<p class="f">A′ = p·(V₂ − V₁)<br>p — Pa; V — m³ (1 litr = 10⁻³ m³); A′ — J. Simulyatsiyada kPa·L = J.</p>
+<p><b>Misol:</b> gaz bilan to'ldirilgan shar isitilganda kengayib atmosferani itaradi.</p>
+<p><b>Masala:</b> p = 2·10⁵ Pa da gaz hajmi 2 L dan 5 L ga ortdi. A′ = ?<details><summary>Yechimi</summary>ΔV = 3·10⁻³ m³; A′ = 2·10⁵ · 3·10⁻³ = 600 J.</details></p>
+<p class="try">🔎 p ni oshiring: grafikdagi to'rtburchak balandlashadi, ish ortadi.</p>`},
+{t:"isobar",n:"Ish ishorasi",title:"Reja 4. Ishning ishorasi: gaz ish bajaradi / gaz ustida ish bajariladi",d:{P:150,V2:0.8},h:`
+<p>Gaz <b>kengayganda</b> ΔV &gt; 0 va gaz ish bajaradi: A′ &gt; 0. Gaz <b>siqilganda</b> ΔV &lt; 0, gaz ishi manfiy: A′ &lt; 0. Bu holda tashqi kuchlar gaz ustida ish bajaradi. Gaz ustida bajarilgan ish gaz ishiga son jihatdan teng, ishorasi qarama-qarshi.</p>
+<p class="f">A = −A′ = −p·ΔV<br>A — gaz ustida bajarilgan ish (J). Kengayishda A &lt; 0, siqilishda A &gt; 0.</p>
+<p><b>Misol:</b> velosiped nasosining dastasini bossak, havo siqiladi — havo ustida ish bajariladi, nasos isiydi.</p>
+<p><b>Masala:</b> p = 10⁵ Pa da gaz 4 L dan 1 L gacha siqildi. A va A′ ni toping.<details><summary>Yechimi</summary>ΔV = −3·10⁻³ m³. A = −pΔV = +300 J (gaz ustida); A′ = −300 J.</details></p>
+<p class="try">🔎 Hajm slayderini boshlang'ich 2 L dan kichik qiling — yashil o'rniga to'q sariq yuza chiqadi (siqilish).</p>`},
+{t:"isobar",n:"1-qonun",title:"Reja 5. Termodinamikaning birinchi qonuni (ΔU = Q + A)",d:{P:150,V2:4},h:`
+<p>Energiya yo'qolmaydi, faqat bir turdan boshqasiga o'tadi. Gaz olgan issiqlik miqdori Q ichki energiyani oshirishga va gaz ish bajarishiga ketadi. Qonun: gaz ichki energiyasining o'zgarishi unga berilgan issiqlik va gaz ustida bajarilgan ish yig'indisiga teng. Q &gt; 0 — gaz issiqlik oldi, Q &lt; 0 — issiqlik berdi.</p>
+<p class="f">ΔU = Q + A  yoki  Q = ΔU + A′<br>Q — issiqlik miqdori (J); A — gaz ustida bajarilgan ish (J); ΔU — ichki energiya o'zgarishi (J).</p>
+<p><b>Misol:</b> gaz porshen ostida qizdirilsa, olgan issiqlikning bir qismi gazni qizdiradi, qolgani porshenni ko'taradi.</p>
+<p><b>Masala:</b> Gazga Q = 500 J issiqlik berildi, gaz A′ = 200 J ish bajardi. ΔU = ?<details><summary>Yechimi</summary>ΔU = Q − A′ = 500 − 200 = 300 J.</details></p>
+<p class="try">🔎 Natijalardagi Q ni kuzating: Q = ΔU + A′. Temperatura slayderi bilan ham hajmni boshqarish mumkin.</p>`},
+{t:"isoT",n:"Amaliy qo'llanish",title:"Reja 6. Amaliy qo'llanilishi (dvigatel, nasos, velosiped nasosi)",d:{Tc:300,V2:0.6},h:`
+<p><b>Dvigatelda</b> yonilg'i yonganda gaz qiziydi, kengayadi va porshenni suradi: ichki energiya mexanik ishga aylanadi. <b>Velosiped nasosida</b> havo siqiladi: unga ish bajariladi va havo isiydi. Sekin siqilganda temperatura o'zgarmaydi (izotermik jarayon), shuning uchun ΔU = 0 va Q = A′. Bunda siqilayotgan gaz atrofga issiqlik beradi (Q &lt; 0). Hajm kamayganda bosim ortadi: p·V = const.</p>
+<p class="f">Izotermik jarayonda: ΔU = 0, Q = A′ = −A<br>Ish p–V grafikdagi egri chiziq ostidagi yuza bilan topiladi.</p>
+<p><b>Misol:</b> nasosni ishlatsangiz, uning ostki qismi qiziydi; sovitgichda gaz siqilib, so'ng kengayib sovuqlik hosil qiladi.</p>
+<p><b>Masala:</b> Nasosda gaz ustida 120 J ish bajarildi, gaz atrofga 20 J issiqlik berdi (Q = −20 J). ΔU = ?<details><summary>Yechimi</summary>ΔU = Q + A = −20 + 120 = +100 J (gaz isidi).</details></p>
+<p class="try">🔎 Hajmni kamaytiring: bosim ortadi, Q manfiy chiqadi. Bosim bu rejimda avtomatik hisoblanadi.</p>`}
+];
+const $=i=>document.getElementById(i),cl=(x,a,b)=>Math.max(a,Math.min(b,x)),V1=2,N=36;
+let M=0,P=150,V2=4,T2=450,Tc=300,s=0,run=false,last=0;
+const mol=[...Array(N)].map(()=>{const a=Math.random()*6.283;return{x:Math.random()*160,y:Math.random()*20,ux:Math.cos(a),uy:Math.sin(a)}});
+const sp=$("sp"),sv=$("sv"),stt=$("stt");
+function st(t){const ty=modes[M].t;
+ if(ty=="heat"){const T=300+(T2-300)*t;return{V:2,T,p:T/2}}
+ const V=V1+(V2-V1)*t;
+ return ty=="isobar"?{V,p:P,T:P*V}:{V,p:Tc/V,T:Tc}}
+function calc(t){const r=st(t),i=st(0),ty=modes[M].t,dV=r.V-i.V;
+ const Ap=ty=="heat"?0:ty=="isobar"?P*dV:Tc*Math.log(r.V/i.V),dU=1.5*(r.T-i.T);
+ return{r,dV,Ap,A:-Ap,dU,Q:dU+Ap}}
+function setMode(i){M=i;const d=modes[i].d,ty=modes[i].t;
+ P=d.P||150;V2=d.V2||2;T2=d.T2||450;Tc=d.Tc||300;s=0;run=false;
+ $("rt").textContent=modes[i].title;$("info").innerHTML=modes[i].h;
+ [...$("tabs").children].forEach((b,k)=>b.className=k==i?"on":"");
+ sp.max=ty=="isobar"?300:1500;sp.disabled=ty!="isobar";sv.disabled=ty=="heat";
+ if(ty=="heat"){stt.min=150;stt.max=800;stt.step=10;stt.value=T2}
+ else if(ty=="isobar"){stt.min=25;stt.max=1500;stt.step=5;stt.value=P*V2}
+ else{stt.min=150;stt.max=600;stt.step=10;stt.value=Tc}
+ sp.value=P;sv.value=V2}
+function reset(){s=0;run=false}
+sp.oninput=()=>{P=+sp.value;stt.value=P*V2;reset()};
+sv.oninput=()=>{V2=+sv.value;if(modes[M].t=="isobar")stt.value=P*V2;reset()};
+stt.oninput=()=>{const v=+stt.value,ty=modes[M].t;
+ if(ty=="heat")T2=v;else if(ty=="isoT")Tc=v;else{V2=cl(v/P,.5,5);sv.value=V2;stt.value=P*V2}reset()};
+$("b1").onclick=()=>{if(s>=1)s=0;run=true};$("b2").onclick=()=>run=false;$("b3").onclick=reset;
+modes.forEach((m,i)=>{const b=document.createElement("button");b.textContent=(i+1)+". "+m.n;b.onclick=()=>setMode(i);$("tabs").appendChild(b)});
+const cc=$("cc").getContext("2d"),gc=$("gc").getContext("2d");
+function drawC(col,r,c){const x0=70,w=160,yb=280,h=r.V/6*250;
+ cc.clearRect(0,0,300,300);
+ const hue=cl(240-(r.T-100)/700*240,0,240);
+ cc.fillStyle=`hsla(${hue},80%,55%,.13)`;cc.fillRect(x0,yb-h,w,h);
+ cc.strokeStyle=col;cc.lineWidth=3;cc.beginPath();cc.moveTo(x0,20);cc.lineTo(x0,yb);cc.lineTo(x0+w,yb);cc.lineTo(x0+w,20);cc.stroke();
+ cc.fillStyle="#8a97a6";cc.fillRect(x0+w/2-3,6,6,yb-h-16);cc.fillRect(x0,yb-h-12,w,12);
+ const step=2.4*Math.sqrt(r.T/300);
+ mol.forEach(m=>{m.x+=m.ux*step;m.y+=m.uy*step;
+  if(m.x<4){m.x=4;m.ux=Math.abs(m.ux)}if(m.x>w-4){m.x=w-4;m.ux=-Math.abs(m.ux)}
+  if(m.y<4){m.y=4;m.uy=Math.abs(m.uy)}if(m.y>h-4){m.y=Math.max(4,h-4);m.uy=-Math.abs(m.uy)}
+  cc.fillStyle=`hsl(${hue},85%,50%)`;cc.beginPath();cc.arc(x0+m.x,yb-m.y,4,0,6.283);cc.fill()});
+ cc.fillStyle=col;cc.font="14px system-ui";cc.textAlign="center";
+ if(s>0&&Math.abs(c.dV)>.005)cc.fillText(c.dV>0?"⬆ Gaz ish bajaradi":"⬇ Gaz ustida ish bajariladi",150,h>200?20:yb-h-30);
+ cc.font="20px system-ui";
+ if(s>0&&c.Q>.5)cc.fillText("🔥 Q > 0",150,298);else if(s>0&&c.Q<-.5)cc.fillText("❄ Q < 0",150,298)}
+function drawG(col,c){const W=340,H=300,L=46,B=36,R=12,T=14,pts=[];
+ for(let k=0;k<=50;k++)pts.push(st(k/50));
+ const ym=Math.max(300,Math.ceil(Math.max(...pts.map(q=>q.p))*1.1/100)*100);
+ const X=v=>L+v/6*(W-L-R),Y=p=>H-B-p/ym*(H-B-T);
+ gc.clearRect(0,0,W,H);gc.font="11px system-ui";gc.fillStyle=col;gc.strokeStyle=col;gc.lineWidth=1;gc.textAlign="center";
+ const n=Math.round(s*50),cur=pts.slice(0,n);cur.push(st(s));
+ if(modes[M].t!="heat"){gc.fillStyle=cur[cur.length-1].V>=V1?"rgba(46,158,91,.4)":"rgba(232,131,42,.4)";
+  gc.beginPath();gc.moveTo(X(cur[0].V),Y(0));cur.forEach(q=>gc.lineTo(X(q.V),Y(q.p)));gc.lineTo(X(cur[cur.length-1].V),Y(0));gc.closePath();gc.fill()}
+ gc.fillStyle=col;gc.beginPath();gc.moveTo(L,T);gc.lineTo(L,H-B);gc.lineTo(W-R,H-B);gc.stroke();
+ for(let v=0;v<=6;v++)gc.fillText(v,X(v),H-B+13);
+ gc.textAlign="right";for(let k=0;k<=4;k++)gc.fillText(Math.round(ym*k/4),L-4,Y(ym*k/4)+4);
+ gc.textAlign="center";gc.fillText("V (L)",(L+W)/2,H-6);gc.fillText("p (kPa)",L+8,T-3);
+ gc.setLineDash([4,4]);gc.beginPath();pts.forEach((q,k)=>k?gc.lineTo(X(q.V),Y(q.p)):gc.moveTo(X(q.V),Y(q.p)));gc.stroke();gc.setLineDash([]);
+ gc.strokeStyle="#2f6fed";gc.lineWidth=3;gc.beginPath();cur.forEach((q,k)=>k?gc.lineTo(X(q.V),Y(q.p)):gc.moveTo(X(q.V),Y(q.p)));gc.stroke();
+ const e=cur[cur.length-1];gc.fillStyle="#2f6fed";gc.beginPath();gc.arc(X(e.V),Y(e.p),5,0,6.283);gc.fill()}
+const f=(x,u,d=1)=>x.toFixed(d).replace(".",",")+" "+u;
+function show(c){const r=c.r,ty=modes[M].t;
+ if(sp.disabled)sp.value=r.p;if(sv.disabled)sv.value=r.V;
+ $("lp").textContent=ty=="isobar"?P:Math.round(r.p);
+ $("lv").textContent=(ty=="heat"?r.V:V2).toFixed(1).replace(".",",");
+ $("lt").textContent=ty=="heat"?T2:ty=="isoT"?Tc:Math.round(P*V2);
+ $("rp").textContent=f(r.p,"kPa",0);$("rv").textContent=f(r.V,"L",2);$("rT").textContent=f(r.T,"K",0);
+ $("rdv").textContent=f(c.dV,"L",2)+" ("+c.dV.toFixed(2).replace(".",",")+"·10⁻³ m³)";
+ $("rap").textContent=f(c.Ap,"J");$("ra").textContent=f(c.A,"J");$("rdu").textContent=f(c.dU,"J");$("rq").textContent=f(c.Q,"J");
+ let m=c.dV>.005?"Gaz kengaydi → gaz ish bajardi (A′ > 0). ":c.dV<-.005?"Gaz siqildi → gaz ustida ish bajarildi (A > 0). ":"Hajm o'zgarmadi → ish 0. ";
+ $("msg").textContent=m+(c.Q>.05?"Gaz issiqlik oldi (Q > 0). ":c.Q<-.05?"Gaz issiqlik berdi (Q < 0). ":"")+"ΔU = Q + A ✔"}
+function frame(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;
+ if(run){s=Math.min(1,s+dt/3.5);if(s>=1)run=false}
+ const col=getComputedStyle(document.body).color,c=calc(s);
+ drawC(col,c.r,c);drawG(col,c);show(c);requestAnimationFrame(frame)}
+setMode(0);requestAnimationFrame(frame);
+</script></body></html>
