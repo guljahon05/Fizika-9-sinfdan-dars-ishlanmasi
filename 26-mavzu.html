@@ -1,0 +1,125 @@
+<!DOCTYPE html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Ichki yonuv dvigatellari</title><style>
+:root{--bg:#eef6ff;--c:#fff;--t:#1f2a44;--p:#4f8cff;--g:#3bb273;--r:#ef6f6c;--o:#ffb259;--h:#e8f0ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#141a2b;--c:#1e2740;--t:#e8ecf8;--h:#2a3558}}
+:root[data-theme=dark]{--bg:#141a2b;--c:#1e2740;--t:#e8ecf8;--h:#2a3558}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;font:18px/1.55 system-ui,Arial,sans-serif;background:var(--bg);color:var(--t)}
+header{text-align:center;padding:16px 12px 4px}h1{font-size:1.35em;margin:0}h2{font-size:1.25em}h3{margin:0 0 8px;font-size:1.05em}
+nav{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+nav button{flex:none;white-space:nowrap}
+main,#tests{max-width:760px;margin:auto;padding:0 12px 12px}
+.card{background:var(--c);border-radius:18px;padding:14px 16px;margin:12px 0;box-shadow:0 4px 14px #4f8cff22;animation:in .4s}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+button,select,input{font:inherit;min-height:44px;border-radius:12px;border:2px solid var(--p);padding:6px 14px;background:var(--c);color:var(--t);margin:4px 4px 4px 0}
+button{background:var(--p);color:#fff;border:0;cursor:pointer}button.on{background:var(--g)}button:active{transform:scale(.96)}
+input[type=range]{width:100%;padding:0;accent-color:var(--p)}input[type=number],input:not([type]){width:140px}
+.row{display:flex;flex-wrap:wrap}.out{background:var(--h);border-radius:12px;padding:10px 12px;margin:8px 0;word-break:break-word}
+.fm .f{font-size:1.2em;font-weight:700;text-align:center;background:var(--h);border-radius:12px;padding:8px;margin:6px 0}
+canvas{width:100%;height:auto;background:#fff;border-radius:14px;display:block}
+table{width:100%;border-collapse:collapse;font-size:.85em}td,th{border:1px solid #8aa;padding:5px}th{background:var(--h)}
+ul{padding-left:20px;margin:6px 0}details{margin-top:6px}label{display:block;margin-top:6px}
+.q button{display:block;width:100%;text-align:left;background:var(--h);color:var(--t)}.q .ok{background:var(--g);color:#fff}.q .no{background:var(--r);color:#fff}
+</style></head><body><header><h1>⚙️ 26-mavzu. Ichki yonuv dvigatellari</h1><small>9-sinf fizika</small></header>
+<nav id="nav"></nav><main id="main"></main><div id="tests"></div><script>
+const $=i=>document.getElementById(i),f=(x,d=1)=>(+x).toFixed(d).replace('.',','),PI=Math.PI,TC='#1f2a44';
+/* Animatsiya: Start/Pauza/Reset */
+function anim(id,draw,rst){const c=$(id),x=c.getContext('2d');let t=0,run=0,last=0;
+function loop(n){if(!run)return;const dt=Math.min(.05,(n-last)/1000);last=n;t+=dt;x.clearRect(0,0,c.width,c.height);draw(x,t,dt,c.width,c.height);requestAnimationFrame(loop)}
+const rd=()=>{x.clearRect(0,0,c.width,c.height);draw(x,t,0,c.width,c.height)};
+$(id+'S').onclick=()=>{if(!run){run=1;last=performance.now();requestAnimationFrame(loop)}};
+$(id+'P').onclick=()=>run=0;$(id+'R').onclick=()=>{run=0;t=0;rst&&rst();rd()};rd();return rd}
+const ln=(x,a,b,c,d,col=TC,w=3)=>{x.strokeStyle=col;x.lineWidth=w;x.beginPath();x.moveTo(a,b);x.lineTo(c,d);x.stroke()};
+const circ=(x,a,b,r,col)=>{x.fillStyle=col;x.beginPath();x.arc(a,b,r,0,7);x.fill()};
+const tx=(x,s,a,b,sz=14,col=TC)=>{x.fillStyle=col;x.font=sz+'px system-ui';x.fillText(s,a,b)};
+const PRB={};
+function sec(n,t,th,fm,ex,sim,pr){PRB[n]=pr;return `<section id=s${n} hidden><h2>${n}-reja. ${t}</h2><div class=card><h3>📘 Nazariya</h3>${th}</div><div class="card fm"><h3>📐 Formula</h3>${fm}</div><div class=card><h3>🌍 Hayotiy misol</h3>${ex}</div><div class=card><h3>🎛 Simulyatsiya</h3>${sim}</div><div class=card><h3>🎬 Animatsiya</h3><canvas id=a${n} width=400 height=280></canvas><div class=row><button id=a${n}S>▶ Start</button><button id=a${n}P>⏸ Pauza</button><button id=a${n}R>↺ Qayta boshlash</button></div></div><div class=card><h3>✏️ Mustaqil masala</h3>${pr.map((p,i)=>`<div><p><b>${i+1})</b> ${p.q}</p><input id=p${n}_${i} inputmode=decimal placeholder="${p.u}"><button onclick="chk(${n},${i})">Tekshirish</button><div id=r${n}_${i} class=out hidden></div><details><summary>Yechimni ko'rish</summary>${p.s}</details></div>`).join('')}</div></section>`}
+function chk(n,i){const p=PRB[n][i],v=parseFloat($(`p${n}_${i}`).value.replace(',','.')),o=$(`r${n}_${i}`);o.hidden=0;
+o.textContent=isNaN(v)?'Javobni kiriting':Math.abs(v-p.a)<=Math.max(.01,Math.abs(p.a)*.01)?"✅ To'g'ri!":"❌ Noto'g'ri, qayta urinib ko'ring"}
+const M=document.getElementById('main');let H='';
+/* ---------- 1-REJA ---------- */
+const parts={Silindr:"Yoqilg'i yonadigan ichki bo'shliq; porshen shu yerda harakatlanadi.",Porshen:"Gaz bosimini shatunga uzatadi, silindr ichida yuqoriga-pastga yuradi.",Shatun:"Porshenning ilgarilanma harakatini tirsakli valga uzatadi.","Tirsakli val":"Ilgarilanma harakatni aylanma harakatga aylantiradi.","Kirish klapani":"Yonilg'i-havo aralashmasini silindrga kiritadi.","Chiqish klapani":"Yonib bo'lgan gazlarni chiqaradi.",Svecha:"Benzinli dvigatelda aralashmani uchqun bilan alangalantiradi.",Forsunka:"Dizelda solyarkani silindrga purkaydi.",Mahovik:"Inersiya bilan valning tekis aylanishini ta'minlaydi."};
+H+=sec(1,"Ichki yonuv dvigatellari haqida tushuncha",`<ul><li>Yoqilg'i dvigatelning <b>ichida (silindrda)</b> yonadi; yonish energiyasi gaz orqali mexanik ishga aylanadi.</li><li><b>Benzinli</b> — uchqun (svecha) bilan alangalanadi; <b>dizel</b> — siqilgan havo qizishidan alangalanadi.</li><li>Tarix: Lenuar (1860, gazli dvigatel), Otto (1876, 4 taktli), Dizel (1897).</li><li>Qismlari: silindr, porshen, shatun, tirsakli val, klapanlar, svecha, forsunka, mahovik.</li><li>Qo'llanilishi: avtomobil, traktor, mototsikl, kichik samolyot, generator.</li></ul>`,`<div class=f>η = A / Q₁ · 100%</div>A — foydali ish, Q₁ — yoqilg'i yonishidan olingan issiqlik.`,`Avtomobil dvigatelida har soniyada o'nlab marta benzin yonadi va porshenni itaradi — natijada g'ildiraklar aylanadi.`,`<div class=row id=pb></div><div class=out id=pi>Qism nomini bosing 👆</div>`,[{q:"Dvigatel yonishdan 40 MJ energiya oldi va 10 MJ foydali ish bajardi. FIK (%) = ?",u:"%",a:25,s:"η = 10/40·100% = 25%"}]);
+/* ---------- 2-REJA ---------- */
+const TN=["Kirish","Siqish","Ishchi yurish","Chiqarish"];
+H+=sec(2,"To'rt taktli dvigatel ish sikli",`<ul><li><b>1-takt, kirish:</b> kirish klapani ochiq, porshen pastga, aralashma so'riladi.</li><li><b>2-takt, siqish:</b> klapanlar yopiq, porshen yuqoriga, bosim va temperatura ortadi.</li><li><b>3-takt, ishchi yurish:</b> uchqun, yonish, gaz kengayib porshenni pastga itaradi — foydali ish.</li><li><b>4-takt, chiqarish:</b> chiqish klapani ochiq, porshen yuqoriga, gazlar chiqadi.</li></ul>`,`<div class=f>1 sikl = 4 takt = 2 aylanish</div>`,`Tirsakli val 3000 ayl/min aylansa, har bir silindr minutiga 1500 ta ishchi yurish bajaradi.`,`<div class=row>${TN.map((n,i)=>`<button onclick="tk(${i})">${i+1}-takt</button>`).join('')}</div><label>Aylanish tezligi: <b id=sv2>5</b></label><input type=range id=sp2 min=1 max=10 value=5 oninput="$('sv2').textContent=this.value"><div class=out id=i2></div>`,[{q:"Tirsakli val 1 minutda 3000 marta aylanadi. Bir silindr 1 soniyada nechta ishchi yurish bajaradi?",u:"marta",a:25,s:"3000/60 = 50 ayl/s; ishchi yurish har 2 aylanishda 1 marta: 50/2 = 25."}]);
+/* ---------- 3-REJA ---------- */
+H+=sec(3,"Dizel va benzinli dvigatelni taqqoslash",`<table><tr><th></th><th>Benzinli</th><th>Dizel</th></tr><tr><td>Alangalanish</td><td>Svecha uchquni</td><td>Siqilgan havo issiqligi</td></tr><tr><td>Yoqilg'i</td><td>Benzin</td><td>Solyarka</td></tr><tr><td>Siqish darajasi</td><td>8–12</td><td>15–22</td></tr><tr><td>FIK</td><td>25–30%</td><td>35–40%</td></tr><tr><td>Ishlatilishi</td><td>Yengil avto, mototsikl</td><td>Yuk avto, traktor, kema</td></tr></table>Benzinli: aralashma siqiladi; dizelda faqat havo siqiladi, forsunka yoqilg'ini purkaydi.`,`<div class=f>ε = V₁ / V₂ (siqish darajasi)</div>`,`Yuk mashinalari dizelni afzal ko'radi: FIK yuqori, sarf kam.`,`<div class=row><button id=b3b class=on onclick="md3(0)">Benzinli</button><button id=b3d onclick="md3(1)">Dizel</button></div><label>Siqish darajasi ε = <b id=ev3></b></label><input type=range id=e3 oninput="up3()"><div class=out id=o3></div>`,[{q:"Dizel dvigatel 100 MJ issiqlik oldi, FIK 38%. Foydali ish (MJ) = ?",u:"MJ",a:38,s:"A = η·Q₁ = 0,38·100 = 38 MJ"}]);
+/* ---------- 4-REJA ---------- */
+H+=sec(4,"Dvigatelning ishi va quvvati",`<ul><li>Bir siklda foydali ish: <b>A = Q₁ − Q₂</b>.</li><li>Q₁ — yoqilg'i yonishidan olingan issiqlik, Q₂ — sovutgichga berilgan issiqlik.</li><li>Yoqilg'i yonish issiqligi: Q₁ = q·m.</li><li>Quvvat — vaqt birligida bajarilgan ish.</li></ul>`,`<div class=f>A = Q₁ − Q₂ &nbsp; Q₁ = q·m &nbsp; N = A / t</div>`,`Benzin q = 46 MJ/kg, m = 0,5 kg bo'lsa, Q₁ = 46·0,5 = 23 MJ.`,`<label>Massa m = <b id=mv4>1</b> kg</label><input type=range id=m4 min=.1 max=5 step=.1 value=1 oninput="up4()"><select id=f4 onchange="up4()"><option value=46>Benzin 46 MJ/kg<option value=42>Dizel 42 MJ/kg<option value=27>Spirt 27 MJ/kg<option value=44>Gaz 44 MJ/kg</select><label>Vaqt t = <b id=tv4>10</b> s</label><input type=range id=t4 min=1 max=60 value=10 oninput="up4()"><label>FIK = <b id=ev4>30</b>%</label><input type=range id=h4 min=20 max=40 value=30 oninput="up4()"><div class=out id=o4></div>`,[{q:"0,2 kg benzin (q = 46 MJ/kg) yondi, FIK 25%. Ish 100 s davom etdi. Quvvat N (kW) = ?",u:"kW",a:23,s:"Q₁ = 46·0,2 = 9,2 MJ; A = 0,25·9,2 = 2,3 MJ; N = 2300 kJ / 100 s = 23 kW."}]);
+/* ---------- 5-REJA ---------- */
+H+=sec(5,"Dvigatelning foydali ish koeffitsiyenti",`<ul><li>FIK — foydali ishning olingan issiqlikka nisbati.</li><li>Real dvigatelda FIK 100% dan doim kichik: energiyaning 60–70% qismi issiqlik, ishqalanish va chiqindi gazlar bilan yo'qoladi.</li><li>Karno sikli — ideal dvigatel, FIK ning eng yuqori chegarasi (T kelvinda).</li></ul>`,`<div class=f>η = A/Q₁·100% = (Q₁−Q₂)/Q₁·100%</div><div class=f>η_max = (T₁−T₂)/T₁</div>`,`Benzinli avtomobilda yoqilg'i energiyasining atigi ~25–30% qismi g'ildirakka yetadi.`,`<label>Q₁ = <b id=qv1>500</b> kJ</label><input type=range id=q15 min=100 max=1000 step=10 value=500 oninput="up5()"><label>Q₂ = <b id=qv2>350</b> kJ</label><input type=range id=q25 min=0 max=1000 step=10 value=350 oninput="up5()"><canvas id=pie5 width=200 height=160 style="max-width:200px;margin:auto"></canvas><div class=out id=o5></div><b>Karno kalkulyatori</b><div class=row><input type=number id=T1 value=600 oninput="kar()"><input type=number id=T2 value=300 oninput="kar()"></div><div class=out id=ok5></div>`,[{q:"Dvigatel isitgichdan 800 kJ oldi, sovutgichga 600 kJ berdi. FIK (%) = ?",u:"%",a:25,s:"η = (800−600)/800·100% = 25%"}]);
+/* ---------- 6-REJA ---------- */
+H+=sec(6,"Ekologik muammolar va masalalar yechish",`<ul><li>Dvigatellar CO₂, CO, azot oksidlari va qurum chiqaradi: global isish, smog, kislotali yomg'ir, sog'liqqa zarar.</li><li>Yechimlar: katalitik neytralizator, filtrlar, FIKni oshirish, gibrid va elektromobillar, biyoyoqilg'i, vodorod.</li></ul>`,`<div class=f>η = A/Q₁ &nbsp; Q₁ = q·m &nbsp; η_max = (T₁−T₂)/T₁</div>`,`1 litr benzin yonganda taxminan 2,3 kg CO₂ chiqadi.`,`<label>Masofa <b id=kv>100</b> km</label><input type=range id=k6 min=10 max=1000 step=10 value=100 oninput="up6()"><label>Sarf <b id=sv6>8</b> l/100 km</label><input type=range id=s6 min=3 max=20 step=.5 value=8 oninput="up6()"><select id=y6 onchange="up6()"><option value=2.3>Benzin<option value=2.7>Dizel<option value=1.6>Suyultirilgan gaz</select><div class=out id=o6></div><div class=row><button class=on onclick="md6(1,this)">Oddiy</button><button onclick="md6(.5,this)">Gibrid</button><button onclick="md6(0,this)">Elektr</button></div>`,[{q:"Dvigatel yoqilg'i yonishidan 200 MJ oldi, 60 MJ foydali ish bajardi. FIK (%) = ?",u:"%",a:30,s:"η = 60/200·100% = 30%"},{q:"2 kg dizel yondi (q = 42 MJ/kg), FIK 35%. Foydali ish (MJ) = ?",u:"MJ",a:29.4,s:"Q₁ = 42·2 = 84 MJ; A = 0,35·84 = 29,4 MJ"},{q:"Dvigatel isitgichdan 500 kJ oldi, sovutgichga 350 kJ berdi. Foydali ish A (kJ) = ?",u:"kJ",a:150,s:"A = Q₁ − Q₂ = 500 − 350 = 150 kJ (FIK = 150/500 = 30%)"},{q:"Karno sikli: T₁ = 600 K, T₂ = 300 K. η_max (%) = ?",u:"%",a:50,s:"η = (600−300)/600 = 0,5 = 50%"}]);
+M.innerHTML=H;
+/* Tab menyu */
+$('nav').innerHTML=["Tushuncha","4 takt","Dizel / benzin","Ish va quvvat","FIK","Ekologiya"].map((n,i)=>`<button onclick="tab(${i+1})" id=tb${i+1}>${i+1}. ${n}</button>`).join('');
+function tab(n){for(let i=1;i<=6;i++){$('s'+i).hidden=i!=n;$('tb'+i).className=i==n?'on':''}window.scrollTo(0,0)}
+/* 1: simulyatsiya + animatsiya */
+for(const k in parts){const b=document.createElement('button');b.textContent=k;b.onclick=()=>$('pi').innerHTML=`<b>${k}</b> — ${parts[k]}`;$('pb').append(b)}
+anim('a1',(x,t,dt,w,h)=>{const cx=170,cy=230,r=42,L=110,a=t*3,px=cx+r*Math.sin(a),py=cy-r*Math.cos(a),by=py-Math.sqrt(L*L-(r*Math.sin(a))**2);
+x.fillStyle='#dfe8f5';x.fillRect(cx-38,20,76,95);ln(x,cx-38,20,cx-38,150,'#667',5);ln(x,cx+38,20,cx+38,150,'#667',5);
+x.fillStyle='#7b869c';x.fillRect(cx-36,by-26,72,26);ln(x,cx,by,px,py,'#e0883a',8);circ(x,cx,cy,r+6,'#aab4c8');circ(x,cx,cy,5,TC);circ(x,px,py,8,'#e0883a');
+x.save();x.translate(310,cy);x.rotate(a);circ(x,0,0,38,'#c9d3e8');ln(x,0,0,30,0,TC,4);x.restore();ln(x,cx,cy,310,cy,'#889',6);
+tx(x,'Silindr',cx+44,40);tx(x,'Porshen',cx+44,by);tx(x,'Shatun',cx+50,(by+py)/2+12);tx(x,'Tirsakli val',20,cy+40);tx(x,'Mahovik',275,cy-48)});
+/* 2 */
+let A2=0,K2=-1;
+function tk(k){A2=k*PI+.001;K2=-1;rd2()}
+const rd2=anim('a2',(x,t,dt)=>{A2+=dt*$('sp2').value*.6;const A=A2%(4*PI),k=Math.floor(A/PI),p=(1-Math.cos(A2))/2,py=70+p*100;
+if(k!=K2){K2=k;$('i2').innerHTML=`<b>${k+1}-takt: ${TN[k]}</b><br>Kirish klapani: ${k==0?'ochiq':'yopiq'} · Chiqish klapani: ${k==3?'ochiq':'yopiq'}<br>Porshen ${k%2?'yuqoriga':'pastga'} yuradi`}
+x.fillStyle='#eef2fa';x.fillRect(130,44,140,py-44);ln(x,130,40,130,245,'#667',5);ln(x,270,40,270,245,'#667',5);ln(x,128,40,272,40,'#667',6);
+const sp=A>2*PI&&A<2.4*PI;
+for(let i=0;i<26;i++){const gx=138+(i*37%122)+Math.sin(t*3+i)*4,gy=50+((i*53%100)/100)*Math.max(4,py-62)+Math.cos(t*4+i)*3;
+if(k==0||(k==1&&i<26))circ(x,gx,gy,3.5,k==1&&i%2?'#2a5fd0':'#4f8cff');
+else if(k==2&&(A-2*PI)<PI*.6)circ(x,gx,gy,5,i%2?'#ff5a36':'#ffb259');
+else if(k==2)circ(x,gx,gy,4,i%2?'#ff9a59':'#c0b0a0');else circ(x,gx,gy,4,'#8e939c')}
+x.fillStyle='#7b869c';x.fillRect(132,py,136,24);ln(x,200,py+24,200+14*Math.sin(A2),250-14*Math.cos(A2),'#e0883a',6);circ(x,200,250,20,'#aab4c8');circ(x,200+14*Math.sin(A2),250-14*Math.cos(A2),5,'#e0883a');
+for(const [vx,op] of [[160,k==0],[240,k==3]]){x.fillStyle=op?'#3bb273':'#ef6f6c';x.fillRect(vx-13,40+(op?12:0),26,6);ln(x,vx,28,vx,40+(op?12:0),'#555',3)}
+if(sp){ln(x,200,28,200,50,'#555',4);circ(x,200,54,9,'#ffe14d')}else ln(x,200,28,200,40,'#555',4);
+tx(x,'Kirish',140,18);tx(x,'Chiqish',222,18);tx(x,'Svecha',172,14);tx(x,TN[k],20,150,18);tx(x,'Takt '+(k+1),20,172,16)},()=>{A2=0;K2=-1});
+/* 3 */
+let m3=0;
+function md3(m){m3=m;$('b3b').className=m?'':'on';$('b3d').className=m?'on':'';const e=$('e3');e.min=m?15:8;e.max=m?22:12;e.value=m?18:10;up3()}
+function up3(){const e=+$('e3').value;$('ev3').textContent=e;const n=m3?35+(e-15)/7*5:25+(e-8)/4*5;
+$('o3').innerHTML=`<b>${m3?'Dizel':'Benzinli'}</b><br>Alangalanish: ${m3?'siqilgan havo issiqligidan':'svecha uchquni bilan'}<br>Yoqilg'i: ${m3?'solyarka (forsunka purkaydi)':'benzin (aralashma)'}<br>FIK ≈ <b>${f(n)}%</b>`}
+function cy3(x,X,d,ph){const p=ph<.5?1-ph*2:ph<.7?0:(ph-.7)/.3,py=70+p*110;x.fillStyle='#f4f7ff';x.fillRect(X,40,110,200);
+x.fillStyle=d?'#cfe3ff':'#9cc4ff';if(ph<.5)x.fillRect(X+2,44,106,py-44);
+if(ph>=.5&&ph<.9){x.fillStyle=`rgba(255,${110+(ph-.5)*250|0},40,${1.1-(ph-.5)*2})`;x.fillRect(X+2,44,106,py-44)}
+x.fillStyle='#7b869c';x.fillRect(X+2,py,106,24);ln(x,X,40,X,245,'#667',4);ln(x,X+110,40,X+110,245,'#667',4);ln(x,X-2,40,X+112,40,'#667',5);
+if(!d&&ph>.48&&ph<.58)circ(x,X+55,52,9,'#ffe14d');if(d&&ph>.46&&ph<.6)for(let i=-1;i<2;i++)ln(x,X+55,42,X+55+i*14,42+30,'#c97a2b',3);
+tx(x,d?'Dizel':'Benzinli',X+25,28,16);tx(x,ph<.5?'Siqish':ph<.7?'Yonish':'Kengayish',X+22,266)}
+anim('a3',(x,t)=>{const ph=(t*.35)%1;cy3(x,50,0,ph);cy3(x,240,1,ph);x.fillStyle='#888';tx(x,'ε≈10',90,150,13,'#2a5fd0');tx(x,'ε≈18',280,150,13,'#2a5fd0')});
+/* 4 */
+function v4(){const m=+$('m4').value,q=+$('f4').value,t=+$('t4').value,e=+$('h4').value,Q1=q*m,A=Q1*e/100;return{m,q,t,e,Q1,A,Q2:Q1-A,N:A*1000/t}}
+function up4(){const v=v4();$('mv4').textContent=f(v.m);$('tv4').textContent=v.t;$('ev4').textContent=v.e;
+$('o4').innerHTML=`Q₁ = q·m = ${v.q}·${f(v.m)} = <b>${f(v.Q1)} MJ</b><br>A = η·Q₁ = <b>${f(v.A)} MJ</b>, Q₂ = ${f(v.Q2)} MJ<br>N = A/t = <b>${f(v.N)} kW</b>`;rd4()}
+const rd4=anim('a4',(x,t)=>{const v=v4(),pr=Math.min(1,t/1.5),W=40+300*v.Q1/230,wa=W*v.e/100;
+x.fillStyle='#ffb259';x.fillRect(30,40,W*pr,50);tx(x,"Yoqilg'i Q₁ = "+f(v.Q1)+' MJ',34,70,15);
+x.fillStyle='rgba(120,120,120,.35)';x.beginPath();x.moveTo(30,90);x.lineTo(30+wa*pr,90);x.lineTo(30+wa*pr,150);x.lineTo(30,150);x.fill();
+x.beginPath();x.moveTo(30+wa*pr,90);x.lineTo(30+W*pr,90);x.lineTo(30+W*pr,150);x.lineTo(40+wa*pr,150);x.fillStyle='rgba(239,111,108,.3)';x.fill();
+x.fillStyle='#3bb273';x.fillRect(30,150,wa*pr,50);tx(x,'A = '+f(v.A),34,180,14,'#fff');x.fillStyle='#ef6f6c';x.fillRect(40+wa*pr,150,(W-wa)*pr,50);tx(x,'Q₂ = '+f(v.Q2)+' MJ',48+wa*pr,180,14,'#fff');
+tx(x,'Foydali ish',30,222,14);tx(x,'Issiqlik yo\'qotishi',30,242,14);tx(x,'N = '+f(v.N)+' kW',30,266,18,'#2a5fd0')});
+/* 5 */
+function up5(){const Q1=+$('q15').value;$('q25').max=Q1;if(+$('q25').value>Q1)$('q25').value=Q1;const Q2=+$('q25').value,e=(Q1-Q2)/Q1*100;
+$('qv1').textContent=Q1;$('qv2').textContent=Q2;$('o5').innerHTML=`A = ${Q1-Q2} kJ<br>η = (${Q1}−${Q2})/${Q1}·100% = <b>${f(e)}%</b>`;
+const c=$('pie5').getContext('2d');c.clearRect(0,0,200,160);c.fillStyle='#ef6f6c';c.beginPath();c.moveTo(100,80);c.arc(100,80,70,0,7);c.fill();
+c.fillStyle='#3bb273';c.beginPath();c.moveTo(100,80);c.arc(100,80,70,-PI/2,-PI/2+e/100*2*PI);c.fill();tx(c,f(e,0)+'%',82,86,20,'#fff');rd5()}
+function kar(){const a=+$('T1').value,b=+$('T2').value;$('ok5').innerHTML=a>b&&b>0?`T₁ = ${a} K, T₂ = ${b} K → η_max = <b>${f((a-b)/a*100)}%</b>`:'T₁ > T₂ > 0 bo\'lishi kerak'}
+const rd5=anim('a5',(x,t)=>{const Q1=+$('q15').value,Q2=+$('q25').value,e=(Q1-Q2)/Q1,p=Math.min(1,t/2),H=200,Y=30;
+const seg=[['Foydali ish',e,'#3bb273'],['Issiqlik',(1-e)*.5,'#ef6f6c'],['Chiqindi gaz',(1-e)*.35,'#8e939c'],['Ishqalanish',(1-e)*.15,'#c9a227']];
+x.save();x.beginPath();x.rect(0,0,30+340*p,280);x.clip();let ly=Y,ry=Y;
+seg.forEach((s,i)=>{const hh=s[1]*H;if(hh<1){ry+=10;return}x.fillStyle=s[2]+'99';x.beginPath();x.moveTo(50,ly);x.bezierCurveTo(170,ly,170,ry,290,ry);x.lineTo(290,ry+hh);x.bezierCurveTo(170,ry+hh,170,ly+hh,50,ly+hh);x.fill();x.fillStyle=s[2];x.fillRect(290,ry,16,hh);tx(x,s[0]+' '+f(s[1]*100,0)+'%',310,ry+hh/2+4,11);ly+=hh;ry+=hh+10});
+x.restore();x.fillStyle='#ffb259';x.fillRect(30,Y,20,H);tx(x,'Q₁ 100%',10,Y+H+20,13)});
+/* 6 */
+function up6(){const k=+$('k6').value,s=+$('s6').value,y=+$('y6').value,L=k*s/100;$('kv').textContent=k;$('sv6').textContent=s;$('o6').innerHTML=`Sarf: <b>${f(L)} l</b><br>CO₂: <b>${f(L*y)} kg</b> (oddiy dvigatel)`}
+let F6=1;function md6(v,b){F6=v;[...b.parentNode.children].forEach(e=>e.className='');b.className='on'}
+anim('a6',(x,t)=>{x.fillStyle='#cfe8ff';x.fillRect(0,0,400,280);for(let i=0;i<6;i++){x.fillStyle=i%2?'#9fb2cc':'#b7c6dc';x.fillRect(i*70,60+(i*37%50),50,110-(i*37%50))}
+x.fillStyle='#555';x.fillRect(0,170,400,70);for(let i=0;i<10;i++)ln(x,i*44-(t*40%44),205,i*44+22-(t*40%44),205,'#fff',3);
+for(let c=0;c<3;c++){const cx=((t*45+c*140)%460)-50;x.fillStyle=['#4f8cff','#ef6f6c','#3bb273'][c];x.fillRect(cx,180,46,18);x.fillRect(cx+10,168,26,14);circ(x,cx+10,200,6,'#222');circ(x,cx+36,200,6,'#222');
+const n=Math.round(9*F6);for(let j=0;j<n;j++){const a=(t*.8+j/n)%1;x.fillStyle=`rgba(90,90,90,${.7*(1-a)})`;x.beginPath();x.arc(cx-6-a*45,196-a*50,3+a*9,0,7);x.fill()}}
+tx(x,F6==1?'Oddiy: ko\'p CO₂':F6?'Gibrid: CO₂ ~2 marta kam':'Elektr: chiqindi yo\'q',14,265,16)});
+/* Testlar */
+const TS=[["Ichki yonuv dvigatelida yoqilg'i qayerda yonadi?",["Silindr ichida","Alohida qozonda","Radiatorda","Chiqish quvurida"],0],["To'rt taktli dvigatelda bitta siklda tirsakli val necha marta aylanadi?",["1 marta","2 marta","3 marta","4 marta"],1],["Dizel dvigatelda aralashma nima bilan alangalanadi?",["Svecha uchquni","Akkumulyator","Siqilgan havoning yuqori temperaturasi","Mahovik"],2],["Qaysi taktda foydali ish bajariladi?",["Kirish","Siqish","Ishchi yurish","Chiqarish"],2],["Issiqlik dvigatelining FIK formulasi qaysi?",["η = Q₁/(Q₁ − Q₂)","η = (Q₁ − Q₂)/Q₁ · 100%","η = Q₂/Q₁","η = A · t"],1]];
+let sc=0,an=0;$('tests').innerHTML='<div class=card><h3>📝 Test (5 ta savol)</h3>'+TS.map((q,i)=>`<div class=q id=q${i}><p><b>${i+1}.</b> ${q[0]}</p>${q[1].map((o,j)=>`<button onclick="ans(${i},${j})">${o}</button>`).join('')}</div>`).join('')+'<div class=out id=res>Natija: 0/5</div></div>';
+function ans(i,j){const d=$('q'+i);if(d.dataset.d)return;d.dataset.d=1;const b=d.querySelectorAll('button');b[TS[i][2]].classList.add('ok');if(j==TS[i][2])sc++;else b[j].classList.add('no');an++;$('res').textContent=`Natija: ${sc}/5`+(an==5?(sc==5?' 🏆 Ajoyib!':sc>=3?' 👍 Yaxshi!':' 📚 Mavzuni takrorlang'):'')}
+md3(0);up4();up5();kar();up6();tab(1);
+</script></body></html>

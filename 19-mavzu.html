@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>19-mavzu. Jismlarning issiqlik muvozanatini aniqlash</title>
+<style>
+:root{--hot:#ef4a2c;--warm:#f59e0b;--cold:#2b7de9;--bg:#f4f7fb;--tx:#1d2433}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);line-height:1.5}
+header{background:linear-gradient(90deg,var(--hot),var(--warm) 50%,var(--cold));color:#fff;padding:14px 16px}
+header h1{margin:0;font-size:1.15rem}header small{opacity:.9}
+nav{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;background:#fff;padding:8px;box-shadow:0 2px 6px #0002}
+nav button{flex:0 0 auto;min-height:44px;padding:0 14px;border:2px solid var(--cold);background:#fff;color:var(--cold);border-radius:22px;font-weight:700;font-size:.95rem}
+nav button.on{background:var(--cold);color:#fff}
+main{max-width:760px;margin:0 auto;padding:10px}
+section{display:none}section.on{display:block}
+.card{background:#fff;border-radius:14px;padding:14px;margin:12px 0;box-shadow:0 2px 8px #0001}
+h2{font-size:1.2rem;margin:8px 0}h3{margin:0 0 8px;font-size:1.02rem;color:var(--cold)}
+.formula{border:2px dashed var(--hot);background:#fff4ec;border-radius:12px;padding:12px;text-align:center;font-size:1.12rem;font-weight:700}
+ol,ul{padding-left:20px;margin:6px 0}li{margin:4px 0}
+label{display:block;margin:10px 0 2px;font-size:.92rem}
+input[type=range]{width:100%;height:34px;accent-color:var(--hot)}
+.res{background:#eef5ff;border-left:5px solid var(--cold);border-radius:8px;padding:10px;margin-top:10px}
+.btn{min-height:46px;padding:0 16px;border:0;border-radius:12px;color:#fff;font-weight:700;font-size:1rem;margin:4px 4px 4px 0}
+.go{background:#16a34a}.st{background:var(--warm)}.rs{background:#64748b}.ck{background:var(--cold)}
+canvas{width:100%;height:auto;background:#f8fbff;border-radius:10px;border:1px solid #d6e2f2;display:block}
+input[type=text]{min-height:46px;width:140px;font-size:1.05rem;padding:0 10px;border:2px solid #b8c6dc;border-radius:10px}
+.ok{color:#15803d;font-weight:700}.bad{color:#b91c1c;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid button{min-height:52px;border:2px solid var(--cold);background:#fff;border-radius:10px;font-weight:600;font-size:.95rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{border:1px solid #c9d6ea;padding:5px;text-align:center}th{background:#e8f0fc}
+.opt{display:block;width:100%;text-align:left;min-height:46px;margin:6px 0;border:2px solid #b8c6dc;background:#fff;border-radius:10px;font-size:1rem;padding:6px 12px}
+.opt.right{background:#dcfce7;border-color:#16a34a}.opt.wrong{background:#fee2e2;border-color:#dc2626}
+</style>
+</head>
+<body>
+<header><h1>19-mavzu. Amaliy mashg‘ulot</h1><small>Jismlarning issiqlik muvozanatini aniqlash · 9-sinf fizika</small></header>
+<nav id="nav"></nav>
+<main id="app"></main>
+<script>
+const $=id=>document.getElementById(id);
+const f=(x,d=1)=>(+x).toFixed(d).replace('.',',');
+const col=t=>{const k=Math.max(0,Math.min(1,t/100));return `rgb(${Math.round(43+196*k)},${Math.round(125-50*k)},${Math.round(233-190*k)})`};
+const LAB={m1:['Issiq jism massasi m₁','g',10,500,200,10],t1:['Issiq jism temperaturasi t₁','°C',40,100,80,1],c1:['Solishtirma sig‘im c₁','J/(kg·°C)',380,4200,4200,20],
+m2:['Sovuq jism massasi m₂','g',10,500,300,10],t2:['Sovuq jism temperaturasi t₂','°C',0,40,20,1],c2:['Solishtirma sig‘im c₂','J/(kg·°C)',380,4200,4200,20],
+R:['Termometr ko‘rsatishi','°C',0,100,60,0.5],L:['Issiqlik yo‘qotish','%',0,20,8,1]};
+const ALL=['m1','t1','c1','m2','t2','c2'];
+const T=[
+{n:'Muvozanat',h:'1-reja. Issiqlik muvozanati tushunchasi',
+th:'Temperaturalari har xil jismlar tekkanda, issiq jism sovuq jismga energiya beradi. Bu jarayon issiqlik almashinuvi deyiladi. Issiq jismning zarrachalari sekinlashadi, sovuqniki tezlashadi. Temperaturalar tenglashganda issiqlik almashinuvi to‘xtaydi — bu issiqlik muvozanati holati.',
+fm:'Q = c·m·Δt &nbsp;|&nbsp; t₁ &gt; θ &gt; t₂, muvozanatda t₁ = t₂ = θ',
+ex:['Issiq choyga (90 °C) sovuq qoshiq (20 °C) tushirildi.','Energiya choydan qoshiqqa o‘tadi: choy biroz soviydi, qoshiq qiziydi.','Birozdan so‘ng ikkalasi ham bir xil temperaturaga (masalan, 85 °C) ega bo‘ladi — muvozanat.'],
+keys:ALL,q:'Massasi bir xil suvdan 100 g 80 °C da, 100 g 20 °C da. Aralashtirilsa, muvozanat temperaturasi (°C) nechaga teng?',a:50,tol:.5},
+{n:'Jihozlar',h:'2-reja. Amaliy ish uchun asbob va jihozlar',
+th:'Ish uchun: kalorimetr (issiqlik yo‘qolishini kamaytiradi), termometr, o‘lchov stakani, tarozi, issiq va sovuq suv kerak. Xavfsizlik: issiq suvni ehtiyot bo‘lib quying, shisha asboblarni sindirmang. Termometrdan o‘qiganda ko‘zni simob ustuni sathida tuting va shkala bo‘linmasini aniqlab oling.',
+fm:'Bo‘linma bahosi = (katta qiymat − kichik qiymat) / oradagi bo‘linmalar soni',
+ex:['Shkalada 20 °C va 30 °C orasida 10 ta bo‘linma bor.','Bo‘linma bahosi = (30 − 20)/10 = 1 °C.','Simob 24-bo‘linmada: t = 20 + 4·1 = 24 °C.'],
+keys:['m1','R'],q:'Termometrning bo‘linma bahosi 0,5 °C. Simob 20 °C chizig‘idan 4 ta bo‘linma yuqorida. Temperatura (°C) nechaga teng?',a:22,tol:.01},
+{n:'Balans',h:'3-reja. Issiqlik balansi tenglamasi',
+th:'Atrofga issiqlik yo‘qolmasa, issiq jism bergan issiqlik miqdori sovuq jism olgan issiqlik miqdoriga teng. θ — umumiy (muvozanat) temperatura.',
+fm:'Q<sub>berilgan</sub> = Q<sub>olingan</sub><br>c₁m₁(t₁ − θ) = c₂m₂(θ − t₂)',
+ex:['Berilgan: m₁=0,2 kg (80 °C), m₂=0,3 kg (20 °C), c=4200 J/(kg·°C), θ=44 °C.','Q₁ = 4200·0,2·(80−44) = 30 240 J.','Q₂ = 4200·0,3·(44−20) = 30 240 J.','Q₁ = Q₂ — balans bajarildi.'],
+keys:ALL,q:'Sovuq suv 200 g, 20 °C dan 50 °C gacha qizdi (c=4200 J/(kg·°C)). Olingan issiqlik miqdori Q (J) nechaga teng?',a:25200,tol:50},
+{n:'θ hisobi',h:'4-reja. Muvozanat temperaturasini hisoblash',
+th:'Balans tenglamasidan θ topiladi. Ikkala jism bir xil moddadan (c₁=c₂) bo‘lsa, c qisqarib ketadi. Hisob natijasi tajriba bilan solishtiriladi; farq xatolik deyiladi.',
+fm:'θ = (c₁m₁t₁ + c₂m₂t₂) / (c₁m₁ + c₂m₂)<br>bir xil modda: θ = (m₁t₁ + m₂t₂)/(m₁ + m₂)',
+ex:['Berilgan: 200 g suv 80 °C, 300 g suv 20 °C.','Suratda: 200·80 + 300·20 = 16 000 + 6 000 = 22 000.','Maxrajda: 200 + 300 = 500.','θ = 22 000/500 = 44 °C.'],
+keys:ALL,q:'400 g suv 70 °C da, 100 g suv 20 °C da aralashtirildi. θ (°C) ni toping.',a:60,tol:.5},
+{n:'Tajriba',h:'5-reja. Amaliy ish: tajribani bosqichma-bosqich bajarish',
+th:'Tartib: 1) sovuq suv massasi m₂ va t₂ ni o‘lchang; 2) issiq suv massasi m₁ va t₁ ni o‘lchang; 3) suvlarni kalorimetrda aralashtiring; 4) θ ni o‘lchang; 5) θ ni hisoblab, tajriba bilan solishtiring.',
+fm:'Xatolik (%) = |θ<sub>hisob</sub> − θ<sub>tajriba</sub>| / θ<sub>hisob</sub> · 100%',
+ex:['Berilgan: m₁=100 g, t₁=70 °C; m₂=100 g, t₂=30 °C.','θ hisob = (100·70 + 100·30)/200 = 50 °C.','Tajribada θ = 48 °C.','Xatolik = |50−48|/50 · 100% = 4%.'],
+keys:['m1','t1','m2','t2'],q:'θ hisob = 50 °C, tajribada θ = 48 °C. Xatolik (%) nechaga teng?',a:4,tol:.1},
+{n:'Xatolik',h:'6-reja. Xatoliklar va xulosa; masalalar yechish',
+th:'Xatolik sabablari: kalorimetrning o‘zi isishi, atrofga issiqlik yo‘qolishi, termometr aniqligi va o‘qish xatosi. Kamaytirish: kalorimetrdan foydalanish, tez aralashtirish, qopqoq yopish, kalorimetrni oldindan isitish.',
+fm:'Real θ &lt; nazariy θ (issiqlik yo‘qolishi tufayli)',
+ex:['<b>1)</b> Suv+suv: 100 g 90 °C va 400 g 20 °C → θ=(9000+8000)/500 = 34 °C.','<b>2)</b> Suv+metall: 0,2 kg po‘lat (c=500) 100 °C va 0,5 kg suv 20 °C → θ=(10 000+42 000)/2200 ≈ 23,6 °C.','<b>3)</b> Uch jism (suv): 100 g 80 °C, 200 g 50 °C, 300 g 20 °C → θ=(8000+10 000+6000)/600 = 40 °C.','<b>4)</b> Noma‘lum massa: 300 g suv 20 °C ga x g 80 °C suv qo‘shildi, θ=40 °C. x(80−40)=300(40−20) → x=150 g.'],
+keys:[...ALL,'L'],q:'4-masala: 300 g suv 20 °C da. Unga x g 80 °C li suv qo‘shilganda θ = 40 °C bo‘ldi. x (g) ni toping.',a:150,tol:1}
+];
+const QZ=[
+{q:'Issiqlik muvozanatida jismlarning nimasi tenglashadi?',o:['Massasi','Temperaturasi','Hajmi','Zichligi'],a:1},
+{q:'Issiqlik balansi tenglamasi qaysi?',o:['Q berilgan > Q olingan','Q berilgan + Q olingan = 0 J','Q berilgan = Q olingan','Q = m/c'],a:2},
+{q:'100 g 60 °C va 100 g 20 °C suv aralashtirilsa, θ qancha?',o:['30 °C','50 °C','60 °C','40 °C'],a:3},
+{q:'Tajribada xatolikning asosiy sababi nima?',o:['Atrofga issiqlik yo‘qolishi','Suvning rangi','Stakan shakli','Xona yorug‘ligi'],a:0},
+{q:'Issiqlik qaysi yo‘nalishda o‘tadi?',o:['Sovuqdan issiqqa','Katta massalidan kichigiga','Issiq jismdan sovuq jismga','Yo‘nalishi yo‘q'],a:2}];
+const TOOLS=[['Kalorimetr','Issiqlik almashinuvi sodir bo‘ladigan idish; atrofga issiqlik yo‘qolishini kamaytiradi.'],['Termometr','Suv temperaturasini o‘lchaydi. Ko‘z simob sathida bo‘lsin.'],['O‘lchov stakani','Suv hajmi/massasini o‘lchash uchun.'],['Tarozi','Suv massasini aniq o‘lchaydi (m₁, m₂).'],['Issiq suv','Issiq jism (t₁). Ehtiyot bo‘ling, kuyish xavfi!'],['Sovuq suv','Sovuq jism (t₂).']];
+const app=$('app'),nav=$('nav');
+function sl(i,k){const L=LAB[k];return `<label>${L[0]}: <b id="v${i}${k}">${L[4]}</b> ${L[1]}</label><input type="range" id="s${i}${k}" min="${L[2]}" max="${L[3]}" step="${L[5]}" value="${L[4]}" oninput="upd(${i})">`}
+T.forEach((s,k)=>{const i=k+1;
+ nav.innerHTML+=`<button id="nb${i}" onclick="show(${i})">${i}. ${s.n}</button>`;
+ let extra='';
+ if(i==2)extra=`<div class="grid" style="margin-top:10px">${TOOLS.map((t,j)=>`<button onclick="tool(${j})">${t[0]}</button>`).join('')}</div><div class="res" id="td">Jihozni bosing — vazifasi chiqadi.</div>`;
+ if(i==4)extra=`<button class="btn ck" onclick="exp4()">Tajriba o‘tkazish</button>`;
+ if(i==5)extra=`<button class="btn go" onclick="step5(1)">Keyingi qadam ▶</button><button class="btn rs" onclick="step5(0)">Qaytadan</button><table><tr><th>m₁</th><th>m₂</th><th>t₁</th><th>t₂</th><th>θ tajriba</th><th>θ hisob</th><th>Xatolik</th></tr><tr id="tb5"></tr></table>`;
+ app.innerHTML+=`<section id="sec${i}"><h2>${s.h}</h2>
+ <div class="card"><h3>1) Qisqa nazariya</h3>${s.th}</div>
+ <div class="card"><h3>2) Asosiy formula</h3><div class="formula">${s.fm}</div></div>
+ <div class="card"><h3>3) Yechilgan misol</h3><ol>${s.ex.map(e=>`<li>${e}</li>`).join('')}</ol></div>
+ <div class="card"><h3>4) Interaktiv simulyatsiya</h3>${s.keys.map(x=>sl(i,x)).join('')}<div class="res" id="r${i}"></div>${extra}</div>
+ <div class="card"><h3>5) Animatsiya</h3><canvas id="cv${i}" width="600" height="300"></canvas>
+ <button class="btn go" onclick="run(${i},1)">Boshlash</button><button class="btn st" onclick="run(${i},0)">To‘xtatish</button><button class="btn rs" onclick="rst(${i})">Qayta boshlash</button></div>
+ <div class="card"><h3>6) Mustaqil masala</h3><p>${s.q}</p><input type="text" inputmode="decimal" id="a${i}" placeholder="Javob"> <button class="btn ck" onclick="chk(${i})">Tekshirish</button><div id="k${i}"></div></div></section>`;});
+app.innerHTML+=`<section id="sec7"><h2>Yakuniy test</h2><div id="qz"></div><div class="card" id="sc"></div></section>`;
+nav.innerHTML+=`<button id="nb7" onclick="show(7)">Test</button>`;
+function V(i){const o={};['m1','t1','c1','m2','t2','c2','R','L'].forEach(k=>{const e=$('s'+i+k);o[k]=e?+e.value:(k[0]=='c'?4200:0)});return o}
+const th=v=>(v.c1*v.m1*v.t1+v.c2*v.m2*v.t2)/(v.c1*v.m1+v.c2*v.m2);
+const Q1=(v,t)=>v.c1*v.m1/1000*(v.t1-t);
+let X4=null,S5=0;
+const RS={
+1:v=>{const t=th(v);return `Muvozanat: <b>θ = ${f(t)} °C</b>. Issiq jism bergan energiya: ${f(Q1(v,t),0)} J.`},
+2:v=>`Tarozi: <b>${v.m1} g</b>. Termometr: <b>${f(v.R)} °C</b>. Bo‘linma bahosi 0,5 °C bo‘lsa, ${f((v.R-20)/0.5,0)} bo‘linma (20 °C dan).`,
+3:v=>{const t=th(v),q=Q1(v,t);return `θ = <b>${f(t)} °C</b><br>Q berilgan = ${f(q,0)} J<br>Q olingan = ${f(q,0)} J (tenglik bajarildi)`},
+4:v=>{const t=th(v);let s=`θ hisob = <b>${f(t,2)} °C</b>`;if(X4!==null){const e=t*(1+X4);s+=`<br>θ tajriba = <b>${f(e,2)} °C</b><br>Xatolik = <b>${f(Math.abs(t-e)/t*100,1)} %</b>`}return s},
+5:v=>`Qadam: ${S5}/5`,
+6:v=>{const t=th(v),r=t-v.L/100*(t-20);return `θ nazariy = <b>${f(t)} °C</b><br>θ real = <b>${f(r)} °C</b><br>Chetlanish = ${f(t-r,2)} °C`}};
+function upd(i){const v=V(i);Object.keys(LAB).forEach(k=>{const e=$('v'+i+k);if(e)e.textContent=f($('s'+i+k).value,k=='R'?1:0)});
+ if(i==5)tb5();$('r'+i).innerHTML=RS[i](v);draw(i)}
+function tool(j){$('td').innerHTML=`<b>${TOOLS[j][0]}:</b> ${TOOLS[j][1]}`}
+function exp4(){X4=(Math.random()-.5)*.08-.02;upd(4)}
+function step5(a){S5=a?Math.min(5,S5+1):0;upd(5)}
+function tb5(){const v=V(5),t=th(v),e=t-.04*(t-20),c=[S5>=2?v.m1:'—',S5>=1?v.m2:'—',S5>=2?v.t1:'—',S5>=1?v.t2:'—',S5>=4?f(e,1):'—',S5>=5?f(t,1):'—',S5>=5?f(Math.abs(t-e)/t*100,1)+'%':'—'];
+ $('tb5').innerHTML=c.map(x=>`<td>${x}</td>`).join('');$('r5').innerHTML='Qadam: '+S5+'/5 — '+['Boshlang‘ich holat','Sovuq suv o‘lchandi','Issiq suv o‘lchandi','Suvlar aralashtirildi','θ tajriba o‘lchandi','Hisoblandi va solishtirildi'][S5]}
+function chk(i){const x=parseFloat($('a'+i).value.replace(',','.'));const T0=T[i-1];$('k'+i).innerHTML=isNaN(x)?'<span class="bad">Javobni kiriting</span>':Math.abs(x-T0.a)<=T0.tol?'<span class="ok">✔ To‘g‘ri!</span>':'<span class="bad">✘ Noto‘g‘ri. Qayta urinib ko‘ring.</span>'}
+// ---- Animatsiya ----
+const bk=(c,x,y,w,h,lv,cl)=>{c.fillStyle=cl;c.fillRect(x+2,y+h*(1-lv),w-4,h*lv-2);c.strokeStyle='#334';c.lineWidth=3;c.beginPath();c.moveTo(x,y);c.lineTo(x,y+h);c.lineTo(x+w,y+h);c.lineTo(x+w,y);c.stroke()};
+const txt=(c,s,x,y,z=14,cl='#223',al='center')=>{c.fillStyle=cl;c.font='bold '+z+'px system-ui';c.textAlign=al;c.fillText(s,x,y)};
+const arw=(c,x1,y,x2,cl)=>{const d=Math.sign(x2-x1);c.strokeStyle=c.fillStyle=cl;c.lineWidth=4;c.beginPath();c.moveTo(x1,y);c.lineTo(x2,y);c.stroke();c.beginPath();c.moveTo(x2,y);c.lineTo(x2-10*d,y-7);c.lineTo(x2-10*d,y+7);c.fill()};
+const thm=(c,x,y,h,val)=>{const k=Math.max(0,Math.min(1,val/100));c.strokeStyle='#334';c.lineWidth=2;c.strokeRect(x-6,y,12,h);c.fillStyle='#ef4a2c';c.fillRect(x-3,y+h*(1-k),6,h*k);c.beginPath();c.arc(x,y+h+8,10,0,7);c.fill();txt(c,f(val)+' °C',x+16,y+h*(1-k)+5,13,'#334','left')};
+const D={};
+D[1]=(c,p,fr,v)=>{const O=th(v),e=Math.exp(-4*p),A=O+(v.t1-O)*e,B=O+(v.t2-O)*e;
+ c.fillStyle=col(A);c.fillRect(60,15,230,140);c.fillStyle=col(B);c.fillRect(290,15,230,140);
+ [[A,60],[B,290]].forEach(([T0,x0])=>{const s=.05+T0/100*.25;for(let j=0;j<24;j++){c.fillStyle='#fff';c.beginPath();c.arc(x0+25+(j%6)*38+9*Math.sin(fr*s*(1+j%3*.3)+j),30+Math.floor(j/6)*32+9*Math.cos(fr*s*(1+j%4*.25)+j*2),6,0,7);c.fill()}});
+ txt(c,'Issiq: '+f(A)+' °C',175,175,15);txt(c,'Sovuq: '+f(B)+' °C',405,175,15);
+ const gx=60,gy=190,gw=460,gh=100,lo=Math.min(v.t1,v.t2)-5,hi=Math.max(v.t1,v.t2)+5,Y=t=>gy+gh-(t-lo)/(hi-lo)*gh;
+ c.strokeStyle='#99a';c.lineWidth=1;c.strokeRect(gx,gy,gw,gh);c.setLineDash([5,4]);c.beginPath();c.moveTo(gx,Y(O));c.lineTo(gx+gw,Y(O));c.stroke();c.setLineDash([]);
+ [[v.t1,'#ef4a2c'],[v.t2,'#2b7de9']].forEach(([t0,cl])=>{c.strokeStyle=cl;c.lineWidth=3;c.beginPath();for(let q=0;q<=p+.001;q+=.01){const y=Y(O+(t0-O)*Math.exp(-4*q));q?c.lineTo(gx+q*gw,y):c.moveTo(gx,y)}c.stroke()});
+ txt(c,'θ',gx-12,Y(O)+4,13)};
+D[2]=(c,p,fr,v)=>{const lv=Math.min(1,p*1.2)*v.m1/500;bk(c,90,70,150,170,lv,col(60));
+ if(p<.8){c.strokeStyle=col(60);c.lineWidth=6;c.beginPath();c.moveTo(130,20);c.lineTo(130,70+170*(1-lv));c.stroke();c.fillStyle='#cbd5e1';c.fillRect(100,10,60,16)}
+ txt(c,'Tarozi: '+v.m1+' g',165,265,15);thm(c,370,40,180,20+(v.R-20)*p);txt(c,'Termometr',370,290,14);
+ for(let k=0;k<=10;k++){c.fillStyle='#334';c.fillRect(380,40+k*18,6,2)}};
+D[3]=(c,p,fr,v)=>{const O=th(v),e=Math.exp(-4*p),A=O+(v.t1-O)*e,B=O+(v.t2-O)*e;
+ bk(c,50,80,150,160,.8,col(A));bk(c,400,80,150,160,.8,col(B));txt(c,f(A)+' °C',125,265,15);txt(c,f(B)+' °C',475,265,15);
+ for(let k=0;k<3;k++){c.globalAlpha=.9;const x=215+((fr*2+k*55)%140);arw(c,x,120+k*40,x+30,'#f59e0b')}c.globalAlpha=1;
+ txt(c,'Q = '+f(Q1(v,O),0)+' J',300,50,16,'#b45309')};
+D[4]=(c,p,fr,v)=>{const O=th(v),e=Math.exp(-4*p),A=O+(v.t1-O)*e,B=O+(v.t2-O)*e;
+ bk(c,160,50,200,200,1,'#fff');c.fillStyle=col(A);c.fillRect(162,52,196,98);c.fillStyle=col(B);c.fillRect(162,150,196,98);
+ for(let k=0;k<12;k++){c.fillStyle='#fff8';c.beginPath();c.arc(180+(k*37+fr*(k%3+1)*.4)%160,60+(k*53)%180,5,0,7);c.fill()}
+ thm(c,450,40,180,v.t2+(O-v.t2)*(1-Math.exp(-5*p)));txt(c,'θ = '+f(O)+' °C',260,280,15)};
+D[5]=(c,p,fr,v)=>{const ph=Math.min(4,Math.floor(p*5)),lp=p*5-ph,O=th(v);
+ txt(c,['1-qadam: sovuq suvni o‘lchash','2-qadam: issiq suvni o‘lchash','3-qadam: aralashtirish','4-qadam: θ ni o‘lchash','5-qadam: hisoblash'][ph],300,25,16,'#2b7de9');
+ if(ph==0){bk(c,230,70,120,150,.7,col(v.t2));txt(c,v.m2+' g, '+v.t2+' °C',290,250,15)}
+ if(ph==1){bk(c,230,70,120,150,.7,col(v.t1));txt(c,v.m1+' g, '+v.t1+' °C',290,250,15)}
+ if(ph==2){bk(c,60,70,120,150,.7*(1-lp),col(v.t1));bk(c,360,70,160,150,.4+.3*lp,col(v.t2+(O-v.t2)*lp));c.strokeStyle=col(v.t1);c.lineWidth=5;c.beginPath();c.moveTo(180,80);c.quadraticCurveTo(300,40,430,150);c.stroke()}
+ if(ph==3){bk(c,200,70,160,150,.7,col(O));thm(c,430,60,150,v.t2+(O-v.t2)*lp)}
+ if(ph==4){txt(c,'θ = (m₁t₁ + m₂t₂)/(m₁ + m₂)',300,120,18);txt(c,'θ = '+f(O)+' °C',300,170,24,'#ef4a2c')}};
+D[6]=(c,p,fr,v)=>{const O=th(v),T0=O-v.L/100*(O-20)*p;bk(c,200,70,200,170,.85,col(T0));c.strokeStyle='#64748b';c.lineWidth=8;c.strokeRect(190,60,220,190);
+ if(v.L>0){c.globalAlpha=Math.min(1,.3+v.L/20);const len=14+v.L*2;[[190,-1],[410,1]].forEach(([x,d])=>{for(let k=0;k<4;k++){const o=(fr*1.5+k*30)%60;arw(c,x+d*(5+o),90+k*40,x+d*(5+o+len),'#ef4a2c')}});c.globalAlpha=1}
+ txt(c,'Kalorimetr ichi: '+f(T0)+' °C (nazariy '+f(O)+')',300,285,14)};
+const P={},F={},RN={};for(let i=1;i<=6;i++)P[i]=F[i]=RN[i]=0;
+function draw(i){const cv=$('cv'+i),c=cv.getContext('2d');c.clearRect(0,0,600,300);D[i](c,P[i],F[i],V(i))}
+function run(i,on){if(on){if(P[i]>=1&&i!=3&&i!=6)P[i]=0;RN[i]=1}else RN[i]=0}
+function rst(i){RN[i]=0;P[i]=0;F[i]=0;draw(i)}
+function loop(){for(let i=1;i<=6;i++)if(RN[i]){F[i]++;if(P[i]<1)P[i]=Math.min(1,P[i]+.004);else if(i!=3&&i!=6)RN[i]=0;draw(i)}requestAnimationFrame(loop)}
+function show(n){for(let i=1;i<=7;i++){$('sec'+i).classList.toggle('on',i==n);$('nb'+i).classList.toggle('on',i==n)}window.scrollTo(0,0)}
+// ---- Test ----
+let score=0,ans=0;
+$('qz').innerHTML=QZ.map((x,i)=>`<div class="card"><b>${i+1}. ${x.q}</b>${x.o.map((o,j)=>`<button class="opt" onclick="pick(${i},${j},this)">${'ABCD'[j]}) ${o}</button>`).join('')}<div id="fb${i}"></div></div>`).join('');
+function pick(i,j,b){const p=b.parentNode;if(p.dataset.d)return;p.dataset.d=1;const ok=j==QZ[i].a,bs=p.querySelectorAll('.opt');bs[QZ[i].a].classList.add('right');if(!ok)b.classList.add('wrong');
+ $('fb'+i).innerHTML=ok?'<span class="ok">✔ To‘g‘ri!</span>':'<span class="bad">✘ Noto‘g‘ri. To‘g‘ri javob: '+'ABCD'[QZ[i].a]+'</span>';
+ if(ok)score++;ans++;$('sc').innerHTML=`Javob berildi: ${ans}/5 · Ball: <b>${score}</b>`;
+ if(ans==5)$('sc').innerHTML=`<h3>Natija: ${score} / 5</h3>${score==5?'A’lo! 🎉':score>=3?'Yaxshi! Xatolarni takrorlang.':'Mavzuni qayta o‘qib chiqing.'}`}
+$('sc').innerHTML='Javob berildi: 0/5 · Ball: <b>0</b>';
+for(let i=1;i<=6;i++)upd(i);
+show(1);requestAnimationFrame(loop);
+</script>
+</body>
+</html>

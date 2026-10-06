@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laboratoriya ishi: solishtirma issiqlik sig'imi</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial,sans-serif;background:#f1f5f9;color:#1e293b;line-height:1.5}
+h1{margin:0;padding:14px;background:#0f766e;color:#fff;font-size:1.1rem;text-align:center}
+nav{display:flex;gap:6px;overflow-x:auto;padding:8px;background:#fff;position:sticky;top:0;z-index:5;box-shadow:0 1px 4px #0002}
+nav button{flex:0 0 auto;border:0;border-radius:8px;padding:8px 12px;background:#e2e8f0;cursor:pointer;font-size:.9rem}
+nav button.on{background:#0f766e;color:#fff}
+main{max-width:820px;margin:auto;padding:10px}
+.sec{display:none}.sec.on{display:block}
+.card{background:#fff;border-radius:12px;padding:12px;margin:10px 0;box-shadow:0 1px 3px #0001}
+.card h3{margin:0 0 6px;font-size:1rem;color:#0f766e}
+.formula{border:2px solid #0f766e;background:#ecfeff;border-radius:10px;padding:10px;text-align:center;font-size:1.1rem;font-family:Georgia,serif}
+label{display:block;margin:6px 0;font-size:.9rem}input[type=range]{width:100%}
+select,input[type=number]{padding:6px;border:1px solid #94a3b8;border-radius:6px;font-size:1rem}
+button.b{border:0;border-radius:8px;padding:8px 14px;margin:3px 3px 3px 0;background:#0f766e;color:#fff;cursor:pointer;font-size:.9rem}
+button.b.g{background:#64748b}
+canvas{width:100%;height:auto;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;display:block}
+.out{background:#fef9c3;border-radius:8px;padding:8px;margin-top:6px;font-size:.95rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.grid button{padding:10px;border:1px solid #94a3b8;border-radius:8px;background:#fff;cursor:pointer;font-size:.9rem}
+.ok{color:#15803d;font-weight:bold}.no{color:#b91c1c;font-weight:bold}
+details{margin:4px 0}
+</style></head><body>
+<h1>20-mavzu. Laboratoriya ishi: qattiq jismlarning solishtirma issiqlik sig'imini aniqlash</h1>
+<nav id="nav"></nav><main id="main"></main>
+<script>
+const $=i=>document.getElementById(i);
+const C={"Mis":380,"Alyuminiy":920,"Po'lat":460,"Qo'rg'oshin":130};
+const CS=4200;
+const sl=(id,l,mn,mx,st,v,u)=>`<label>${l}: <b id="${id}v">${v}</b> ${u}<input type="range" id="${id}" min="${mn}" max="${mx}" step="${st}" value="${v}"></label>`;
+const sel=id=>`<label>Modda: <select id="${id}">${Object.keys(C).map(k=>`<option>${k}</option>`).join("")}</select></label>`;
+const f2=x=>(Math.round(x*100)/100).toString().replace(".",",");
+function bind(ids,fn){ids.forEach(i=>$(i).addEventListener("input",()=>{if($(i+"v"))$(i+"v").textContent=$(i).value;fn()}));fn()}
+const V=i=>parseFloat($(i).value);
+
+function anim(n,draw,dur){
+ const x=$("cv"+n).getContext("2d");let t=0,run=false,last=0;
+ const paint=()=>{x.clearRect(0,0,600,220);draw(x,t)};
+ function fr(ts){if(run){t+=Math.min((ts-last)/1000,.1);if(dur&&t>=dur){t=dur;run=false}}last=ts;paint();if(run)requestAnimationFrame(fr)}
+ $("st"+n).onclick=()=>{if(run)return;if(dur&&t>=dur)t=0;run=true;last=performance.now();requestAnimationFrame(fr)};
+ $("sp"+n).onclick=()=>{run=false};
+ $("rs"+n).onclick=()=>{run=false;t=0;paint()};
+ paint();
+ $("main").addEventListener("input",()=>{if(!run)paint()});
+}
+function chk(n,ans,tol){
+ const v=parseFloat(String($("a"+n).value).replace(",","."));
+ $("r"+n).innerHTML=isNaN(v)?"Javobni kiriting.":Math.abs(v-ans)<=tol?'<span class="ok">✔ To\'g\'ri!</span>':'<span class="no">✘ Noto\'g\'ri.</span> Formulani qayta tekshirib ko\'ring.';
+}
+
+const S=[
+{t:"1. Maqsad va nazariy asos",
+th:"<b>Ishning maqsadi:</b> qattiq jismning solishtirma issiqlik sig'imini tajribada aniqlash.<br><b>Solishtirma issiqlik sig'imi (c)</b> — massasi 1 kg bo'lgan moddani 1 °C ga isitish uchun kerak bo'ladigan issiqlik miqdori. Birligi: J/(kg·°C). Har bir modda uchun u har xil: suv — 4200, alyuminiy — 920, po'lat — 460, mis — 380, qo'rg'oshin — 130.",
+f:"c = Q / (m·Δt)<br>Q = c·m·(t₂ − t₁)",
+ex:"Quyoshda qolgan metall qoshiq tez qizib ketadi, suv to'la idish esa sekin isiydi. Sababi suvning solishtirma issiqlik sig'imi metallnikidan ancha katta.",
+sim:()=>{$("sim0").innerHTML=sl("m1","Massa m",0.05,1,0.05,0.2,"kg")+sl("d1","Temperatura o'zgarishi Δt",5,100,5,30,"°C")+'<canvas id="bar1" width="600" height="200"></canvas><div class="out" id="o1"></div>';
+  bind(["m1","d1"],()=>{const x=$("bar1").getContext("2d");x.clearRect(0,0,600,200);const m=V("m1"),d=V("d1"),ks=Object.keys(C),Q=ks.map(k=>C[k]*m*d),mx=Math.max(...Q);
+   ks.forEach((k,i)=>{const h=Q[i]/mx*130,X=40+i*140;x.fillStyle=["#b45309","#64748b","#475569","#334155"][i];x.fillRect(X,160-h,90,h);x.fillStyle="#000";x.font="14px sans-serif";x.fillText(k,X,180);x.fillText(Math.round(Q[i])+" J",X,152-h)});
+   $("o1").innerHTML="Bir xil m = "+m+" kg va Δt = "+d+" °C uchun eng ko'p issiqlik alyuminiyga kerak: "+Math.round(C["Alyuminiy"]*m*d)+" J."})},
+an:(x,t)=>{const T=20+t*8,a=1+(T-20)/80*7;x.fillStyle="#cbd5e1";x.fillRect(40,40,300,140);
+  for(let i=0;i<6;i++)for(let j=0;j<4;j++){const px=70+i*50+Math.sin(t*(6+T/10)+i*2+j)*a,py=65+j*35+Math.cos(t*(7+T/10)+j*3+i)*a;x.fillStyle="hsl("+(220-(T-20)*2)+",80%,50%)";x.beginPath();x.arc(px,py,8,0,7);x.fill()}
+  x.strokeStyle="#000";x.strokeRect(440,20,30,170);x.fillStyle="#dc2626";const h=(T-20)/80*160;x.fillRect(444,186-h,22,h);x.fillStyle="#000";x.font="16px sans-serif";x.fillText(Math.round(T)+" °C",480,110);x.fillText("Molekulalar tebranishi tezlashadi",40,205)},dur:10,
+q:["m = 0,2 kg alyuminiy (c = 920 J/(kg·°C)) 30 °C ga isitildi. Qancha issiqlik kerak (J)?",5520,1]},
+
+{t:"2. Asbob-jihozlar va xavfsizlik",
+th:"<b>Kerakli asboblar:</b> kalorimetr, termometr, tarozi, o'lchov stakani, issiq suv, sovuq suv, metall silindr, ip.<br><b>Termometr bilan ishlash:</b> uni urmang, idish devori va tubiga tegizmang, ko'zingiz shkala bilan bir tekis turib o'qing, o'lchashdan oldin 1–2 daqiqa kuting.<br><b>Xavfsizlik:</b> issiq suvni ehtiyotkorlik bilan quying, qo'lni kuydirmang, silindrni faqat ip yoki qisqich bilan ushlang, shisha asboblarni sindirmang.",
+f:"Asbob xatoligi ≈ bo'linma qiymatining yarmi<br>Δ = (bo'linma qiymati) / 2",
+ex:"Oshxonada issiq kastryulkani qo'l bilan emas, tutqich yoki latta bilan ushlaymiz — laboratoriyada ham xuddi shunday ehtiyot bo'lamiz.",
+sim:()=>{const I=[["Kalorimetr","Issiqlik almashinuvi bo'ladigan va atrofga issiqlik yo'qotilishini kamaytiradigan idish","—"],["Termometr","Suv va jism temperaturasini o'lchaydi","±0,5 °C"],["Tarozi","Jism va suv massasini o'lchaydi","±1 g"],["O'lchov stakani","Suv hajmini (massasini) o'lchaydi","±5 ml"],["Issiq suv","Silindrni 100 °C gacha qizdiradi","—"],["Sovuq suv","Issiq jismdan issiqlik oladi","—"],["Metall silindr","Sinaladigan qattiq jism","—"],["Ip","Silindrni suvga tushirish va olish uchun","—"]];
+  const ord=[6,2,3,5,1,4,7,0];let g=false,k=0;
+  $("sim1").innerHTML='<div class="grid" id="g2">'+I.map((e,i)=>`<button data-i="${i}">${e[0]}</button>`).join("")+'</div><div class="out" id="o2">Asbobni bosing — vazifasi va aniqligi chiqadi.</div><button class="b g" id="gm">O\'yin: asboblarni ish tartibida bosing</button>';
+  $("g2").onclick=e=>{const i=e.target.dataset.i;if(i===undefined)return;
+   if(!g){$("o2").innerHTML="<b>"+I[i][0]+"</b><br>Vazifasi: "+I[i][1]+"<br>Aniqligi (xatoligi): "+I[i][2];return}
+   if(+i===ord[k]){k++;$("o2").innerHTML='<span class="ok">To\'g\'ri!</span> Bajarildi: '+k+" / 8"+(k==8?" — barakalla, tartib to'g'ri!":"");if(k==8)g=false}
+   else $("o2").innerHTML='<span class="no">Bu bosqichda boshqa asbob kerak.</span> Hozir: '+(k+1)+"-qadam. Maslahat: avval jism massasi o'lchanadi.";};
+  $("gm").onclick=()=>{g=true;k=0;$("o2").textContent="Boshladik! 1-qadam: tajribani qaysi asbobdan boshlaysiz?"}},
+an:(x,t)=>{const L=[["🧱","Stol"],["⚖️","Tarozi"],["🧪","Stakan"],["🥤","Kalorimetr"],["🌡️","Termometr"],["♨️","Issiq suv"],["🔩","Silindr"]];x.fillStyle="#d6b98c";x.fillRect(0,150,600,70);x.font="38px sans-serif";x.textAlign="center";
+  for(let i=1;i<L.length;i++){const s=Math.min(1,Math.max(0,t-(i-1)));x.globalAlpha=s;x.fillText(L[i][0],40+i*85,150-(1-s)*40);x.font="13px sans-serif";x.fillStyle="#000";x.fillText(L[i][1],40+i*85,175);x.font="38px sans-serif"}x.globalAlpha=1;x.textAlign="left"},dur:7,
+q:["Termometr bo'linmasining qiymati 1 °C. Asbob xatoligi bo'linma qiymatining yarmiga teng. Xatolik necha °C?",0.5,0.01]},
+
+{t:"3. Issiqlik balansi tenglamasi va ishchi formula",
+th:"Issiq jism sovuq suvga tushganda u issiqlik beradi, suv (va kalorimetr) esa issiqlik oladi. Energiya saqlanadi, shuning uchun: <b>Q_berilgan = Q_olingan</b>. Oxirida ikkalasining temperaturasi bir xil bo'ladi — θ. Tenglamadan jismning c_j sini topamiz (suvniki c_s = 4200 J/(kg·°C)).",
+f:"c_j·m_j·(t₂ − θ) = c_s·m_s·(θ − t₁)<br>c_j = c_s·m_s·(θ − t₁) / [m_j·(t₂ − θ)]<br>Kalorimetr bilan: (c_s·m_s + c_k·m_k)·(θ − t₁)",
+ex:"Issiq choyga sovuq sut qo'shsangiz, aralashma iliq bo'lib qoladi — bu issiqlik balansining oddiy ko'rinishi.",
+sim:()=>{$("sim2").innerHTML=sel("mt3")+sl("mj3","m_j",0.05,0.5,0.01,0.1,"kg")+sl("ms3","m_s",0.05,0.5,0.01,0.2,"kg")+sl("t13","t₁",5,30,1,20,"°C")+sl("t23","t₂",60,100,1,100,"°C")+'<label><input type="checkbox" id="kal3"> Kalorimetrni hisobga olish (alyuminiy, m_k = 0,05 kg)</label><div class="out" id="o3"></div>';
+  bind(["mt3","mj3","ms3","t13","t23","kal3"],()=>{const r=th3();$("o3").innerHTML="θ = <b>"+f2(r.th)+" °C</b><br>c_j (ishchi formula) = <b>"+Math.round(r.c)+" J/(kg·°C)</b>"})},
+an:(x,t)=>{const r=th3(),tau=1.6,Tj=u=>r.th+(V("t23")-r.th)*Math.exp(-u/tau),Ts=u=>r.th+(V("t13")-r.th)*Math.exp(-u/tau);
+  x.strokeStyle="#64748b";x.strokeRect(10,40,150,150);x.fillStyle="#7dd3fc";const wl=100;x.fillRect(11,wl,148,89);
+  const y=t<1?20+t*(wl+20):wl+20;const tj=Math.min(Tj(Math.max(t-1,0)),100);x.fillStyle="hsl("+Math.round(200-(tj-20)/80*200)+",70%,45%)";x.fillRect(70,y,30,30);
+  x.fillStyle="#000";x.font="13px sans-serif";x.fillText("Jism "+Math.round(Tj(Math.max(t-1,0)))+" °C",15,32);x.fillText("Suv "+Math.round(Ts(Math.max(t-1,0)))+" °C",15,210);
+  const gx=200,gw=380,lo=Math.min(V("t13"),r.th)-3,hi=V("t23")+3,Y=v=>190-(v-lo)/(hi-lo)*150;x.strokeStyle="#000";x.beginPath();x.moveTo(gx,40);x.lineTo(gx,190);x.lineTo(gx+gw,190);x.stroke();x.fillText("t (°C)",gx,34);x.fillText("vaqt",gx+gw-30,205);
+  [[Tj,"#dc2626"],[Ts,"#2563eb"]].forEach(([F,c])=>{x.strokeStyle=c;x.beginPath();for(let u=0;u<=Math.max(t-1,0);u+=.05){const X=gx+u/7*gw;u?x.lineTo(X,Y(F(u))):x.moveTo(X,Y(F(u)))}x.stroke()});
+  x.setLineDash([4,4]);x.strokeStyle="#16a34a";x.beginPath();x.moveTo(gx,Y(r.th));x.lineTo(gx+gw,Y(r.th));x.stroke();x.setLineDash([]);x.fillStyle="#16a34a";x.fillText("θ = "+f2(r.th),gx+gw-70,Y(r.th)-4)},dur:8,
+q:["m_s = 0,2 kg, t₁ = 20 °C, m_j = 0,1 kg, t₂ = 100 °C, θ = 25 °C. Jismning solishtirma issiqlik sig'imi c_j ni toping (J/(kg·°C)).",560,5]},
+
+{t:"4. Ishni bajarish tartibi",
+th:"Tajriba 6 bosqichda bajariladi. Har bir bosqichda o'lchangan qiymat jurnalga yoziladi. Jismni qaynoq suvdan kalorimetrga <b>tezda</b> ko'chiring, aks holda issiqlik atrofga yo'qoladi. Aralashmani aralashtirib, temperaturasi turg'unlashgach θ ni o'qing.",
+f:"1) m_j  2) m_s  3) t₁  4) t₂ ≈ 100 °C  5) jismni tushirish  6) θ<br>c_j = c_s·m_s·(θ − t₁) / [m_j·(t₂ − θ)]",
+ex:"Pishirishda go'shtni qaynoq suvdan olib, sovuq suvga tezda solamiz — jism bilan suv orasida issiqlik almashinuvi shunday kuzatiladi.",
+sim:()=>{const ST=[["Jism massasini tarozida o'lchang (m_j)","mj4","m_j","kg",0.05,0.3,0.01,0.15],["Kalorimetrga suv quyib, massasini aniqlang (m_s)","ms4","m_s","kg",0.05,0.3,0.01,0.1],["Suvning boshlang'ich temperaturasini o'lchang (t₁)","t14","t₁","°C",10,30,1,20],["Jismni qaynayotgan suvda qizdirib, temperaturasini aniqlang (t₂ ≈ 100 °C)","t24","t₂","°C",95,100,1,100],["Jismni tezda kalorimetrga tushiring","","","",0,0,0,0],["Aralashmaning ustuvor temperaturasini o'lchang (θ)","th4","θ","°C",21,60,1,30]];
+  let s=0;$("sim3").innerHTML=ST.map(e=>e[1]?sl(e[1],e[2],e[4],e[5],e[6],e[7],e[3]):"").join("")+'<div class="out" id="o4"></div><button class="b g" id="pv">◀ Oldingi</button><button class="b" id="nx">Keyingi bosqich ▶</button>';
+  const rd=()=>{let h="<b>"+(s+1)+"-bosqich:</b> "+ST[s][0]+"<br>";for(let i=0;i<=s;i++)if(ST[i][1])h+=ST[i][2]+" = "+$(ST[i][1]).value+" "+ST[i][3]+"; ";if(s==5){const c=CS*V("ms4")*(V("th4")-V("t14"))/(V("mj4")*(V("t24")-V("th4")));h+="<br>c_j = <b>"+Math.round(c)+" J/(kg·°C)</b>"}$("o4").innerHTML=h};
+  bind(["mj4","ms4","t14","t24","th4"],rd);$("pv").onclick=()=>{s=Math.max(0,s-1);rd()};$("nx").onclick=()=>{s=Math.min(5,s+1);rd()}},
+an:(x,t)=>{const N=["m_j","m_s","t₁","t₂","tushirish","θ"],cur=Math.min(5,Math.floor(t/1.5));x.textAlign="center";
+  for(let i=0;i<6;i++){const X=60+i*96;x.fillStyle=i<cur?"#16a34a":i==cur?"#f59e0b":"#cbd5e1";x.beginPath();x.arc(X,90,26,0,7);x.fill();x.fillStyle="#000";x.font="bold 18px sans-serif";x.fillText(i+1,X,96);x.font="13px sans-serif";x.fillText(N[i],X,140);if(i<5){x.fillStyle="#94a3b8";x.fillRect(X+28,89,40,3)}}
+  x.fillStyle="#0f766e";x.fillRect(30,180,540*Math.min(1,t/9),14);x.strokeRect(30,180,540,14);x.textAlign="left"},dur:9,
+q:["m_j = 0,15 kg, m_s = 0,1 kg, t₁ = 20 °C, t₂ = 100 °C, θ = 30 °C. c_j ni toping (J/(kg·°C)).",400,5]},
+
+{t:"5. Hisoblash va xatolikni baholash (taxminiy reja)",
+th:"Tajribada topilgan c ni jadvaldagi qiymat bilan solishtiramiz. Farq issiqlik yo'qotilishi, asbob xatoligi va jismni ko'chirish vaqtiga bog'liq. Nisbiy xatolik tajriba qanchalik aniq ekanini ko'rsatadi.",
+f:"Δc = |c_tajriba − c_jadval|<br>ε = Δc / c_jadval · 100 %",
+ex:"Do'konda tarozi 1 g aniqlikda bo'lsa, 100 g mahsulotda xatolik 1 % bo'ladi; 10 g da esa 10 % — kichik massada nisbiy xatolik katta.",
+sim:()=>{$("sim4").innerHTML=sel("mt5")+sl("mj5","m_j",0.05,0.3,0.01,0.15,"kg")+sl("ms5","m_s",0.05,0.3,0.01,0.1,"kg")+sl("t15","t₁",10,30,1,20,"°C")+sl("t25","t₂",95,100,1,100,"°C")+sl("th5","θ",21,60,1,30,"°C")+'<div class="out" id="o5"></div>';
+  bind(["mt5","mj5","ms5","t15","t25","th5"],()=>{const r=c5();$("o5").innerHTML="c_tajriba = <b>"+Math.round(r.c)+"</b>; c_jadval = "+r.ct+"<br>Δc = "+Math.round(r.d)+"; ε = <b>"+f2(r.e)+" %</b>"})},
+an:(x,t)=>{const r=c5(),p=Math.min(1,t/2),mx=Math.max(r.c,r.ct)*1.15||1;[[r.c,"Tajriba","#f59e0b",150],[r.ct,"Jadval","#0f766e",350]].forEach(([v,n,c,X])=>{const h=Math.min(v/mx,1.2)*150*p;x.fillStyle=c;x.fillRect(X,180-h,100,h);x.fillStyle="#000";x.font="14px sans-serif";x.fillText(n+": "+Math.round(v*p),X,198)})},dur:2.5,
+q:["Tajribada c = 400 J/(kg·°C), jadvalda 380 J/(kg·°C). Nisbiy xatolik necha % (bir o'nli xonagacha)?",5.3,0.1]},
+
+{t:"6. Xulosa va nazorat savollari (taxminiy reja)",
+th:"<b>Xulosa:</b> issiqlik balansi tenglamasidan jismning solishtirma issiqlik sig'imini topdik. Tajriba natijasi jadvaldan biroz farq qiladi, chunki issiqlikning bir qismi atrofga, kalorimetr va termometrga ketadi — bunda olingan issiqlik kamayib, c ni kichik topamiz.<details><summary>1. Nima uchun jismni tezda tushirish kerak?</summary>Issiqlik havoga yo'qolmasligi uchun.</details><details><summary>2. Suv massasi ortsa, θ qanday o'zgaradi?</summary>θ kamayadi, t₁ ga yaqinlashadi.</details><details><summary>3. Nega kalorimetr ishlatiladi?</summary>Atrof bilan issiqlik almashinuvini kamaytirish uchun.</details>",
+f:"Q_olingan = Q_berilgan·(1 − η_yo'qotish)<br>c_tajriba ≈ c_haqiqiy·(1 − η)",
+ex:"Termos issiq choyni uzoq saqlaydi — kalorimetr ham shu printsipda ishlaydi.",
+sim:()=>{$("sim5").innerHTML=sl("ls6","Issiqlik yo'qotilishi",0,30,1,10,"%")+'<div class="out" id="o6"></div>';
+  bind(["ls6"],()=>{const L=V("ls6")/100;$("o6").innerHTML="Jism bergan Q = 840 J; suv oldi: "+Math.round(840*(1-L))+" J<br>Topilgan c = <b>"+Math.round(400*(1-L))+"</b> (haqiqiy 400) J/(kg·°C)"})},
+an:(x,t)=>{const L=V("ls6")/100;x.fillStyle="#7dd3fc";x.fillRect(220,60,160,110);x.strokeStyle="#334155";x.lineWidth=3;x.strokeRect(220,40,160,130);x.lineWidth=1;x.font="14px sans-serif";x.fillStyle="#000";x.fillText("Kalorimetr",262,115);
+  for(let i=0;i<8;i++){const u=((t*.6+i/8)%1),X=i<4?220-u*150:380+u*150,Y=60+(i%4)*30;x.globalAlpha=(1-u)*Math.min(1,L*6);x.fillStyle="#dc2626";x.fillText(i<4?"←":"→",X,Y)}x.globalAlpha=1;x.fillStyle="#000";x.fillText("Yo'qotish: "+Math.round(L*100)+" %",240,200)},dur:0,
+q:["Jism 840 J issiqlik berdi, suv esa 756 J oldi. Issiqlik yo'qotilishi necha %?",10,0.1]}
+];
+function th3(){const c0=C[$("mt3").value],mj=V("mj3"),ms=V("ms3"),t1=V("t13"),t2=V("t23"),k=$("kal3").checked?900*0.05:0;
+ const th=((CS*ms+k)*t1+c0*mj*t2)/(CS*ms+k+c0*mj);return{th,c:(CS*ms+k)*(th-t1)/(mj*(t2-th))}}
+function c5(){const mj=V("mj5"),ms=V("ms5"),t1=V("t15"),t2=V("t25"),th=V("th5"),ct=C[$("mt5").value],c=CS*ms*(th-t1)/(mj*(t2-th));return{c,ct,d:Math.abs(c-ct),e:Math.abs(c-ct)/ct*100}}
+
+const nav=$("nav"),main=$("main");
+S.forEach((s,n)=>{
+ const b=document.createElement("button");b.textContent="Reja "+(n+1);b.onclick=()=>{[...nav.children].forEach((e,i)=>{e.classList.toggle("on",i==n);document.getElementById("s"+i).classList.toggle("on",i==n)})};nav.appendChild(b);
+ const d=document.createElement("div");d.className="sec";d.id="s"+n;
+ d.innerHTML=`<h2>${s.t}</h2><div class="card"><h3>📘 Nazariy ma'lumot</h3>${s.th}</div><div class="card"><h3>📐 Formulalar</h3><div class="formula">${s.f}</div></div><div class="card"><h3>🌍 Hayotiy misol</h3>${s.ex}</div><div class="card"><h3>🎛️ Interaktiv simulyatsiya</h3><div id="sim${n}"></div></div><div class="card"><h3>🎬 Animatsiya</h3><canvas id="cv${n}" width="600" height="220"></canvas><button class="b" id="st${n}">▶ Boshlash</button><button class="b g" id="sp${n}">⏸ To'xtatish</button><button class="b g" id="rs${n}">↺ Qayta boshlash</button></div><div class="card"><h3>✏️ Mustaqil masala</h3>${s.q[0]}<br><input type="number" step="any" id="a${n}" placeholder="Javob"> <button class="b" id="ck${n}">Tekshirish</button><div id="r${n}"></div></div>`;
+ main.appendChild(d);
+});
+S.forEach((s,n)=>{s.sim();anim(n,s.an,s.dur);$("ck"+n).onclick=()=>chk(n,s.q[1],s.q[2])});
+nav.children[0].click();
+</script></body></html>

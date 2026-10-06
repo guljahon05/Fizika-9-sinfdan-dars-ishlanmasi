@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>24-mavzu: Termodinamikaning ikkinchi qonuni</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:18px/1.55 system-ui,Segoe UI,Arial,sans-serif;background:#f4f7fb;color:#1f2a44}
+header{padding:16px;text-align:center;background:linear-gradient(135deg,#dfe9ff,#e9f7ef)}
+header h1{margin:0;font-size:1.25rem}header p{margin:4px 0 0;font-size:.9rem;color:#5a6785}
+nav{display:flex;gap:8px;overflow-x:auto;padding:10px;background:#fff;position:sticky;top:0;z-index:5;box-shadow:0 2px 8px #0001}
+nav button{flex:0 0 auto;min-height:48px;padding:8px 14px;border:2px solid #d7e0f5;border-radius:14px;background:#f4f7fb;font-size:.95rem;color:#1f2a44}
+nav button.on{background:#4f7cff;border-color:#4f7cff;color:#fff}
+main{max-width:820px;margin:0 auto;padding:12px}
+.card{background:#fff;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #1f2a4414}
+h2{margin:0 0 8px;font-size:1.3rem}h3{margin:0 0 8px;font-size:1.05rem;color:#4f7cff}
+.formula{border:3px solid #4f7cff;background:#eef3ff;border-radius:14px;padding:12px;text-align:center;font-size:1.2rem;font-weight:600}
+.ex{background:#fff7e8;border-left:5px solid #f5a54a}
+.panel{display:none}.panel.on{display:block}
+label{display:block;margin:10px 0;font-size:.95rem}
+input[type=range]{width:100%;height:34px;accent-color:#4f7cff}
+input[type=number]{width:100%;padding:10px;font-size:1rem;border:2px solid #d7e0f5;border-radius:10px}
+button.b{min-height:48px;padding:10px 16px;margin:4px 4px 4px 0;border:0;border-radius:12px;background:#4f7cff;color:#fff;font-size:1rem}
+button.b.g{background:#2fb67c}button.b.r{background:#ef5b5b}button.b.o{background:#f5a54a}
+canvas{width:100%;height:auto;background:#fbfdff;border:1px solid #e1e8f7;border-radius:12px;display:block}
+.out{background:#e9f7ef;border-radius:12px;padding:10px;margin:8px 0;font-weight:600}
+.warn{background:#fdecec;color:#b13a3a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cd{border:2px solid #d7e0f5;border-radius:12px;padding:10px;margin:8px 0}
+.cd.ok{border-color:#2fb67c;background:#e9f7ef}.cd.no{border-color:#ef5b5b;background:#fdecec}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;padding:12px;border:2px solid #d7e0f5;border-radius:12px;background:#f9fbff;font-size:1rem}
+.opt.sel{border-color:#4f7cff;background:#eef3ff}.opt.ok{border-color:#2fb67c;background:#d9f5e8}.opt.no{border-color:#ef5b5b;background:#fde0e0}
+@media(max-width:480px){body{font-size:17px}.grid{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>24-mavzu. Issiqlik jarayonlarining qaytishi. Termodinamikaning ikkinchi qonuni</h1><p>9-sinf fizika</p></header>
+<nav id="nav"></nav><main id="main"></main>
+<script>
+const $=id=>document.getElementById(id),V=id=>+$(id).value;
+const S={Q1:500,Q2:350,t1:80,t2:20,th:50};
+const sl=(id,l,mn,mx,v,st,u)=>`<label>${l}: <b id="${id}v">${v}</b> ${u}<input type="range" id="${id}" min="${mn}" max="${mx}" value="${v}" step="${st}"></label>`;
+const f1=x=>Math.round(x*100)/100;
+
+function chart(cv,series,xr,yr,xl,yl,mark){
+ const c=cv.getContext('2d'),W=cv.width,H=cv.height,L=60,B=40,T=14,R=16;c.clearRect(0,0,W,H);
+ const X=x=>L+(x-xr[0])/(xr[1]-xr[0])*(W-L-R),Y=y=>H-B-(y-yr[0])/(yr[1]-yr[0])*(H-B-T);
+ c.strokeStyle='#cfd8ee';c.fillStyle='#5a6785';c.font='15px sans-serif';c.lineWidth=1;
+ for(let i=0;i<=4;i++){const x=xr[0]+(xr[1]-xr[0])*i/4,y=yr[0]+(yr[1]-yr[0])*i/4;
+  c.beginPath();c.moveTo(X(x),T);c.lineTo(X(x),H-B);c.moveTo(L,Y(y));c.lineTo(W-R,Y(y));c.stroke();
+  c.textAlign='center';c.fillText(f1(x),X(x),H-B+16);c.textAlign='right';c.fillText(f1(y),L-6,Y(y)+5);}
+ c.textAlign='center';c.fillText(xl,(W+L)/2,H-6);c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillText(yl,0,0);c.restore();
+ series.forEach(s=>{c.strokeStyle=s.col;c.lineWidth=3;c.beginPath();s.p.forEach((q,i)=>i?c.lineTo(X(q[0]),Y(q[1])):c.moveTo(X(q[0]),Y(q[1])));c.stroke();
+  c.fillStyle=s.col;c.textAlign='left';c.fillText(s.n,X(s.p[s.p.length-1][0])-70,Y(s.p[s.p.length-1][1])-8);});
+ if(mark){c.fillStyle='#ef5b5b';c.beginPath();c.arc(X(mark[0]),Y(mark[1]),7,0,7);c.fill();}
+}
+const hsl=T=>{const lo=Math.min(S.t1,S.t2),hi=Math.max(S.t1,S.t2),f=hi==lo?.5:(T-lo)/(hi-lo);return `hsl(${240+120*f},75%,58%)`};
+const arrow=(c,x1,y1,x2,y2,col,w)=>{c.strokeStyle=c.fillStyle=col;c.lineWidth=w||5;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();const a=Math.atan2(y2-y1,x2-x1);c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-16*Math.cos(a-.4),y2-16*Math.sin(a-.4));c.lineTo(x2-16*Math.cos(a+.4),y2-16*Math.sin(a+.4));c.fill();};
+const txt=(c,s,x,y,col,sz)=>{c.fillStyle=col||'#1f2a44';c.font=(sz||18)+'px sans-serif';c.textAlign='center';c.fillText(s,x,y);};
+
+const EV={a:[1,'Ishqalanishsiz ideal mayatnik','QAYTAR: energiya yo\'qolmaydi, mayatnik har safar dastlabki holatga qaytadi (bu ideal model).'],
+b:[0,'Shisha chilparchin bo\'lishi','QAYTMAS: parchalar o\'z-o\'zidan yana butun shishaga birlashmaydi.'],
+c:[0,'Sovuq choyning o\'z-o\'zidan qizishi','QAYTMAS: issiqlik o\'z-o\'zidan faqat issiqdan sovuqqa o\'tadi, choy esa xonaga sovib boradi.'],
+d:[0,'Gazning bo\'shliqqa kengayishi','QAYTMAS: gaz o\'z-o\'zidan yana bir burchakka yig\'ilib qolmaydi.']};
+
+const P=[
+{n:'1. Qaytar / qaytmas',t:'Qaytar jarayonda tizim va atrof-muhit dastlabki holatga o\'z-o\'zidan qaytishi mumkin. Qaytmas jarayon o\'z-o\'zidan teskari yo\'nalishda bormaydi. Tabiatdagi barcha real jarayonlar qaytmas: ishqalanish, diffuziya, issiqlik uzatilishi.',
+f:'Real jarayonlar = qaytmas<br>Qaytar jarayon — faqat ideal model',
+ex:'Qizdirilgan choy sovib xona havosini isitadi, lekin xona havosi hech qachon choyni o\'z-o\'zidan qaynatmaydi.',
+sim:`<p>Hodisani tanlang:</p><button class="b" data-e="a">Mayatnik</button><button class="b" data-e="b">Shisha sinishi</button><button class="b" data-e="c">Sovuq choy</button><button class="b" data-e="d">Gaz kengayishi</button><div class="out" id="o0">Hodisani tanlang...</div>`,
+init(){document.querySelectorAll('#p0 [data-e]').forEach(b=>b.onclick=()=>{const e=EV[b.dataset.e];$('o0').className='out'+(e[0]?'':' warn');$('o0').innerHTML='<b>'+e[1]+'</b><br>'+e[2]});},
+draw(c,t){c.clearRect(0,0,600,300);const w=2.6;[[150,1,'Ideal (ishqalanishsiz)'],[450,0,'Ishqalanishli']].forEach(([x,id,l])=>{const A=id?.7:.7*Math.exp(-.18*t),a=A*Math.cos(w*t),L=170;c.strokeStyle='#8a95b3';c.lineWidth=3;c.beginPath();c.moveTo(x-50,25);c.lineTo(x+50,25);c.stroke();const bx=x+L*Math.sin(a),by=25+L*Math.cos(a);c.beginPath();c.moveTo(x,25);c.lineTo(bx,by);c.stroke();c.fillStyle=id?'#4f7cff':'#ef5b5b';c.beginPath();c.arc(bx,by,18,0,7);c.fill();txt(c,l,x,280,'#1f2a44',16);if(!id)txt(c,'amplituda: '+f1(A/.7*100)+'%',x,260,'#ef5b5b',15);});},
+task:['Quyidagi 5 hodisadan nechtasi qaytmas? (ideal mayatnik tebranishi, qahvaning sovishi, shisha sinishi, gaz diffuziyasi, muzning xonada erishi)',4,'ta']},
+
+{n:'2. Issiqlik yo\'nalishi',t:'Issiqlik o\'z-o\'zidan faqat issiq jismdan sovuq jismga o\'tadi. Teskarisi o\'z-o\'zidan bo\'lmaydi. Jarayon jismlar temperaturasi tenglashguncha (issiqlik muvozanati θ gacha) davom etadi.',
+f:'θ = (c₁m₁t₁ + c₂m₂t₂) / (c₁m₁ + c₂m₂)',
+ex:'Issiq choyga sovuq qoshiq tushsa, qoshiq isiydi, choy esa biroz soviydi — ikkalasi ham bir xil temperaturaga keladi.',
+sim:sl('a1','t₁ (issiq jism)',40,100,80,1,'°C')+sl('b1','m₁',.1,2,.5,.1,'kg')+sl('c1','c₁',400,4200,4200,100,'J/(kg·°C)')+sl('d1','t₂ (sovuq jism)',0,39,20,1,'°C')+sl('e1','m₂',.1,2,.5,.1,'kg')+sl('f1','c₂',400,4200,4200,100,'J/(kg·°C)')+'<div class="out" id="o1"></div><canvas id="s1" width="600" height="280"></canvas>',
+run(){const t1=V('a1'),m1=V('b1'),c1=V('c1'),t2=V('d1'),m2=V('e1'),c2=V('f1');const th=(c1*m1*t1+c2*m2*t2)/(c1*m1+c2*m2);S.t1=t1;S.t2=t2;S.th=th;$('o1').textContent='Muvozanat temperaturasi θ = '+f1(th)+' °C';
+ const p1=[],p2=[];for(let i=0;i<=40;i++){const x=i/4;p1.push([x,th+(t1-th)*Math.exp(-.35*x)]);p2.push([x,th+(t2-th)*Math.exp(-.35*x)]);}
+ chart($('s1'),[{p:p1,col:'#ef5b5b',n:'t₁(τ)'},{p:p2,col:'#4f7cff',n:'t₂(τ)'}],[0,10],[0,100],'vaqt τ','t, °C');},
+draw(c,t){c.clearRect(0,0,600,300);const k=Math.exp(-.3*t),T1=S.th+(S.t1-S.th)*k,T2=S.th+(S.t2-S.th)*k;c.fillStyle=hsl(T1);c.fillRect(40,90,150,130);c.fillStyle=hsl(T2);c.fillRect(410,90,150,130);txt(c,f1(T1)+' °C',115,165,'#fff',24);txt(c,f1(T2)+' °C',485,165,'#fff',24);txt(c,'1-jism',115,80);txt(c,'2-jism',485,80);
+ if(Math.abs(T1-T2)>.6){c.save();c.setLineDash([22,14]);c.lineDashOffset=-t*60;c.strokeStyle='#f5a54a';c.lineWidth=7;c.beginPath();c.moveTo(200,155);c.lineTo(390,155);c.stroke();c.restore();arrow(c,350,155,400,155,'#f5a54a',7);txt(c,'issiqlik Q',300,135,'#c77b1c');}else txt(c,'Muvozanat ✔',300,150,'#2fb67c',22);},
+task:['200 g suv (80 °C) va 300 g suv (20 °C) aralashtirildi. Muvozanat temperaturasi θ = ?',44,'°C']},
+
+{n:'3. Ikkinchi qonun',t:'Klauzius: issiqlik o\'z-o\'zidan sovuq jismdan issiq jismga o\'tmaydi. Kelvin: olingan issiqlikni to\'liq ishga aylantiradigan davriy dvigatel yo\'q. Birinchi qonun energiya saqlanishini, ikkinchi qonun esa jarayon yo\'nalishini belgilaydi. Ikkinchi tur abadiy dvigatel (perpetuum mobile) mumkin emas.',
+f:'Q₂ > 0 ⇒ η < 100%<br>1-qonun: Q = ΔU + A | 2-qonun: yo\'nalish',
+ex:'Muzlatgich sovuq kameradan issiqlikni xonaga uzatadi, lekin buning uchun elektr ishi sarflanadi.',
+sim:'<p>Har bir hodisa uchun tanlang:</p><div id="cards"></div><div class="out" id="o2">Ball: 0 / 6</div><button class="b o" id="rs2">Qayta boshlash</button>',
+init(){const D=[['Issiq choy xonada sovib qoladi',1],['Muz bo\'lagi issiq suvni o\'zi isitib, o\'zi sovuydi',0],['Muzlatgich elektr bilan ishlab, ichini sovitadi',1],['Dvigatel olingan issiqning 100% ini ishga aylantiradi',0],['Kema okean suvini sovitib, shu issiqlik hisobiga suzadi (2-tur abadiy dvigatel)',0],['Issiq jism sovuq jismga issiqlik beradi',1]];let sc=0,dn=0;
+ const build=()=>{sc=0;dn=0;$('o2').textContent='Ball: 0 / 6';$('cards').innerHTML=D.map((d,i)=>`<div class="cd" id="k${i}"><div>${i+1}. ${d[0]}</div><button class="b g" data-i="${i}" data-v="1">Mumkin</button><button class="b r" data-i="${i}" data-v="0">Mumkin emas</button></div>`).join('');
+ document.querySelectorAll('#cards button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,k=$('k'+i);if(k.dataset.d)return;k.dataset.d=1;const ok=D[i][1]==+b.dataset.v;if(ok)sc++;dn++;k.classList.add(ok?'ok':'no');k.insertAdjacentHTML('beforeend','<div>'+(ok?'✔ To\'g\'ri':'✘ Noto\'g\'ri — to\'g\'ri javob: '+(D[i][1]?'mumkin':'mumkin emas'))+'</div>');$('o2').textContent='Ball: '+sc+' / 6'+(dn==6?' — tugadi!':'');});};
+ $('rs2').onclick=build;build();},
+draw(c,t){c.clearRect(0,0,600,300);c.fillStyle='#fde0e0';c.fillRect(30,80,110,120);c.fillStyle='#dde8ff';c.fillRect(30,230,110,50);txt(c,'ISSIQ',85,140);txt(c,'SOVUQ',85,262);
+ arrow(c,85,225,85,205,'#b9c2d9',6);c.strokeStyle='#ef5b5b';c.lineWidth=9;c.beginPath();c.moveTo(60,25);c.lineTo(110,65);c.moveTo(110,25);c.lineTo(60,65);c.stroke();txt(c,'TAQIQLANGAN',85,20,'#ef5b5b',14);
+ txt(c,'O\'z-o\'zidan: yo\'q',85,297,'#ef5b5b',14);
+ c.fillStyle='#fde0e0';c.fillRect(330,40,130,80);c.fillStyle='#dde8ff';c.fillRect(330,210,130,70);txt(c,'XONA (issiq)',395,85,'#1f2a44',16);txt(c,'MUZLATGICH',395,250,'#1f2a44',16);
+ for(let i=0;i<4;i++){const y=205-((t*40+i*22)%88);c.fillStyle='#4f7cff';c.beginPath();c.arc(395,y,6,0,7);c.fill();}
+ arrow(c,395,165,395,128,'#4f7cff',3);c.fillStyle='#2fb67c';c.fillRect(480,140,100,40);txt(c,'A (ish)',530,166,'#fff',17);arrow(c,480,160,462,160,'#2fb67c',5);txt(c,'Ish sarflansa — mumkin ✔',460,297,'#2fb67c',14);},
+task:['Muzlatgich sovuq kameradan 300 J issiqlik oladi, kompressor 100 J ish bajaradi. Xonaga necha J issiqlik beriladi?',400,'J']},
+
+{n:'4. Issiqlik dvigatellari',t:'Issiqlik dvigateli isitgich (T₁), ishchi jism va sovitgich (T₂) dan iborat. Q₁ — isitgichdan olingan issiqlik, Q₂ — sovitgichga berilgan issiqlik. Foydali ish A = Q₁ − Q₂. Ichki yonuv dvigateli 4 taktda ishlaydi: so\'rish, siqish, ishchi yurish, chiqarish.',
+f:'A = Q₁ − Q₂',
+ex:'Avtomobil dvigatelida benzin yonib Q₁ beradi, bir qismi g\'ildirakni aylantiradi (A), qolgani chiqindi gaz va radiator orqali atrofga ketadi (Q₂).',
+sim:sl('a4','Q₁ (isitgichdan)',100,1000,600,10,'J')+sl('b4','Q₂ (sovitgichga)',0,1000,400,10,'J')+'<div class="out" id="o4"></div><canvas id="s4" width="600" height="260"></canvas>',
+run(){const q1=V('a4'),q2=V('b4'),A=q1-q2,o=$('o4');const bad=A<0||q2==0;o.className='out'+(bad?' warn':'');o.textContent=A<0?'Q₂ > Q₁ bo\'lishi mumkin emas (energiya saqlanish qonuni)!':q2==0?'A = '+A+' J. Q₂ = 0 — Kelvin ta\'rifiga zid, mumkin emas!':'A = Q₁ − Q₂ = '+A+' J   (η = '+f1(A/q1*100)+'%)';
+ const c=$('s4').getContext('2d');c.clearRect(0,0,600,260);[['Q₁',q1,'#ef5b5b'],['Q₂',q2,'#4f7cff'],['A',Math.max(A,0),'#2fb67c']].forEach((b,i)=>{const h=b[1]/1000*190,x=90+i*170;c.fillStyle=b[2];c.fillRect(x,220-h,100,h);txt(c,b[0]+' = '+b[1]+' J',x+50,215-h,'#1f2a44',17);txt(c,['Olingan','Berilgan','Foydali ish'][i],x+50,245,'#5a6785',15);});},
+draw(c,t){c.clearRect(0,0,600,300);const N=['1. SO\'RISH','2. SIQISH','3. ISHCHI YURISH','4. CHIQARISH'],s=Math.floor(t/2)%4,ph=(t/2)%1,pos=(s==0||s==2)?ph:1-ph;
+ c.fillStyle='#e8eefc';c.fillRect(200,50,200,40);c.strokeStyle='#8a95b3';c.lineWidth=5;c.strokeRect(200,90,200,170);
+ const py=100+pos*110,gc=['#cfe6ff','#ffd9a8','#ff9c8a','#c9ccd6'][s];c.fillStyle=gc;c.fillRect(204,py+20,192,258-py-20);c.fillStyle='#5a6785';c.fillRect(200,py,200,20);c.fillRect(296,py-35,8,35);
+ c.fillStyle=s==0?'#2fb67c':'#ef5b5b';c.fillRect(215,80,50,10);c.fillStyle=s==3?'#2fb67c':'#ef5b5b';c.fillRect(335,80,50,10);
+ if(s==2&&ph<.25){c.fillStyle='#f5d142';c.beginPath();c.arc(300,92,14,0,7);c.fill();}
+ if(s==0)arrow(c,240,30,240,76,'#2fb67c',5);if(s==3)arrow(c,360,76,360,30,'#2fb67c',5);
+ txt(c,N[s],100,60,'#4f7cff',20);txt(c,'porshen: '+Math.round(pos*100)+'% pastga',100,90,'#5a6785',15);txt(c,'klapan: yashil = ochiq',500,280,'#5a6785',14);},
+task:['Dvigatel isitgichdan 800 J issiqlik oldi va foydali ish 200 J bo\'ldi. Sovitgichga necha J berildi?',600,'J']},
+
+{n:'5. FIK va Karno',t:'FIK (foydali ish koeffitsiyenti) — foydali ishning olingan issiqlikka nisbati. Ideal (Karno) dvigatelning FIK si T₁ va T₂ ga bog\'liq (T — kelvinda). FIK hech qachon 100% bo\'lmaydi. Oshirish: T₁ ni ko\'tarish, T₂ ni pasaytirish, ishqalanishni kamaytirish.',
+f:'η = A/Q₁ = (Q₁ − Q₂)/Q₁ · 100%<br>η<sub>max</sub> = (T₁ − T₂)/T₁, T = t + 273',
+ex:'Bug\' turbinasida T₁ = 527 °C (800 K), T₂ = 27 °C (300 K). η<sub>max</sub> = 500/800 = 62,5%. Real FIK bundan ancha past.',
+sim:sl('a5','T₁ (isitgich)',100,1500,527,1,'°C')+sl('b5','T₂ (sovitgich)',0,99,27,1,'°C')+sl('c5','Real dvigatel FIK',10,60,35,1,'%')+'<div class="out" id="o5"></div><canvas id="s5" width="600" height="260"></canvas>',
+run(){const T1=V('a5')+273,T2=V('b5')+273,e=(T1-T2)/T1*100,r=V('c5');$('o5').innerHTML='η<sub>Karno</sub> = '+f1(e)+'%<br>Real: '+r+'% → '+(r<=e?'Karnodan past ✔ (mumkin)':'Karnodan yuqori ✘ (mumkin emas!)');
+ const p=[];for(let x=100;x<=1500;x+=50)p.push([x,(x-V('b5'))/(x+273)*100]);chart($('s5'),[{p,col:'#4f7cff',n:'η(T₁)'}],[100,1500],[0,100],'T₁, °C','η, %',[V('a5'),e]);},
+draw(c,t){c.clearRect(0,0,600,300);const X=v=>70+(v-.8)/2.6*500,Y=p=>260-(p-.8)/3.6*230,g=1.4,seg=[];
+ const f=[v=>4/v,v=>2*Math.pow(2/v,g),v=>2*Math.pow(2/3.2,g)*3.2/v,v=>(2*Math.pow(2/3.2,g)*3.2/1.6)*Math.pow(1.6/v,g)],R=[[1,2],[2,3.2],[3.2,1.6],[1.6,1]],col=['#ef5b5b','#f5a54a','#4f7cff','#7a8bd1'],nm=['1→2 izotermik kengayish (T₁)','2→3 adiabatik kengayish','3→4 izotermik siqilish (T₂)','4→1 adiabatik siqilish'];
+ c.strokeStyle='#8a95b3';c.lineWidth=2;c.beginPath();c.moveTo(70,10);c.lineTo(70,260);c.lineTo(580,260);c.stroke();txt(c,'V',585,278,'#5a6785',16);txt(c,'p',55,18,'#5a6785',16);
+ const q=(t/2.5)%4,k=Math.floor(q),u=q-k;let last;
+ for(let i=0;i<4;i++){const n=30;c.lineWidth=i<k?5:2;c.strokeStyle=i<k?col[i]:'#d3dbef';c.beginPath();for(let j=0;j<=n;j++){const v=R[i][0]+(R[i][1]-R[i][0])*j/n;j?c.lineTo(X(v),Y(f[i](v))):c.moveTo(X(v),Y(f[i](v)));}c.stroke();}
+ c.strokeStyle=col[k];c.lineWidth=5;c.beginPath();let vv;for(let j=0;j<=30;j++){vv=R[k][0]+(R[k][1]-R[k][0])*u*j/30;j?c.lineTo(X(vv),Y(f[k](vv))):c.moveTo(X(vv),Y(f[k](vv)));}c.stroke();
+ c.fillStyle='#1f2a44';c.beginPath();c.arc(X(vv),Y(f[k](vv)),9,0,7);c.fill();txt(c,nm[k],330,22,col[k],17);},
+task:['Karno dvigatelida T₁ = 227 °C, T₂ = 27 °C. η<sub>max</sub> = ? (%)',40,'%']},
+
+{n:'6. Masalalar va ekologiya',t:'<b>Masalalar:</b><br>1) Q₁ = 500 kJ, Q₂ = 350 kJ. A = 500−350 = <b>150 kJ</b>; η = 150/500 = <b>30%</b>.<br>2) T₁ = 800 K, T₂ = 300 K. η = (800−300)/800 = <b>62,5%</b>.<br>3) η = 30%, A = 6 kJ: Q₁ = A/η = <b>20 kJ</b>; Q₂ = 20−6 = <b>14 kJ</b>.<br>4) Hech bir dvigatelning FIK si shu T₁ va T₂ dagi Karno FIK sidan yuqori bo\'la olmaydi.<br><b>Ekologiya:</b> yoqilg\'i yonganda CO₂ ajraladi (issiqxona effekti), issiq chiqindi atrofni isitadi (issiqlik ifloslanishi). Kamaytirish: FIK ni oshirish, filtrlar, elektromobil, quyosh va shamol energiyasi.',
+f:'η = A/Q₁ ; A = Q₁ − Q₂ ; η<sub>max</sub> = (T₁−T₂)/T₁',
+ex:'Elektr stansiyasi FIK 40% bo\'lsa, yoqilg\'i energiyasining 60% i atrofga issiqlik bo\'lib tarqaladi.',
+sim:'<p>Istalgan ikkita kattalikni kiriting (T — kelvinda):</p><div class="grid">'+['Q₁ (kJ)','Q₂ (kJ)','A (kJ)','η (%)','T₁ (K)','T₂ (K)'].map((l,i)=>`<label>${l}<input type="number" step="any" id="k${i}"></label>`).join('')+'</div><button class="b" id="hs">Hisobla</button><button class="b o" id="ht">Tozalash</button><div class="out" id="o6">Natija shu yerda</div>',
+init(){const ids=[0,1,2,3,4,5].map(i=>$('k'+i)),get=i=>ids[i].value===''?null:+ids[i].value;
+ $('ht').onclick=()=>{ids.forEach(e=>e.value='');$('o6').textContent='Natija shu yerda'};
+ $('hs').onclick=()=>{let [q1,q2,a,e,t1,t2]=ids.map((_,i)=>get(i));for(let i=0;i<4;i++){if(a===null&&q1!==null&&q2!==null)a=q1-q2;if(q2===null&&q1!==null&&a!==null)q2=q1-a;if(q1===null&&q2!==null&&a!==null)q1=q2+a;
+  if(e===null&&a!==null&&q1)e=a/q1*100;if(q1===null&&a!==null&&e)q1=a/e*100;if(a===null&&q1!==null&&e!==null)a=q1*e/100;}
+  let s='';const o=$('o6');if(q1===null||q2===null||a===null||e===null){o.className='out warn';o.textContent='Yetarli ma\'lumot yo\'q: kamida 2 ta mos kattalik kiriting.';return;}
+  if(t1&&t2){const em=(t1-t2)/t1*100;s='<br>η<sub>Karno</sub> = '+f1(em)+'%'+(e>em+1e-9?' — <b>real FIK Karnodan yuqori: mumkin emas!</b>':' ✔');}
+  S.Q1=Math.max(q1,0);S.Q2=Math.max(q2,0);o.className='out';o.innerHTML='Q₁ = '+f1(q1)+' kJ, Q₂ = '+f1(q2)+' kJ, A = '+f1(a)+' kJ, η = '+f1(e)+'%'+s;};},
+draw(c,t){c.clearRect(0,0,600,300);const Q1=S.Q1||1,k=170/Q1,h1=Q1*k,h2=S.Q2*k,hA=Math.max(Q1-S.Q2,0)*k;
+ const band=(x1,y1,x2,y2,h,col,lab)=>{c.globalAlpha=.55;c.strokeStyle=col;c.lineWidth=Math.max(h,1);c.beginPath();c.moveTo(x1,y1);c.bezierCurveTo((x1+x2)/2,y1,(x1+x2)/2,y2,x2,y2);c.stroke();c.globalAlpha=1;c.save();c.setLineDash([10,16]);c.lineDashOffset=-t*50;c.strokeStyle='#fff';c.lineWidth=2;c.stroke();c.restore();txt(c,lab,x2-20,y2-h/2-6,'#1f2a44',16);};
+ c.globalAlpha=.55;c.strokeStyle='#ef5b5b';c.lineWidth=h1;c.beginPath();c.moveTo(30,150);c.lineTo(190,150);c.stroke();c.globalAlpha=1;txt(c,'Q₁ = '+f1(S.Q1)+' kJ',90,150-h1/2-8);
+ band(190,150-h1/2+hA/2,560,55,hA,'#2fb67c','A = '+f1(hA/k)+' kJ');band(190,150+h1/2-h2/2,560,245,h2,'#4f7cff','Q₂ = '+f1(S.Q2)+' kJ');},
+task:['Dvigatelning FIK 25%, Q₁ = 2000 J. Sovitgichga berilgan Q₂ = ? (J)',1500,'J']}
+];
+
+const TEST=[['Quyidagilardan qaysi biri qaytmas jarayon?',['Ishqalanishsiz mayatnik tebranishi','Issiq jismdan sovuq jismga issiqlik o\'tishi','Ideal elastik to\'qnashuv','Vakuumda sayyora aylanishi'],1],
+['Klauzius ta\'rifi bo\'yicha issiqlik...',['sovuqdan issiqqa o\'z-o\'zidan o\'tadi','faqat ish bilan hosil bo\'ladi','sovuq jismdan issiq jismga o\'z-o\'zidan o\'tmaydi','hech qachon o\'tmaydi'],2],
+['Issiqlik dvigatelining FIK formulasi qaysi?',['η = (Q₁ − Q₂)/Q₁','η = Q₂/Q₁','η = Q₁/A','η = A·Q₁'],0],
+['T₁ = 600 K, T₂ = 300 K bo\'lgan Karno dvigatelining η<sub>max</sub> = ?',['30%','60%','100%','50%'],3],
+['Issiqlik dvigatellarining qaysi ta\'siri issiqxona effektini kuchaytiradi?',['Shovqin','CO₂ chiqarilishi','Yorug\'lik','Magnit maydon'],1]];
+
+const nav=$('nav'),main=$('main'),AN=[];let cur=0;
+P.forEach((p,i)=>{
+ nav.insertAdjacentHTML('beforeend',`<button data-i="${i}">${p.n}</button>`);
+ main.insertAdjacentHTML('beforeend',`<section class="panel" id="p${i}"><div class="card"><h2>${p.n}</h2><h3>Nazariya</h3><p>${p.t}</p></div><div class="card"><h3>Asosiy formula</h3><div class="formula">${p.f}</div></div><div class="card ex"><h3>Hayotiy misol</h3>${p.ex}</div><div class="card"><h3>Interaktiv simulyatsiya</h3>${p.sim}</div><div class="card"><h3>Animatsiya</h3><canvas id="c${i}" width="600" height="300"></canvas><button class="b g" data-a="s">▶ Start</button><button class="b r" data-a="p">■ Stop</button><button class="b o" data-a="r">↺ Reset</button></div><div class="card"><h3>Mustaqil masala</h3><p>${p.task[0]}</p><input type="number" step="any" id="ans${i}" placeholder="Javob (${p.task[2]})"><button class="b" data-a="k">Tekshirish</button><div class="out" id="res${i}" style="display:none"></div></div></section>`);
+ AN[i]={run:false,t:0};
+ const pn=$('p'+i);
+ pn.addEventListener('input',()=>{pn.querySelectorAll('input[type=range]').forEach(r=>$(r.id+'v').textContent=r.value);p.run&&p.run();redraw(i)});
+ pn.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a=='s')AN[i].run=true;if(a=='p')AN[i].run=false;if(a=='r'){AN[i].run=false;AN[i].t=0;redraw(i)}
+  if(a=='k'){const v=parseFloat($('ans'+i).value),r=$('res'+i),ok=Math.abs(v-p.task[1])<=Math.abs(p.task[1])*.005+1e-9;r.style.display='block';r.className='out'+(ok?'':' warn');r.textContent=isNaN(v)?'Javobni kiriting.':ok?'✔ To\'g\'ri!':'✘ Noto\'g\'ri. Qayta urinib ko\'ring. (To\'g\'ri javob: '+p.task[1]+' '+p.task[2]+')';}});
+ p.init&&p.init();p.run&&p.run();
+});
+function redraw(i){const p=P[i];p.draw($('c'+i).getContext('2d'),AN[i].t);}
+function show(i){cur=i;document.querySelectorAll('.panel').forEach((e,j)=>e.classList.toggle('on',j==i));nav.querySelectorAll('button').forEach((b,j)=>b.classList.toggle('on',j==i));P[i].run&&P[i].run();redraw(i);scrollTo(0,0);}
+nav.onclick=e=>{if(e.target.dataset.i!=null)show(+e.target.dataset.i)};
+let last=0;(function loop(ts){const dt=Math.min((ts-last)/1000,.1);last=ts;if(AN[cur].run){AN[cur].t+=dt;redraw(cur);}requestAnimationFrame(loop)})(0);
+
+// Test
+main.insertAdjacentHTML('beforeend',`<section class="card" id="test"><h2>Yakuniy test (5 ta savol)</h2>${TEST.map((q,i)=>`<div class="q" data-q="${i}"><p><b>${i+1}.</b> ${q[0]}</p>${q[1].map((o,j)=>`<button class="opt" data-j="${j}">${'ABCD'[j]}) ${o}</button>`).join('')}</div>`).join('')}<button class="b" id="tk">Tekshirish</button><div class="out" id="tr" style="display:none"></div></section>`);
+const pick={};
+document.querySelectorAll('.q').forEach(q=>q.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{q.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');pick[q.dataset.q]=+b.dataset.j;}));
+$('tk').onclick=()=>{let s=0;document.querySelectorAll('.q').forEach(q=>{const i=+q.dataset.q,a=TEST[i][2];q.querySelectorAll('.opt').forEach((b,j)=>{b.classList.remove('sel','ok','no');if(j==a)b.classList.add('ok');else if(pick[i]==j)b.classList.add('no');});if(pick[i]==a)s++;});
+ const r=$('tr');r.style.display='block';r.className='out'+(s<3?' warn':'');r.textContent='Natija: '+s+' / 5 ball ('+s*20+'%)'+(s==5?' — Ajoyib! 🎉':s>=3?' — Yaxshi!':' — Mavzuni qayta o\'qing.');};
+show(0);
+</script></body></html>
