@@ -1,301 +1,117 @@
 <!DOCTYPE html>
-<html lang="uz"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>18-mavzu: Masalalar yechish</title>
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef6ff;--card:#fff;--tx:#1f2a44;--pr:#1e88e5;--ac:#ff7043;--ok:#2e9e4f;--bad:#e53935;--bd:#cfe3fa}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101a2b;--card:#182640;--tx:#eaf1ff;--bd:#2c426a}}
-:root[data-theme="dark"]{--bg:#101a2b;--card:#182640;--tx:#eaf1ff;--bd:#2c426a}
-*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
-header{background:linear-gradient(135deg,#1e88e5,#7e57c2);color:#fff;padding:16px;text-align:center}
-header h1{margin:0;font-size:1.3rem}header p{margin:4px 0 0;opacity:.9;font-size:.9rem}
-.wrap{max-width:820px;margin:0 auto;padding:10px}
-#tabs{display:flex;gap:8px;overflow-x:auto;padding:6px 2px}
-#tabs button{flex:0 0 auto;min-height:48px;min-width:52px;border:2px solid var(--bd);background:var(--card);color:var(--tx);border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;padding:0 14px}
-#tabs button.on{background:var(--pr);color:#fff;border-color:var(--pr)}
-.card{background:var(--card);border:2px solid var(--bd);border-radius:16px;padding:14px;margin:10px 0}
-h2{margin:0 0 8px;font-size:1.15rem;color:var(--pr)}h3{margin:12px 0 6px}
-.cond{font-size:1.02rem;background:#fff8e1;color:#4a3b00;border-left:5px solid #ffb300;padding:8px 10px;border-radius:8px}
-table{width:100%;border-collapse:collapse;margin:10px 0}
-td{border:1px solid var(--bd);padding:7px 9px;vertical-align:top}td:first-child{width:30%;font-weight:700;background:rgba(30,136,229,.1)}
-ol{margin:0;padding-left:20px}ol li{margin:4px 0;animation:in .4s}@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
-.ans{color:var(--ok);font-weight:800}
-canvas{width:100%;max-width:520px;display:block;margin:8px auto;border-radius:12px;border:2px solid var(--bd)}
-.btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.btns button,.big{flex:1 1 130px;min-height:50px;border:0;border-radius:12px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;padding:8px 12px}
-.g{background:var(--ok)}.o{background:var(--ac)}.b{background:var(--pr)}.p{background:#7e57c2}
-.sl{margin:10px 0}.sl label{display:block;font-weight:600}.sl input{width:100%;height:34px;accent-color:var(--pr)}
-input[type=number]{font-size:1.1rem;padding:10px;border:2px solid var(--bd);border-radius:10px;width:150px;background:var(--card);color:var(--tx)}
-.res{margin-top:8px;font-weight:700}.ok{color:var(--ok)}.no{color:var(--bad)}
-.q{margin:12px 0;padding:10px;border:2px solid var(--bd);border-radius:12px}
-.q label{display:block;padding:10px;margin:4px 0;border-radius:10px;border:2px solid var(--bd);cursor:pointer;min-height:44px}
-.q input{margin-right:8px;transform:scale(1.3)}
-.score{font-size:1.4rem;font-weight:800;text-align:center;margin:10px 0}
-</style></head><body>
-<header><h1>⚗️ 18-mavzu: Masalalar yechish</h1><p>9-sinf fizika · Termodinamika va issiqlik hodisalari</p></header>
-<div class="wrap">
-<div id="tabs"></div>
-<div class="card" id="panel"></div>
-<div class="card"><h2>📝 Yakuniy test (5 ta savol)</h2><div id="test"></div>
-<button class="big b" style="width:100%" onclick="grade()">Natijani ko‘rish</button><div id="tres"></div></div>
-</div>
-<script>
-const $=s=>document.querySelector(s);
-const g=x=>String(+(+x).toPrecision(8)).replace('.',',');
-const fm=(x,d=0)=>{let[a,b]=(+x).toFixed(d).split('.');a=a.replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');return b?a+','+b:a};
-const col=t=>{t=Math.max(0,Math.min(100,t))/100;return`rgb(${80+160*t|0},${160-80*t|0},${240-180*t|0})`};
-function txt(c,s,x,y,k='#1f2a44',z=14,al='left'){c.fillStyle=k;c.font='bold '+z+'px sans-serif';c.textAlign=al;c.fillText(s,x,y)}
-function arrow(c,x1,y1,x2,y2,k,lb){c.strokeStyle=c.fillStyle=k;c.lineWidth=4;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();let a=Math.atan2(y2-y1,x2-x1);c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-13*Math.cos(a-.5),y2-13*Math.sin(a-.5));c.lineTo(x2-13*Math.cos(a+.5),y2-13*Math.sin(a+.5));c.closePath();c.fill();if(lb)txt(c,lb,(x1+x2)/2+8,(y1+y2)/2-6,k,15)}
-function beaker(c,x,y,w,h,lv,k){c.fillStyle=k;c.fillRect(x,y+h-lv,w,lv);c.strokeStyle='#334';c.lineWidth=3;c.beginPath();c.moveTo(x,y);c.lineTo(x,y+h);c.lineTo(x+w,y+h);c.lineTo(x+w,y);c.stroke()}
-function thermo(c,x,y,h,t,lb=true){c.fillStyle='#fff';c.fillRect(x-5,y,10,h);c.strokeStyle='#334';c.lineWidth=2;c.strokeRect(x-5,y,10,h);let f=h*Math.max(0,Math.min(100,t))/100;c.fillStyle='#e02';c.fillRect(x-3,y+h-f,6,f);c.beginPath();c.arc(x,y+h+6,9,0,7);c.fill();if(lb)txt(c,fm(t,1)+'°C',x+14,y+h-f+4,'#c62828',13)}
-function flame(c,x,y,T,s=1){for(let i=0;i<3;i++){let hh=(28+9*Math.sin(T*9+i*2))*s,xc=x+(i-1)*14*s;c.fillStyle=['#ff9500','#ffd000','#ff4d00'][i];c.beginPath();c.moveTo(xc-8*s,y);c.quadraticCurveTo(xc-8*s,y-hh/2,xc,y-hh);c.quadraticCurveTo(xc+8*s,y-hh/2,xc+8*s,y);c.fill()}}
+  body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 15px; background: #101a2b; color: #eaf1ff; }
+  header { background: linear-gradient(135deg, #1e88e5, #7e57c2); padding: 16px; text-align: center; border-radius: 12px; margin-bottom: 15px; }
+  header h1 { margin: 0; font-size: 1.3rem; color: #fff; }
+  header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; color: #fff; }
+  .card { background: #182640; border: 2px solid #2c426a; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+  h2 { margin-top: 0; color: #64b5f6; font-size: 1.1rem; }
+  #tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 5px; }
+  #tabs button { background: #182640; color: #fff; border: 2px solid #2c426a; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+  #tabs button.active { background: #1e88e5; border-color: #1e88e5; }
+  .cond { background: #fff8e1; color: #4a3b00; padding: 10px; border-left: 4px solid #ffb300; border-radius: 6px; margin-bottom: 10px; font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  td { border: 1px solid #2c426a; padding: 8px; font-size: 0.95rem; }
+  td:first-child { width: 35%; font-weight: bold; color: #90caf9; }
+  .btn { width: 100%; padding: 12px; background: #1e88e5; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+  .q { margin: 12px 0; padding: 10px; border: 1px solid #2c426a; border-radius: 8px; background: #111d33; }
+  .q label { display: block; padding: 8px; margin: 4px 0; border: 1px solid #2c426a; border-radius: 6px; cursor: pointer; }
+  .score { font-size: 1.2rem; font-weight: bold; text-align: center; margin-top: 10px; padding: 10px; border-radius: 8px; }
+  .ok { color: #4caf50; }
+  .no { color: #f44336; }
+</style>
+</head>
+<body>
 
-const P=[
-{t:'ΔU',name:'Ichki energiya o‘zgarishi',
- sl:[['Q','Berilgan issiqlik Q','J',100,1000,50,500],['A','Gaz bajargan ish A','J',0,800,50,200]],
- cond:v=>`Silindrdagi gazga ${fm(v.Q)} J issiqlik berildi. Gaz kengayib, porshenni ko‘tardi va ${fm(v.A)} J ish bajardi. Gazning ichki energiyasi qanchaga o‘zgardi?`,
- calc(v){let d=v.Q-v.A;return{given:[`Q = ${fm(v.Q)} J`,`A = ${fm(v.A)} J`],find:'ΔU = ?  (J)',formula:'ΔU = Q − A',steps:[
- 'Formulani yozamiz: ΔU = Q − A',`Qiymatlarni qo‘yamiz: ΔU = ${fm(v.Q)} J − ${fm(v.A)} J`,`Hisoblaymiz: ΔU = ${fm(d)} J`,
- `Javob: ΔU = ${fm(d)} J — ichki energiya ${d>=0?'ortdi':'kamaydi'}.`]}},
- draw(c,v,p,T){let du=v.Q-v.A,py=150-70*v.A/1000*p;
-  c.fillStyle=col(50+du/12);c.fillRect(130,py+8,120,202-py);
-  for(let i=0;i<14;i++){let s=1+Math.abs(du)/250;c.fillStyle='#fff';c.beginPath();c.arc(142+(i*37)%96+Math.sin(T*3*s+i*2)*6,py+22+((i*53)%100)/100*(202-py-34)+Math.sin(T*4*s+i)*5,4,0,7);c.fill()}
-  c.strokeStyle='#334';c.lineWidth=4;c.beginPath();c.moveTo(130,50);c.lineTo(130,210);c.lineTo(250,210);c.lineTo(250,50);c.stroke();
-  c.fillStyle='#556';c.fillRect(130,py,120,8);c.fillRect(186,py-30,8,30);
-  arrow(c,12,185,40+80*v.Q/1000*p,185,'#e53935','Q');
-  arrow(c,275,py+4,275,py-10-40*v.A/800*p,'#1e88e5','A');
-  if(Math.abs(du*p)>20)arrow(c,325,130,325,130-du/1000*100*p,'#2e9e4f','ΔU');
-  txt(c,`ΔU = ${fm(du*p)} J`,180,232,'#2e9e4f',15,'center')},
- ind:{q:'Gazga 800 J issiqlik berildi, gaz 300 J ish bajardi. ΔU = ? (J)',a:500,u:'J',h:'ΔU = Q − A'}},
-{t:'A',name:'Termodinamik ish',
- sl:[['p','Bosim p','·10⁵ Pa',1,5,.5,2],['dV','Hajm o‘zgarishi ΔV','litr (l)',1,6,.5,3]],
- cond:v=>`Gaz o‘zgarmas ${g(v.p)}·10⁵ Pa bosimda kengayib, hajmi ${g(v.dV/1000)} m³ ga ortdi. Gaz qancha ish bajardi?`,
- calc(v){let A=v.p*1e5*v.dV/1000;return{given:[`p = ${g(v.p)}·10⁵ Pa`,`ΔV = ${g(v.dV/1000)} m³`],find:'A = ?  (J)',formula:'A = p · ΔV',steps:[
- 'Formulani yozamiz: A = p · ΔV',`Qo‘yamiz: A = ${g(v.p)}·10⁵ Pa · ${g(v.dV/1000)} m³`,`Hisoblaymiz: A = ${fm(A)} J`,
- `Javob: A = ${fm(A)} J — p–V grafikdagi shtrixlangan to‘g‘ri to‘rtburchak yuzi.`]}},
- draw(c,v,p,T){let V=v.dV*p,py=210-170*(1+V)/8;
-  c.fillStyle='#ffd9a8';c.fillRect(30,py,80,210-py);c.fillStyle='#556';c.fillRect(30,py-8,80,8);c.fillRect(66,py-40,8,32);
-  c.strokeStyle='#334';c.lineWidth=4;c.beginPath();c.moveTo(30,40);c.lineTo(30,210);c.lineTo(110,210);c.lineTo(110,40);c.stroke();
-  let X=190,Y=200,W=150,H=150,x1=X+W/8,x2=X+W*(1+V)/8,y=Y-H*v.p/5;
-  c.strokeStyle='#334';c.lineWidth=2;c.beginPath();c.moveTo(X,Y-H-8);c.lineTo(X,Y);c.lineTo(X+W+8,Y);c.stroke();
-  c.fillStyle='rgba(255,140,0,.45)';c.fillRect(x1,y,x2-x1,Y-y);
-  c.strokeStyle='#e65100';c.lineWidth=1;for(let x=x1;x<x2;x+=7){c.beginPath();c.moveTo(x,Y);c.lineTo(Math.min(x+10,x2),Math.max(y,Y-10));c.stroke()}
-  c.lineWidth=3;c.beginPath();c.moveTo(x1,y);c.lineTo(x2,y);c.stroke();
-  txt(c,'p, 10⁵ Pa',X-8,22,'#334',12);txt(c,'V, l',X+W-8,Y+18,'#334',12);txt(c,g(v.p),X-6,y+4,'#e65100',12,'right');
-  txt(c,`A = ${fm(v.p*1e2*v.dV*p)} J`,X+W/2,228,'#e65100',15,'center')},
- ind:{q:'Gaz 3·10⁵ Pa bosimda 0,004 m³ ga kengaydi. Ish A = ? (J)',a:1200,u:'J',h:'A = p · ΔV'}},
-{t:'Q',name:'Isitish uchun issiqlik miqdori',
- sl:[['m','Suv massasi m','kg',1,5,.5,2],['t1','Boshlang‘ich t₁','°C',0,40,5,20],['t2','Oxirgi t₂','°C',50,100,5,80]],
- cond:v=>`${g(v.m)} kg suvni ${v.t1} °C dan ${v.t2} °C gacha isitish uchun qancha issiqlik kerak? Suvning solishtirma issiqlik sig‘imi c = 4200 J/(kg·°C).`,
- calc(v){let d=v.t2-v.t1,Q=4200*v.m*d;return{given:[`m = ${g(v.m)} kg`,`t₁ = ${v.t1} °C, t₂ = ${v.t2} °C`,'c = 4200 J/(kg·°C)'],find:'Q = ?  (J)',formula:'Q = c · m · (t₂ − t₁)',steps:[
- `Temperatura o‘zgarishi: Δt = t₂ − t₁ = ${v.t2} − ${v.t1} = ${d} °C`,`Formulaga qo‘yamiz: Q = 4200 · ${g(v.m)} · ${d}`,`Hisoblaymiz: Q = ${fm(Q)} J = ${g(Q/1000)} kJ`,
- `Javob: Q = ${fm(Q)} J issiqlik kerak.`]}},
- draw(c,v,p,T,r){let t=v.t1+(v.t2-v.t1)*p;
-  beaker(c,100,50,110,130,30+v.m*18,col(t));txt(c,`${g(v.m)} kg suv`,155,40,'#1f2a44',14,'center');
-  if(r){flame(c,155,216,T,1.3);arrow(c,55,215,55,150,'#e53935','Q')}
-  thermo(c,270,40,140,t);txt(c,`Q = ${fm(4200*v.m*(t-v.t1))} J`,180,238,'#d33',14,'center')},
- ind:{q:'3 kg suvni 10 °C dan 50 °C gacha isitish uchun Q = ? (J), c = 4200 J/(kg·°C)',a:504000,u:'J',h:'Q = c·m·(t₂ − t₁)'}},
-{t:'Balans',name:'Issiqlik balansi (suvlarni aralashtirish)',
- sl:[['m1','Issiq suv m₁','kg',1,3,.5,1],['T1','Issiq suv t₁','°C',50,90,5,80],['m2','Sovuq suv m₂','kg',1,5,.5,3],['T2','Sovuq suv t₂','°C',10,40,5,20]],
- cond:v=>`${g(v.m1)} kg ${v.T1} °C li issiq suvga ${g(v.m2)} kg ${v.T2} °C li sovuq suv qo‘shildi. Aralashmaning temperaturasi qancha bo‘ladi? (Issiqlik yo‘qotilmaydi.)`,
- calc(v){let n=v.m1*v.T1+v.m2*v.T2,d=v.m1+v.m2,tm=n/d;return{given:[`m₁ = ${g(v.m1)} kg, t₁ = ${v.T1} °C`,`m₂ = ${g(v.m2)} kg, t₂ = ${v.T2} °C`],find:'t = ?  (°C)',formula:'Q_bergan = Q_olgan:  c·m₁(t₁ − t) = c·m₂(t − t₂)',steps:[
- 'Issiq suv bergan issiqlik sovuq suv olgan issiqlikka teng: c·m₁(t₁ − t) = c·m₂(t − t₂)','c qisqaradi, t ni topamiz: t = (m₁t₁ + m₂t₂) / (m₁ + m₂)',
- `Qo‘yamiz: t = (${g(v.m1)}·${v.T1} + ${g(v.m2)}·${v.T2}) / (${g(v.m1)} + ${g(v.m2)}) = ${g(n)} / ${g(d)}`,
- `Tekshiramiz: Q_bergan = ${fm(4200*v.m1*(v.T1-tm))} J, Q_olgan = ${fm(4200*v.m2*(tm-v.T2))} J — teng`,
- `Javob: t = ${g(+tm.toFixed(1))} °C`]}},
- draw(c,v,p,T){let tm=(v.m1*v.T1+v.m2*v.T2)/(v.m1+v.m2),th=v.T1+(tm-v.T1)*p,tc=v.T2+(tm-v.T2)*p;
-  beaker(c,30,60,80,140,25+v.m1*20,col(th));beaker(c,200,60,80,140,25+v.m2*20,col(tc));
-  thermo(c,135,60,120,th,false);thermo(c,315,60,120,tc,false);
-  if(p<.98)arrow(c,60,40,250,40,'#e53935','issiqlik');
-  txt(c,`${g(v.m1)} kg, ${fm(th,1)}°C`,70,224,'#c62828',13,'center');txt(c,`${g(v.m2)} kg, ${fm(tc,1)}°C`,240,224,'#1565c0',13,'center');
-  if(p>.98)txt(c,`Muvozanat: t = ${fm(tm,1)} °C`,180,20,'#2e9e4f',15,'center')},
- ind:{q:'2 kg 90 °C li suv va 2 kg 30 °C li suv aralashtirildi. Aralashma temperaturasi t = ? (°C)',a:60,u:'°C',h:'t = (m₁t₁ + m₂t₂)/(m₁ + m₂)'}},
-{t:'Q=qm',name:'Yoqilg‘ining yonish issiqligi',
- sl:[['coal','Ko‘mir massasi','kg',.1,.6,.1,.5],['mw','Suv massasi','kg',50,150,10,50]],
- cond:v=>`${g(v.coal)} kg ko‘mir to‘liq yondi (q = 27·10⁶ J/kg). Shu issiqlikning hammasi ${v.mw} kg, 20 °C li suvni isitishga sarflandi. Suv necha °C gacha isiydi? (c = 4200 J/(kg·°C))`,
- calc(v){let Q=27e6*v.coal,d=Q/(4200*v.mw),tf=20+d;return{given:[`m_ko‘mir = ${g(v.coal)} kg`,'q = 27·10⁶ J/kg',`m_suv = ${v.mw} kg, t₁ = 20 °C`,'c = 4200 J/(kg·°C)'],find:'Q = ?  Δt = ?  t₂ = ?',formula:'Q = q·m;   Q = c·m·Δt',steps:[
- `Ko‘mir yonishidan: Q = q·m = 27·10⁶ · ${g(v.coal)} = ${fm(Q)} J`,'Suv uchun Q = c·m·Δt, bundan Δt = Q / (c·m)',`Δt = ${fm(Q)} / (4200 · ${v.mw}) = ${g(+d.toFixed(1))} °C`,
- `Oxirgi temperatura: t₂ = 20 + ${g(+d.toFixed(1))} = ${g(+tf.toFixed(1))} °C`,`Javob: Q = ${fm(Q)} J, suv ${g(+tf.toFixed(1))} °C gacha isiydi.`]}},
- draw(c,v,p,T,r){let d=27e6*v.coal/(4200*v.mw),t=20+d*p;
-  beaker(c,100,15,120,115,Math.min(105,15+v.mw*.6),col(t));thermo(c,290,20,120,t);
-  c.fillStyle='#765';c.fillRect(60,212,200,6);let n=Math.round(v.coal*10),s=26*(1-.6*p);
-  for(let i=0;i<n;i++){let x=95+(i%3)*s*1.4+(Math.floor(i/3)%2)*10,y=210-Math.floor(i/3)*s*.9-s;c.fillStyle=r?'#5a2a10':'#222';c.fillRect(x,y,s,s);if(r){c.fillStyle='rgba(255,120,0,'+(.5+.4*Math.sin(T*8+i))+')';c.fillRect(x+3,y+3,s-6,s-6)}}
-  if(r){flame(c,160,172,T<!DOCTYPE html>
-<html lang="uz"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>18-mavzu: Masalalar yechish</title>
-<style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef6ff;--card:#fff;--tx:#1f2a44;--pr:#1e88e5;--ac:#ff7043;--ok:#2e9e4f;--bad:#e53935;--bd:#cfe3fa}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101a2b;--card:#182640;--tx:#eaf1ff;--bd:#2c426a}}
-:root[data-theme="dark"]{--bg:#101a2b;--card:#182640;--tx:#eaf1ff;--bd:#2c426a}
-*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
-header{background:linear-gradient(135deg,#1e88e5,#7e57c2);color:#fff;padding:16px;text-align:center}
-header h1{margin:0;font-size:1.3rem}header p{margin:4px 0 0;opacity:.9;font-size:.9rem}
-.wrap{max-width:820px;margin:0 auto;padding:10px}
-#tabs{display:flex;gap:8px;overflow-x:auto;padding:6px 2px}
-#tabs button{flex:0 0 auto;min-height:48px;min-width:52px;border:2px solid var(--bd);background:var(--card);color:var(--tx);border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;padding:0 14px}
-#tabs button.on{background:var(--pr);color:#fff;border-color:var(--pr)}
-.card{background:var(--card);border:2px solid var(--bd);border-radius:16px;padding:14px;margin:10px 0}
-h2{margin:0 0 8px;font-size:1.15rem;color:var(--pr)}h3{margin:12px 0 6px}
-.cond{font-size:1.02rem;background:#fff8e1;color:#4a3b00;border-left:5px solid #ffb300;padding:8px 10px;border-radius:8px}
-table{width:100%;border-collapse:collapse;margin:10px 0}
-td{border:1px solid var(--bd);padding:7px 9px;vertical-align:top}td:first-child{width:30%;font-weight:700;background:rgba(30,136,229,.1)}
-ol{margin:0;padding-left:20px}ol li{margin:4px 0;animation:in .4s}@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
-.ans{color:var(--ok);font-weight:800}
-canvas{width:100%;max-width:520px;display:block;margin:8px auto;border-radius:12px;border:2px solid var(--bd)}
-.btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.btns button,.big{flex:1 1 130px;min-height:50px;border:0;border-radius:12px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;padding:8px 12px}
-.g{background:var(--ok)}.o{background:var(--ac)}.b{background:var(--pr)}.p{background:#7e57c2}
-.sl{margin:10px 0}.sl label{display:block;font-weight:600}.sl input{width:100%;height:34px;accent-color:var(--pr)}
-input[type=number]{font-size:1.1rem;padding:10px;border:2px solid var(--bd);border-radius:10px;width:150px;background:var(--card);color:var(--tx)}
-.res{margin-top:8px;font-weight:700}.ok{color:var(--ok)}.no{color:var(--bad)}
-.q{margin:12px 0;padding:10px;border:2px solid var(--bd);border-radius:12px}
-.q label{display:block;padding:10px;margin:4px 0;border-radius:10px;border:2px solid var(--bd);cursor:pointer;min-height:44px}
-.q input{margin-right:8px;transform:scale(1.3)}
-.score{font-size:1.4rem;font-weight:800;text-align:center;margin:10px 0}
-</style></head><body>
-<header><h1>⚗️ 18-mavzu: Masalalar yechish</h1><p>9-sinf fizika · Termodinamika va issiqlik hodisalari</p></header>
-<div class="wrap">
-<div id="tabs"></div>
-<div class="card" id="panel"></div>
-<div class="card"><h2>📝 Yakuniy test (5 ta savol)</h2><div id="test"></div>
-<button class="big b" style="width:100%" onclick="grade()">Natijani ko‘rish</button><div id="tres"></div></div>
-</div>
-<script>
-const $=s=>document.querySelector(s);
-const g=x=>String(+(+x).toPrecision(8)).replace('.',',');
-const fm=(x,d=0)=>{let[a,b]=(+x).toFixed(d).split('.');a=a.replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');return b?a+','+b:a};
-const col=t=>{t=Math.max(0,Math.min(100,t))/100;return`rgb(${80+160*t|0},${160-80*t|0},${240-180*t|0})`};
-function txt(c,s,x,y,k='#1f2a44',z=14,al='left'){c.fillStyle=k;c.font='bold '+z+'px sans-serif';c.textAlign=al;c.fillText(s,x,y)}
-function arrow(c,x1,y1,x2,y2,k,lb){c.strokeStyle=c.fillStyle=k;c.lineWidth=4;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();let a=Math.atan2(y2-y1,x2-x1);c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-13*Math.cos(a-.5),y2-13*Math.sin(a-.5));c.lineTo(x2-13*Math.cos(a+.5),y2-13*Math.sin(a+.5));c.closePath();c.fill();if(lb)txt(c,lb,(x1+x2)/2+8,(y1+y2)/2-6,k,15)}
-function beaker(c,x,y,w,h,lv,k){c.fillStyle=k;c.fillRect(x,y+h-lv,w,lv);c.strokeStyle='#334';c.lineWidth=3;c.beginPath();c.moveTo(x,y);c.lineTo(x,y+h);c.lineTo(x+w,y+h);c.lineTo(x+w,y);c.stroke()}
-function thermo(c,x,y,h,t,lb=true){c.fillStyle='#fff';c.fillRect(x-5,y,10,h);c.strokeStyle='#334';c.lineWidth=2;c.strokeRect(x-5,y,10,h);let f=h*Math.max(0,Math.min(100,t))/100;c.fillStyle='#e02';c.fillRect(x-3,y+h-f,6,f);c.beginPath();c.arc(x,y+h+6,9,0,7);c.fill();if(lb)txt(c,fm(t,1)+'°C',x+14,y+h-f+4,'#c62828',13)}
-function flame(c,x,y,T,s=1){for(let i=0;i<3;i++){let hh=(28+9*Math.sin(T*9+i*2))*s,xc=x+(i-1)*14*s;c.fillStyle=['#ff9500','#ffd000','#ff4d00'][i];c.beginPath();c.moveTo(xc-8*s,y);c.quadraticCurveTo(xc-8*s,y-hh/2,xc,y-hh);c.quadraticCurveTo(xc+8*s,y-hh/2,xc+8*s,y);c.fill()}}
+<header>
+  <h1>⚗️ 18-mavzu: Masalalar yechish</h1>
+  <p>9-sinf fizika · Termodinamika va issiqlik hodisalari</p>
+</header>
 
-const P=[
-{t:'ΔU',name:'Ichki energiya o‘zgarishi',
- sl:[['Q','Berilgan issiqlik Q','J',100,1000,50,500],['A','Gaz bajargan ish A','J',0,800,50,200]],
- cond:v=>`Silindrdagi gazga ${fm(v.Q)} J issiqlik berildi. Gaz kengayib, porshenni ko‘tardi va ${fm(v.A)} J ish bajardi. Gazning ichki energiyasi qanchaga o‘zgardi?`,
- calc(v){let d=v.Q-v.A;return{given:[`Q = ${fm(v.Q)} J`,`A = ${fm(v.A)} J`],find:'ΔU = ?  (J)',formula:'ΔU = Q − A',steps:[
- 'Formulani yozamiz: ΔU = Q − A',`Qiymatlarni qo‘yamiz: ΔU = ${fm(v.Q)} J − ${fm(v.A)} J`,`Hisoblaymiz: ΔU = ${fm(d)} J`,
- `Javob: ΔU = ${fm(d)} J — ichki energiya ${d>=0?'ortdi':'kamaydi'}.`]}},
- draw(c,v,p,T){let du=v.Q-v.A,py=150-70*v.A/1000*p;
-  c.fillStyle=col(50+du/12);c.fillRect(130,py+8,120,202-py);
-  for(let i=0;i<14;i++){let s=1+Math.abs(du)/250;c.fillStyle='#fff';c.beginPath();c.arc(142+(i*37)%96+Math.sin(T*3*s+i*2)*6,py+22+((i*53)%100)/100*(202-py-34)+Math.sin(T*4*s+i)*5,4,0,7);c.fill()}
-  c.strokeStyle='#334';c.lineWidth=4;c.beginPath();c.moveTo(130,50);c.lineTo(130,210);c.lineTo(250,210);c.lineTo(250,50);c.stroke();
-  c.fillStyle='#556';c.fillRect(130,py,120,8);c.fillRect(186,py-30,8,30);
-  arrow(c,12,185,40+80*v.Q/1000*p,185,'#e53935','Q');
-  arrow(c,275,py+4,275,py-10-40*v.A/800*p,'#1e88e5','A');
-  if(Math.abs(du*p)>20)arrow(c,325,130,325,130-du/1000*100*p,'#2e9e4f','ΔU');
-  txt(c,`ΔU = ${fm(du*p)} J`,180,232,'#2e9e4f',15,'center')},
- ind:{q:'Gazga 800 J issiqlik berildi, gaz 300 J ish bajardi. ΔU = ? (J)',a:500,u:'J',h:'ΔU = Q − A'}},
-{t:'A',name:'Termodinamik ish',
- sl:[['p','Bosim p','·10⁵ Pa',1,5,.5,2],['dV','Hajm o‘zgarishi ΔV','litr (l)',1,6,.5,3]],
- cond:v=>`Gaz o‘zgarmas ${g(v.p)}·10⁵ Pa bosimda kengayib, hajmi ${g(v.dV/1000)} m³ ga ortdi. Gaz qancha ish bajardi?`,
- calc(v){let A=v.p*1e5*v.dV/1000;return{given:[`p = ${g(v.p)}·10⁵ Pa`,`ΔV = ${g(v.dV/1000)} m³`],find:'A = ?  (J)',formula:'A = p · ΔV',steps:[
- 'Formulani yozamiz: A = p · ΔV',`Qo‘yamiz: A = ${g(v.p)}·10⁵ Pa · ${g(v.dV/1000)} m³`,`Hisoblaymiz: A = ${fm(A)} J`,
- `Javob: A = ${fm(A)} J — p–V grafikdagi shtrixlangan to‘g‘ri to‘rtburchak yuzi.`]}},
- draw(c,v,p,T){let V=v.dV*p,py=210-170*(1+V)/8;
-  c.fillStyle='#ffd9a8';c.fillRect(30,py,80,210-py);c.fillStyle='#556';c.fillRect(30,py-8,80,8);c.fillRect(66,py-40,8,32);
-  c.strokeStyle='#334';c.lineWidth=4;c.beginPath();c.moveTo(30,40);c.lineTo(30,210);c.lineTo(110,210);c.lineTo(110,40);c.stroke();
-  let X=190,Y=200,W=150,H=150,x1=X+W/8,x2=X+W*(1+V)/8,y=Y-H*v.p/5;
-  c.strokeStyle='#334';c.lineWidth=2;c.beginPath();c.moveTo(X,Y-H-8);c.lineTo(X,Y);c.lineTo(X+W+8,Y);c.stroke();
-  c.fillStyle='rgba(255,140,0,.45)';c.fillRect(x1,y,x2-x1,Y-y);
-  c.strokeStyle='#e65100';c.lineWidth=1;for(let x=x1;x<x2;x+=7){c.beginPath();c.moveTo(x,Y);c.lineTo(Math.min(x+10,x2),Math.max(y,Y-10));c.stroke()}
-  c.lineWidth=3;c.beginPath();c.moveTo(x1,y);c.lineTo(x2,y);c.stroke();
-  txt(c,'p, 10⁵ Pa',X-8,22,'#334',12);txt(c,'V, l',X+W-8,Y+18,'#334',12);txt(c,g(v.p),X-6,y+4,'#e65100',12,'right');
-  txt(c,`A = ${fm(v.p*1e2*v.dV*p)} J`,X+W/2,228,'#e65100',15,'center')},
- ind:{q:'Gaz 3·10⁵ Pa bosimda 0,004 m³ ga kengaydi. Ish A = ? (J)',a:1200,u:'J',h:'A = p · ΔV'}},
-{t:'Q',name:'Isitish uchun issiqlik miqdori',
- sl:[['m','Suv massasi m','kg',1,5,.5,2],['t1','Boshlang‘ich t₁','°C',0,40,5,20],['t2','Oxirgi t₂','°C',50,100,5,80]],
- cond:v=>`${g(v.m)} kg suvni ${v.t1} °C dan ${v.t2} °C gacha isitish uchun qancha issiqlik kerak? Suvning solishtirma issiqlik sig‘imi c = 4200 J/(kg·°C).`,
- calc(v){let d=v.t2-v.t1,Q=4200*v.m*d;return{given:[`m = ${g(v.m)} kg`,`t₁ = ${v.t1} °C, t₂ = ${v.t2} °C`,'c = 4200 J/(kg·°C)'],find:'Q = ?  (J)',formula:'Q = c · m · (t₂ − t₁)',steps:[
- `Temperatura o‘zgarishi: Δt = t₂ − t₁ = ${v.t2} − ${v.t1} = ${d} °C`,`Formulaga qo‘yamiz: Q = 4200 · ${g(v.m)} · ${d}`,`Hisoblaymiz: Q = ${fm(Q)} J = ${g(Q/1000)} kJ`,
- `Javob: Q = ${fm(Q)} J issiqlik kerak.`]}},
- draw(c,v,p,T,r){let t=v.t1+(v.t2-v.t1)*p;
-  beaker(c,100,50,110,130,30+v.m*18,col(t));txt(c,`${g(v.m)} kg suv`,155,40,'#1f2a44',14,'center');
-  if(r){flame(c,155,216,T,1.3);arrow(c,55,215,55,150,'#e53935','Q')}
-  thermo(c,270,40,140,t);txt(c,`Q = ${fm(4200*v.m*(t-v.t1))} J`,180,238,'#d33',14,'center')},
- ind:{q:'3 kg suvni 10 °C dan 50 °C gacha isitish uchun Q = ? (J), c = 4200 J/(kg·°C)',a:504000,u:'J',h:'Q = c·m·(t₂ − t₁)'}},
-{t:'Balans',name:'Issiqlik balansi (suvlarni aralashtirish)',
- sl:[['m1','Issiq suv m₁','kg',1,3,.5,1],['T1','Issiq suv t₁','°C',50,90,5,80],['m2','Sovuq suv m₂','kg',1,5,.5,3],['T2','Sovuq suv t₂','°C',10,40,5,20]],
- cond:v=>`${g(v.m1)} kg ${v.T1} °C li issiq suvga ${g(v.m2)} kg ${v.T2} °C li sovuq suv qo‘shildi. Aralashmaning temperaturasi qancha bo‘ladi? (Issiqlik yo‘qotilmaydi.)`,
- calc(v){let n=v.m1*v.T1+v.m2*v.T2,d=v.m1+v.m2,tm=n/d;return{given:[`m₁ = ${g(v.m1)} kg, t₁ = ${v.T1} °C`,`m₂ = ${g(v.m2)} kg, t₂ = ${v.T2} °C`],find:'t = ?  (°C)',formula:'Q_bergan = Q_olgan:  c·m₁(t₁ − t) = c·m₂(t − t₂)',steps:[
- 'Issiq suv bergan issiqlik sovuq suv olgan issiqlikka teng: c·m₁(t₁ − t) = c·m₂(t − t₂)','c qisqaradi, t ni topamiz: t = (m₁t₁ + m₂t₂) / (m₁ + m₂)',
- `Qo‘yamiz: t = (${g(v.m1)}·${v.T1} + ${g(v.m2)}·${v.T2}) / (${g(v.m1)} + ${g(v.m2)}) = ${g(n)} / ${g(d)}`,
- `Tekshiramiz: Q_bergan = ${fm(4200*v.m1*(v.T1-tm))} J, Q_olgan = ${fm(4200*v.m2*(tm-v.T2))} J — teng`,
- `Javob: t = ${g(+tm.toFixed(1))} °C`]}},
- draw(c,v,p,T){let tm=(v.m1*v.T1+v.m2*v.T2)/(v.m1+v.m2),th=v.T1+(tm-v.T1)*p,tc=v.T2+(tm-v.T2)*p;
-  beaker(c,30,60,80,140,25+v.m1*20,col(th));beaker(c,200,60,80,140,25+v.m2*20,col(tc));
-  thermo(c,135,60,120,th,false);thermo(c,315,60,120,tc,false);
-  if(p<.98)arrow(c,60,40,250,40,'#e53935','issiqlik');
-  txt(c,`${g(v.m1)} kg, ${fm(th,1)}°C`,70,224,'#c62828',13,'center');txt(c,`${g(v.m2)} kg, ${fm(tc,1)}°C`,240,224,'#1565c0',13,'center');
-  if(p>.98)txt(c,`Muvozanat: t = ${fm(tm,1)} °C`,180,20,'#2e9e4f',15,'center')},
- ind:{q:'2 kg 90 °C li suv va 2 kg 30 °C li suv aralashtirildi. Aralashma temperaturasi t = ? (°C)',a:60,u:'°C',h:'t = (m₁t₁ + m₂t₂)/(m₁ + m₂)'}},
-{t:'Q=qm',name:'Yoqilg‘ining yonish issiqligi',
- sl:[['coal','Ko‘mir massasi','kg',.1,.6,.1,.5],['mw','Suv massasi','kg',50,150,10,50]],
- cond:v=>`${g(v.coal)} kg ko‘mir to‘liq yondi (q = 27·10⁶ J/kg). Shu issiqlikning hammasi ${v.mw} kg, 20 °C li suvni isitishga sarflandi. Suv necha °C gacha isiydi? (c = 4200 J/(kg·°C))`,
- calc(v){let Q=27e6*v.coal,d=Q/(4200*v.mw),tf=20+d;return{given:[`m_ko‘mir = ${g(v.coal)} kg`,'q = 27·10⁶ J/kg',`m_suv = ${v.mw} kg, t₁ = 20 °C`,'c = 4200 J/(kg·°C)'],find:'Q = ?  Δt = ?  t₂ = ?',formula:'Q = q·m;   Q = c·m·Δt',steps:[
- `Ko‘mir yonishidan: Q = q·m = 27·10⁶ · ${g(v.coal)} = ${fm(Q)} J`,'Suv uchun Q = c·m·Δt, bundan Δt = Q / (c·m)',`Δt = ${fm(Q)} / (4200 · ${v.mw}) = ${g(+d.toFixed(1))} °C`,
- `Oxirgi temperatura: t₂ = 20 + ${g(+d.toFixed(1))} = ${g(+tf.toFixed(1))} °C`,`Javob: Q = ${fm(Q)} J, suv ${g(+tf.toFixed(1))} °C gacha isiydi.`]}},
- draw(c,v,p,T,r){let d=27e6*v.coal/(4200*v.mw),t=20+d*p;
-  beaker(c,100,15,120,115,Math.min(105,15+v.mw*.6),col(t));thermo(c,290,20,120,t);
-  c.fillStyle='#765';c.fillRect(60,212,200,6);let n=Math.round(v.coal*10),s=26*(1-.6*p);
-  for(let i=0;i<n;i++){let x=95+(i%3)*s*1.4+(Math.floor(i/3)%2)*10,y=210-Math.floor(i/3)*s*.9-s;c.fillStyle=r?'#5a2a10':'#222';c.fillRect(x,y,s,s);if(r){c.fillStyle='rgba(255,120,0,'+(.5+.4*Math.sin(T*8+i))+')';c.fillRect(x+3,y+3,s-6,s-6)}}
-  if(r){flame(c,160,172,T,1.5);arrow(c,65,175,65,140,'#e53935','Q')}
-  txt(c,`Q = ${fm(27e6*v.coal*p)} J`,180,236,'#d33',14,'center')},
- ind:{q:'2 kg ko‘mir (q = 27·10⁶ J/kg) yonganda qancha issiqlik ajraladi? Javobni MJ da kiriting.',a:54,u:'MJ',h:'Q = q·m'}},
-{t:'FIK',name:'Aralash masala (FIK bilan)',
- sl:[['coal','Ko‘mir massasi','kg',.1,.4,.05,.2],['eta','FIK η','%',20,60,5,40],['mw','Suv massasi','kg',20,60,5,20]],
- cond:v=>`${g(v.coal)} kg ko‘mir yondi (q = 27·10⁶ J/kg). Ajralgan issiqlikning ${v.eta}% i ${v.mw} kg, 20 °C li suvni isitishga sarflandi. Suvning oxirgi temperaturasini toping.`,
- calc(v){let Q=27e6*v.coal,e=v.eta/100,Qf=Q*e,d=Qf/(4200*v.mw),tf=20+d;return{given:[`m_ko‘mir = ${g(v.coal)} kg, q = 27·10⁶ J/kg`,`η = ${v.eta}% = ${g(e)}`,`m_suv = ${v.mw} kg, t₁ = 20 °C, c = 4200 J/(kg·°C)`],find:'t₂ = ?  (°C)',formula:'Q = q·m;  Q_foyd = η·Q;  Q_foyd = c·m·Δt',steps:[
- `To‘liq yonishdan: Q = q·m = 27·10⁶ · ${g(v.coal)} = ${fm(Q)} J`,`Foydali issiqlik: Q_foyd = η·Q = ${g(e)} · ${fm(Q)} = ${fm(Qf)} J`,
- `Δt = Q_foyd / (c·m) = ${fm(Qf)} / (4200 · ${v.mw}) = ${g(+d.toFixed(1))} °C`,`t₂ = 20 + ${g(+d.toFixed(1))} = ${g(+tf.toFixed(1))} °C`,
- `Javob: suv ${g(+tf.toFixed(1))} °C gacha isiydi (yo‘qotish: ${fm(Q-Qf)} J).`]}},
- draw(c,v,p,T,r){let e=v.eta/100,Q=27e6*v.coal,t=20+Q*e/(4200*v.mw)*p;
-  c.fillStyle='#ff9800';c.fillRect(30,30,300*p,26);txt(c,`Yonish: Q = ${g(+(Q/1e6).toFixed(2))}·10⁶ J`,30,24,'#e65100',13);
-  c.fillStyle='#43a047';c.fillRect(30,85,300*e*p,26);c.fillStyle='#9e9e9e';c.fillRect(30+300*e*p,85,300*(1-e)*p,26);
-  arrow(c,180,58,180,80,'#555');txt(c,`Foydali: ${g(+(Q*e/1e6).toFixed(2))}·10⁶ J`,30,79,'#2e7d32',13);txt(c,'Yo‘qotish',330,79,'#616161',13,'right');
-  beaker(c,50,130,100,80,Math.min(70,10+v.mw),col(t));thermo(c,260,130,80,t);txt(c,`${v.mw} kg suv`,100,230,'#1f2a44',13,'center');
-  if(r)arrow(c,175,170,225,170,'#2e9e4f','Q_foyd')},
- ind:{q:'0,1 kg ko‘mir (q = 27·10⁶ J/kg) yondi, issiqlikning 50% i 10 kg, 20 °C li suvni isitdi. Δt = ? (°C)',a:32.14,u:'°C',h:'Q_foyd = η·q·m;  Δt = Q_foyd/(c·m)'}}
+<div id="tabs">
+  <button onclick="showTab(0)" class="active">1. ΔU</button>
+  <button onclick="showTab(1)">2. A</button>
+  <button onclick="showTab(2)">3. Q</button>
+  <button onclick="showTab(3)">4. Balans</button>
+  <button onclick="showTab(4)">5. Q=qm</button>
+</div>
+
+<div class="card" id="taskPanel"></div>
+
+<div class="card">
+  <h2>📝 Yakuniy test (5 ta savol)</h2>
+  <div id="testArea"></div>
+  <button class="btn" onclick="checkTest()">Natijani ko‘rish</button>
+  <div id="testResult"></div>
+</div>
+
+<script>
+const tasks = [
+  { name: "1. Ichki energiya o‘zgarishi (ΔU)", cond: "Silindrdagi gazga 500 J issiqlik berildi. Gaz kengayib, porshenni ko‘tardi va 200 J ish bajardi. Gazning ichki energiyasi qanchaga o‘zgardi?", given: "Q = 500 J<br>A = 200 J", find: "ΔU = ?", formula: "ΔU = Q − A", step: "ΔU = 500 J − 200 J = 300 J", ans: "300 J" },
+  { name: "2. Termodinamik ish (A)", cond: "Gaz o‘zgarmas 2·10⁵ Pa bosimda kengayib, hajmi 0,003 m³ ga ortdi. Gaz qancha ish bajardi?", given: "p = 2·10⁵ Pa<br>ΔV = 0,003 m³", find: "A = ?", formula: "A = p · ΔV", step: "A = 2·10⁵ Pa · 0,003 m³ = 600 J", ans: "600 J" },
+  { name: "3. Isitish uchun issiqlik miqdori (Q)", cond: "2 kg suvni 20 °C dan 80 °C gacha isitish uchun qancha issiqlik kerak? (c = 4200 J/(kg·°C))", given: "m = 2 kg<br>t₁ = 20 °C, t₂ = 80 °C<br>c = 4200 J/(kg·°C)", find: "Q = ?", formula: "Q = c · m · (t₂ − t₁)", step: "Q = 4200 · 2 · (80 − 20) = 504 000 J", ans: "504 000 J (504 kJ)" },
+  { name: "4. Issiqlik balansi", cond: "1 kg 80 °C li issiq suvga 3 kg 20 °C li sovuq suv qo‘shildi. Aralashmaning temperaturasi qancha bo‘ladi?", given: "m₁ = 1 kg, t₁ = 80 °C<br>m₂ = 3 kg, t₂ = 20 °C", find: "t = ?", formula: "t = (m₁t₁ + m₂t₂) / (m₁ + m₂)", step: "t = (1·80 + 3·20) / (1 + 3) = 140 / 4 = 35 °C", ans: "35 °C" },
+  { name: "5. Yoqilg‘ining yonish issiqligi", cond: "0,5 kg ko‘mir to‘liq yonganda qancha issiqlik ajraladi? (q = 27·10⁶ J/kg)", given: "m = 0,5 kg<br>q = 27·10⁶ J/kg", find: "Q = ?", formula: "Q = q · m", step: "Q = 27·10⁶ · 0,5 = 13,5·10⁶ J", ans: "13,5 MJ" }
 ];
-const TESTS=[
-{q:'Gazga 300 J issiqlik berildi, u 100 J ish bajardi. ΔU = ?',o:['400 J','200 J','300 J','100 J'],a:1,e:'ΔU = Q − A = 300 − 100 = 200 J.'},
-{q:'p = 1·10⁵ Pa bosimda gaz hajmi 0,005 m³ ga ortdi. Ish qancha?',o:['50 J','5000 J','500 J','0,5 J'],a:2,e:'A = p·ΔV = 10⁵ · 0,005 = 500 J.'},
-{q:'1 kg suvni 10 °C ga isitish uchun qancha issiqlik kerak? (c = 4200 J/(kg·°C))',o:['420 J','4200 J','42 000 J','420 000 J'],a:2,e:'Q = c·m·Δt = 4200 · 1 · 10 = 42 000 J.'},
-{q:'1 kg 60 °C li va 1 kg 20 °C li suv aralashtirildi. Aralashma temperaturasi?',o:['30 °C','40 °C','50 °C','80 °C'],a:1,e:'Massalar teng: t = (60 + 20)/2 = 40 °C.'},
-{q:'2 kg ko‘mir yonganda (q = 27·10⁶ J/kg) qancha issiqlik ajraladi?',o:['13,5 MJ','27 MJ','54 MJ','540 MJ'],a:2,e:'Q = q·m = 27·10⁶ · 2 = 54·10⁶ J = 54 MJ.'}];
 
-let cur=0,p=0,run=false,last=performance.now(),vals=P.map(q=>Object.fromEntries(q.sl.map(s=>[s[0],s[6]]))),shown=P.map(()=>0),cv;
-function render(i){cur=i;p=0;run=false;let q=P[i];
- document.querySelectorAll('#tabs button').forEach((b,j)=>b.classList.toggle('on',j==i));
- $('#panel').innerHTML=`<h2>${i+1}-reja. ${q.name}</h2><div class="cond" id="cond"></div><table id="tb"></table>
- <canvas id="cv" width="360" height="240"></canvas>
- <div class="btns"><button class="g" onclick="run=true;if(p>=1)p=0">▶ Boshlash</button><button class="o" onclick="run=false">⏸ To‘xtatish</button><button class="b" onclick="p=0;run=true">↺ Qayta boshlash</button></div>
- <h3>🎚 Simulyatsiya</h3><div id="sl">${q.sl.map(s=>`<div class="sl"><label>${s[1]}: <b id="lb_${s[0]}"></b> ${s[2]}</label><input type="range" min="${s[3]}" max="${s[4]}" step="${s[5]}" value="${vals[i][s[0]]}" oninput="sv('${s[0]}',this.value)"></div>`).join('')}</div>
- <div class="btns"><button class="p" onclick="shown[cur]++;upd()">Keyingi qadam ▶</button><button class="b" onclick="shown[cur]=0;upd()">Yechimni yashirish</button></div>
- <h3>✍️ Mustaqil masala</h3><p>${q.ind.q}</p><input type="number" step="any" id="ia" inputmode="decimal" placeholder="Javob"> ${q.ind.u}
- <div class="btns"><button class="g" onclick="chk()">Tekshirish</button></div><div class="res" id="ir"></div>`;
- cv=$('#cv');upd()}
-function sv(k,x){vals[cur][k]=+x;p=1;run=false;upd()}
-function upd(){let q=P[cur],v=vals[cur],r=q.calc(v),n=r.steps.length,k=Math.min(shown[cur],n);shown[cur]=k;
- q.sl.forEach(s=>$('#lb_'+s[0]).textContent=g(v[s[0]]));$('#cond').textContent=q.cond(v);
- $('#tb').innerHTML=`<tr><td>Berilgan</td><td>${r.given.join('<br>')}</td></tr><tr><td>Topish kerak</td><td>${r.find}</td></tr><tr><td>Formula</td><td>${r.formula}</td></tr>
- <tr><td>Yechim</td><td>${k?`<ol>${r.steps.slice(0,Math.min(k,n-1)).map(s=>`<li>${s}</li>`).join('')}</ol>`:'<i>«Keyingi qadam» tugmasini bosing</i>'}</td></tr>
- <tr><td>Javob</td><td class="ans">${k>=n?r.steps[n-1].replace('Javob: ',''):'—'}</td></tr>`}
-function chk(){let a=P[cur].ind,x=parseFloat(($('#ia').value\vert{}\vert{}'').replace(',','.')),e=$('#ir');
- if(isNaN(x)){e.className='res no';e.textContent='Javobni kiriting.';return}
- if(Math.abs(x-a.a)<=Math.abs(a.a)*.02){e.className='res ok';e.textContent='✅ To‘g‘ri! Barakalla!'}
- else{e.className='res no';e.textContent='❌ Noto‘g‘ri. Maslahat: '+a.h+'. Yana urinib ko‘ring.'}}
-function loop(now){let dt=(now-last)/1000;last=now;if(run){p=Math.min(1,p+dt/4);if(p>=1)run=false}
- let c=cv.getContext('2d');c.clearRect(0,0,360,240);c.fillStyle='#f2f8ff';c.fillRect(0,0,360,240);P[cur].draw(c,vals[cur],p,now/1000,run);requestAnimationFrame(loop)}
-$('#tabs').innerHTML=P.map((q,i)=>`<button onclick="render(${i})">${i+1}. ${q.t}</button>`).join('');
-$('#test').innerHTML=TESTS.map((t,i)=>`<div class="q"><b>${i+1}. ${t.q}</b>${t.o.map((o,j)=>`<label><input type="radio" name="t${i}" value="${j}">${'ABCD'[j]})${o}</label>`).join('')}</div>`).join('');
-function grade(){let s=0,h='';TESTS.forEach((t,i)=>{let r=document.querySelector(`input[name=t${i}]:checked`),ok=r&&+r.value==t.a;if(ok)s++;
- h+=`<div class="res ${ok?'ok':'no'}">${i+1}-savol: ${ok?'✅ to‘g‘ri':'❌ noto‘g‘ri'}${ok?'':` — to‘g‘ri javob ${'ABCD'[t.a]}.${t.e}`}</div>`});
- $('#tres').innerHTML=`<div class="score ${s>=4?'ok':s>=3?'':'no'}">Natija: ${s} / 5 ball ${s==5?'🏆':s>=3?'👍':'📚'}</div>`+h}
-render(0);requestAnimationFrame(loop);
-</script></body></html>
+const tests = [
+  { q: "Gazga 300 J issiqlik berildi, u 100 J ish bajardi. ΔU = ?", o: ["400 J", "200 J", "300 J", "100 J"], a: 1 },
+  { q: "p = 1·10⁵ Pa bosimda gaz hajmi 0,005 m³ ga ortdi. Ish qancha?", o: ["50 J", "5000 J", "500 J", "0,5 J"], a: 2 },
+  { q: "1 kg suvni 10 °C ga isitish uchun qancha issiqlik kerak? (c = 4200)", o: ["420 J", "4200 J", "42 000 J", "420 000 J"], a: 2 },
+  { q: "1 kg 60 °C va 1 kg 20 °C suv aralashtirildi. Oxirgi temp?", o: ["30 °C", "40 °C", "50 °C", "80 °C"], a: 1 },
+  { q: "2 kg ko‘mir yonganda (q = 27·10⁶ J/kg) qancha issiqlik ajraladi?", o: ["13,5 MJ", "27 MJ", "54 MJ", "540 MJ"], a: 2 }
+];
+
+function showTab(idx) {
+  const btns = document.querySelectorAll('#tabs button');
+  btns.forEach((b, i) => b.classList.toggle('active', i === idx));
+  
+  const t = tasks[idx];
+  document.getElementById('taskPanel').innerHTML = `
+    <h2>${t.name}</h2>
+    <div class="cond">${t.cond}</div>
+    <table>
+      <tr><td>Berilgan</td><td>${t.given}</td></tr>
+      <tr><td>Topish kerak</td><td>${t.find}</td></tr>
+      <tr><td>Formula</td><td>${t.formula}</td></tr>
+      <tr><td>Yechilishi</td><td>${t.step}</td></tr>
+      <tr><td>Javob</td><td><b>${t.ans}</b></td></tr>
+    </table>
+  `;
+}
+
+function renderTests() {
+  const area = document.getElementById('testArea');
+  area.innerHTML = tests.map((t, i) => `
+    <div class="q">
+      <b>${i + 1}. ${t.q}</b>
+      ${t.o.map((opt, j) => `
+        <label><input type="radio" name="q${i}" value="${j}"> ${'ABCD'[j]})${opt}</label>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function checkTest() {
+  let score = 0;
+  tests.forEach((t, i) => {
+    const sel = document.querySelector(`input[name="q${i}"]:checked`);
+    if (sel && parseInt(sel.value) === t.a) score++;
+  });
+  
+  const res = document.getElementById('testResult');
+  res.className = `score ${score >= 3 ? 'ok' : 'no'}`;
+  res.innerHTML = `Natija: ${score} / 5 ball ${score >= 3 ? '👍' : '📚'}`;
+}
+
+// Boshlang'ich yuklash
+showTab(0);
+renderTests();
+</script>
+</body>
+</html>
