@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Issiqlik mashinalari va tabiatni muhofaza qilish</title>
+<style>
+:root{--bg:#eef3f6;--card:#fff;--ink:#14262e;--mut:#5a717b;--pri:#1b6b8a;--hot:#e0542b;--cold:#2f7fd0;--ok:#2a9d6a;--bad:#d64545;--line:#d5e0e6;--fm:#e8f4f8}
+:root[data-theme=dark]{--bg:#0e1b21;--card:#16272f;--ink:#e6f0f4;--mut:#93aab4;--pri:#4fb3d6;--line:#27404b;--fm:#1c3440}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px 6px}
+h1{font-size:1.05rem;margin:0;line-height:1.25}
+#th{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:8px 12px;font-size:.9rem}
+nav{display:flex;gap:8px;overflow-x:auto;padding:6px 14px 10px;position:sticky;top:env(safe-area-inset-top,0);background:var(--bg);z-index:5}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:22px;padding:11px 16px;font-size:.95rem;min-height:44px}
+nav button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+main{padding:4px 14px 40px;max-width:720px;margin:auto}
+.c{background:var(--card);border-radius:16px;padding:14px;margin:12px 0;border-left:6px solid var(--pri);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.c h2{font-size:1.02rem;margin:0 0 8px}
+.c.f{border-color:#8a5cc9}.c.e{border-color:#d9962b}.c.s{border-color:var(--ok)}.c.a{border-color:var(--hot)}.c.m{border-color:var(--cold)}
+.fm{background:var(--fm);border-radius:12px;padding:10px 12px;font-size:1.05rem;line-height:1.8}
+p{margin:6px 0}
+input[type=range]{width:100%;height:36px;accent-color:var(--pri)}
+label{display:block;margin-top:6px;font-size:.95rem}
+.out{background:var(--fm);border-radius:12px;padding:10px 12px;margin-top:10px}
+.bar{height:20px;background:var(--line);border-radius:10px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;border-radius:10px;transition:width .2s}
+canvas{width:100%;height:auto;border-radius:12px;background:var(--fm);display:block}
+button.b{background:var(--pri);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-size:1rem;min-height:46px;margin:6px 6px 0 0}
+button.b.alt{background:var(--hot)}
+input[type=number],textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:12px;font-size:1rem}
+.row{display:flex;flex-wrap:wrap}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.cards button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:12px 6px;font-size:.92rem;min-height:56px}
+.msg{margin-top:8px;font-weight:600}
+.ok{color:var(--ok)}.no{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{border-bottom:1px solid var(--line);padding:6px;text-align:left}
+.opt{display:block;width:100%;text-align:left;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:12px;margin-top:8px;font-size:1rem;min-height:48px}
+.opt.g{background:var(--ok);border-color:var(--ok);color:#fff}.opt.r{background:var(--bad);border-color:var(--bad);color:#fff}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<header><h1>29-mavzu. Issiqlik mashinalari va tabiatni muhofaza qilish</h1><button id="th">Mavzu</button></header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<script>
+const $=s=>document.querySelector(s);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let cur=0,mode=0,V={},raf=0,T0=0;
+if(matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.dataset.theme='dark';
+$('#th').onclick=()=>{const d=document.documentElement.dataset;d.theme=d.theme==='dark'?'light':'dark'};
+const f1=x=>(Math.round(x*10)/10).toString().replace('.',',');
+const bar=(p,c)=>`<div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%;background:${c}"></i></div>`;
+const MACH=[
+['Bug\' mashinasi','Porshenli mashina. Uatt (1769) takomillashtirgan. Bug\' porshenni suradi. FIK ≈ 8–15%.'],
+['Bug\' turbinasi','Bug\' kuragi bor g\'ildirakni aylantiradi. Elektr stansiyalarida ishlatiladi. FIK ≈ 30–40%.'],
+['Ichki yonuv dvigateli','Yoqilg\' silindr ichida yonadi. Avtomobillarda. Benzinli ≈ 25–30%, dizel ≈ 35–45%.'],
+['Gaz turbinasi','Yonish gazlari turbina kuragini aylantiradi. Elektr stansiya va kemalarda.'],
+['Reaktiv dvigatel','Gaz orqaga otilib, oldinga itarish kuchi hosil qiladi. Samolyot va raketalarda.']];
+function info(i){$('#inf').innerHTML=`<b>${MACH[i][0]}:</b> ${MACH[i][1]}`}
+function setMode(m){mode=m;upd()}
+/* ---- chizish yordamchilari ---- */
+function arrow(c,x1,y1,x2,y2,w,col,t){c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=Math.max(2,w);c.setLineDash([10,8]);c.lineDashOffset=-t*40;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.setLineDash([]);const a=Math.atan2(y2-y1,x2-x1);c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-12*Math.cos(a-.5),y2-12*Math.sin(a-.5));c.lineTo(x2-12*Math.cos(a+.5),y2-12*Math.sin(a+.5));c.closePath();c.fill();c.restore()}
+function box(c,x,y,w,h,col,txt){c.fillStyle=col;c.beginPath();c.roundRect(x,y,w,h,10);c.fill();c.fillStyle='#fff';c.font='bold 12px sans-serif';c.textAlign='center';c.fillText(txt,x+w/2,y+h/2+4)}
+function txt(c,s,x,y,col,sz){c.fillStyle=col||css('--ink');c.font=(sz||12)+'px sans-serif';c.textAlign='center';c.fillText(s,x,y)}
+const GAM=0.4;
+function carnot(T1,T2){const r=Math.pow(T1/T2,1/GAM),V3=2*r,V4=r,pts=[],N=40;
+ for(let i=0;i<=N;i++){const v=1+i/N;pts.push([v,T1/v])}
+ for(let i=1;i<=N;i++){const v=2+(V3-2)*i/N;pts.push([v,T1*Math.pow(2/v,GAM)/v])}
+ for(let i=1;i<=N;i++){const v=V3-(V3-V4)*i/N;pts.push([v,T2/v])}
+ for(let i=1;i<N;i++){const v=V4-(V4-1)*i/N;pts.push([v,T2*Math.pow(V4/v,GAM)/v])}
+ return pts}
+/* ---- animatsiyalar ---- */
+const D=[
+(c,t,v,W,H)=>{c.strokeStyle=css('--ink');c.lineWidth=3;c.strokeRect(30,50,170,70);
+ const k=(1+Math.sin(t*2))/2,px=50+k*(20+v.dv*9);
+ c.fillStyle='rgba(120,170,220,.5)';c.fillRect(32,52,px-32,66);
+ c.fillStyle=css('--hot');c.fillRect(px,52,10,66);
+ c.fillStyle=css('--ink');c.fillRect(px+10,82,200-px-10+60,6);
+ const cx=270,cy=85,a=t*2;c.beginPath();c.arc(cx,cy,26,0,7);c.strokeStyle=css('--pri');c.stroke();
+ c.beginPath();c.moveTo(cx,cy);c.lineTo(cx+26*Math.cos(a),cy+26*Math.sin(a));c.stroke();
+ txt(c,'Bug\' mashinasi porsheni',160,25),txt(c,'bug\'',90,140,css('--mut'))},
+(c,t,v,W,H)=>{box(c,10,50,70,70,css('--hot'),'Isitgich');box(c,125,50,70,70,'#8a5cc9','Ishchi jism');box(c,240,50,70,70,css('--cold'),'Sovitgich');
+ arrow(c,82,85,123,85,v.q1/50,css('--hot'),t);arrow(c,197,85,238,85,v.q2/50,css('--cold'),t);
+ if(v.A>0)arrow(c,160,48,160,12,v.A/50,css('--ok'),t);
+ txt(c,'Q₁',102,76,css('--hot'),13);txt(c,'Q₂',218,76,css('--cold'),13);txt(c,'A',175,25,css('--ok'),13);txt(c,'A = Q₁ − Q₂',160,155,css('--ink'),13)},
+(c,t,v,W,H)=>{const e=v.eta/100;box(c,10,60,56,50,css('--hot'),'Q₁');box(c,254,15,56,40,css('--ok'),'A');box(c,254,115,56,40,css('--bad'),'Q₂');
+ for(let i=0;i<30;i++){const ph=(t*.45+i/30)%1,x=70+ph*180,g=i/30<e,ty=g?35:135,k=Math.max(0,(ph-.35)/.65),y=85+(ty-85)*k;
+ c.fillStyle=g?css('--ok'):css('--bad');c.beginPath();c.arc(x,y,4,0,7);c.fill()}
+ txt(c,'foydali '+f1(v.eta)+'%',200,12,css('--ok'));txt(c,'isrof '+f1(100-v.eta)+'%',200,168,css('--bad'))},
+(c,t,v,W,H)=>{const P=carnot(v.T1,v.T2),lx=p=>Math.log(p[0]),ly=p=>Math.log(p[1]);
+ const xs=P.map(lx),ys=P.map(ly),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+ const X=p=>35+(lx(p)-x0)/(x1-x0||1)*265,Y=p=>145-(ly(p)-y0)/(y1-y0||1)*120;
+ c.strokeStyle=css('--mut');c.lineWidth=1;c.beginPath();c.moveTo(30,10);c.lineTo(30,150);c.lineTo(308,150);c.stroke();txt(c,'p',18,16,css('--mut'));txt(c,'V',300,164,css('--mut'));
+ const seg=[css('--hot'),css('--pri'),css('--cold'),css('--pri')];
+ for(let s=0;s<4;s++){c.strokeStyle=seg[s];c.lineWidth=3;c.beginPath();const a=s*40+(s?1:0),b=s*40+40;for(let i=a;i<=Math.min(b,P.length-1);i++){i===a?c.moveTo(X(P[i]),Y(P[i])):c.lineTo(X(P[i]),Y(P[i]))}c.stroke()}
+ const k=Math.floor(t*18)%P.length,q=P[k];c.fillStyle=css('--ink');c.beginPath();c.arc(X(q),Y(q),7,0,7);c.fill();
+ const st=['1→2 izotermik kengayish (T₁)','2→3 adiabatik kengayish','3→4 izotermik siqilish (T₂)','4→1 adiabatik siqilish'];
+ txt(c,st[Math.min(3,Math.floor(k/40))],170,12,css('--ink'),12)},
+(c,t,v,W,H)=>{const lv=Math.min(.75,v.n*v.cons/9000);c.fillStyle=css('--fm');c.fillRect(0,0,W,H);
+ c.fillStyle=`rgba(90,90,90,${lv})`;c.fillRect(0,0,W,H);
+ c.fillStyle='#777';c.fillRect(40,90,90,70);c.fillRect(70,40,16,55);c.fillRect(0,150,W,20);
+ const K=Math.round(8+v.n/60);for(let i=0;i<K;i++){const ph=(t*.25+i/K)%1,x=78+ph*170+Math.sin(i*3)*8,y=40-ph*30,r=4+ph*14;
+ c.fillStyle=`rgba(60,60,60,${(1-ph)*.7})`;c.beginPath();c.arc(x,y,r,0,7);c.fill()}
+ txt(c,'Atmosfera ifloslanishi: '+Math.round(lv/.75*100)+'%',200,150,css('--ink'),12)},
+(c,t,v,W,H)=>{const e=mode===1;c.fillStyle=e?'#8fd0f2':'#9a9a9a';c.fillRect(0,0,W,H);
+ c.fillStyle=e?'#5cae5c':'#555';c.fillRect(0,135,W,35);
+ if(e){c.fillStyle='#ffd93b';c.beginPath();c.arc(40,35,20,0,7);c.fill();
+  c.fillStyle='#eee';c.fillRect(250,60,5,75);const a=t*2;c.strokeStyle='#fff';c.lineWidth=4;for(let k=0;k<3;k++){const b=a+k*2.094;c.beginPath();c.moveTo(252,58);c.lineTo(252+28*Math.cos(b),58+28*Math.sin(b));c.stroke()}
+  c.fillStyle='#2e8b3a';for(const x of [110,150,200,290]){c.fillRect(x,105,6,30);c.beginPath();c.arc(x+3,100,14,0,7);c.fill()}
+  c.fillStyle='#4a9eea';c.fillRect(60,115,60,18);c.fillRect(130,110,0,0)}
+ else{c.fillStyle='#3a3a3a';for(const [x,h] of [[20,70],[70,95],[120,60],[170,85]])c.fillRect(x,135-h,40,h);
+  c.fillRect(250,50,18,85);for(let i=0;i<14;i++){const ph=(t*.3+i/14)%1;c.fillStyle=`rgba(30,30,30,${(1-ph)*.7})`;c.beginPath();c.arc(259+ph*40,45-ph*30,5+ph*12,0,7);c.fill()}}
+ txt(c,e?'Toza shahar: quyosh, shamol, elektromobil':'Ifloslangan shahar: tutun va qurum',165,16,e?'#14262e':'#fff',13)}
+];
+/* ---- rejalar ---- */
+const P=[
+{n:'Tushuncha',h:'1-reja. Issiqlik mashinalari haqida tushuncha',
+th:`<b>Issiqlik mashinasi</b> — yoqilg\'i energiyasini mexanik ishga aylantiruvchi qurilma. Yoqilg\'i yonganda ajraladigan issiqlik gazni (yoki bug\'ni) kengaytiradi, kengayayotgan gaz esa porshenni yoki turbinani harakatga keltiradi.<p>Turlari: bug\' mashinasi, bug\' turbinasi, ichki yonuv dvigateli, gaz turbinasi, reaktiv dvigatel.</p><p>Tarixi: 1769-yilda Jeyms Uatt bug\' mashinasini takomillashtirdi. Shundan keyin sanoat va transport tez rivojlandi.</p>`,
+fm:`A = p · ΔV<br>Q → A (issiqlik → ish)`,
+ex:`Poyezd lokomotivida yoqilg\'i yonadi, bug\' hosil bo\'ladi, bug\' porshenlarni suradi va g\'ildiraklar aylanadi.`,
+sl:[['p','Bosim p',100,500,200,'kPa'],['dv','Hajm o\'zgarishi ΔV',1,10,5,'L']],
+x:`<div class="cards">${MACH.map((m,i)=>`<button onclick="info(${i})">${m[0]}</button>`).join('')}</div><div class="out" id="inf">Mashina turini bosing.</div>`,
+f:v=>`Gaz bajargan ish: A = p·ΔV = ${v.p} kPa · ${v.dv} L = <b>${v.p*v.dv} J</b>`,
+task:{q:`Gaz p = 200 kPa bosimda ΔV = 5 L ga kengaydi. Bajarilgan ish necha joul? (1 kPa·L = 1 J)`,a:1000,u:'J'}},
+{n:'Tuzilishi',h:'2-reja. Issiqlik mashinasining tuzilishi va ishlash prinsipi',
+th:`Har qanday issiqlik mashinasi uch qismdan iborat: <b>isitgich</b> (issiqlik beradi), <b>ishchi jism</b> (gaz yoki bug\', kengayib ish bajaradi) va <b>sovitgich</b> (ortiqcha issiqlikni oladi). Olingan issiqlikning bir qismigina ishga aylanadi, qolgani sovitgichga beriladi.`,
+fm:`A = Q₁ − Q₂<br>Q₁ — isitgichdan olingan issiqlik<br>Q₂ — sovitgichga berilgan issiqlik`,
+ex:`Avtomobil dvigatelida yonayotgan benzin isitgich, silindrdagi gaz ishchi jism, atrof-muhitga chiqayotgan issiq gaz va radiator sovitgich vazifasini bajaradi.`,
+sl:[['q1','Q₁',100,1000,800,'kJ'],['q2','Q₂',0,1000,500,'kJ']],
+f:v=>{v.q2=Math.min(v.q2,v.q1);v.A=v.q1-v.q2;return`A = Q₁ − Q₂ = ${v.q1} − ${v.q2} = <b>${v.A} kJ</b>${bar(v.q1/10,'var(--hot)')}${bar(v.A/10,'var(--ok)')}${bar(v.q2/10,'var(--cold)')}<small>qizil: Q₁, yashil: A, ko\'k: Q₂</small>`},
+task:{q:`Q₁ = 800 kJ, Q₂ = 500 kJ. Bajarilgan ish A necha kJ?`,a:300,u:'kJ'}},
+{n:'FIK',h:'3-reja. Foydali ish koeffitsiyenti (FIK)',
+th:`FIK — bajarilgan foydali ishning olingan issiqlikka nisbati. Q₂ doim noldan katta bo\'ladi (sovitgichga issiqlik berilmasa, mashina ishlay olmaydi), shuning uchun FIK hech qachon 100% bo\'lmaydi.<table><tr><th>Dvigatel</th><th>FIK</th></tr><tr><td>Bug\' mashinasi</td><td>8–15%</td></tr><tr><td>Benzinli</td><td>25–30%</td></tr><tr><td>Dizel</td><td>35–45%</td></tr><tr><td>Bug\' turbinasi</td><td>30–40%</td></tr></table>`,
+fm:`η = A/Q₁ · 100%<br>η = (Q₁ − Q₂)/Q₁ · 100%`,
+ex:`Benzinli dvigatel 100 kJ energiya olsa, atigi taxminan 25–30 kJ i foydali ishga aylanadi, qolgani issiqlik bo\'lib yo\'qoladi.`,
+sl:[['q1','Q₁',100,1000,500,'kJ'],['A','A',0,1000,150,'kJ']],
+f:v=>{v.A=Math.min(v.A,v.q1);v.eta=v.A/v.q1*100;return`η = ${v.A}/${v.q1} · 100% = <b>${f1(v.eta)}%</b>${bar(v.eta,'var(--ok)')}`},
+task:{q:`Q₁ = 500 kJ, Q₂ = 350 kJ. FIK necha foiz?`,a:30,u:'%'}},
+{n:'Karno',h:'4-reja. Ideal issiqlik mashinasi (Karno sikli)',
+th:`Fransuz muhandisi Sadi Karno eng yuqori FIKga ega ideal mashinani o\'ylab topdi. Uning siklida ikkita izotermik va ikkita adiabatik jarayon bor. Karno FIKi faqat isitgich (T₁) va sovitgich (T₂) haroratlariga bog\'liq. Temperatura <b>kelvinda</b> olinadi: T = t + 273.<p>FIKni oshirish: T₁ ni oshirish yoki T₂ ni kamaytirish.</p>`,
+fm:`η_max = (T₁ − T₂)/T₁<br>T(K) = t(°C) + 273`,
+ex:`Issiqlik elektr stansiyasida bug\' harorati qanchalik baland bo\'lsa, FIK shunchalik yuqori. Shuning uchun zamonaviy turbinalar juda qizigan bug\'da ishlaydi.`,
+sl:[['T1','T₁',300,1500,600,'K'],['T2','T₂',200,600,300,'K'],['re','Real FIK',5,60,30,'%']],
+f:v=>{v.T2=Math.min(v.T2,v.T1-10);const e=(v.T1-v.T2)/v.T1*100;return`η_max = (${v.T1} − ${v.T2})/${v.T1} = <b>${f1(e)}%</b>${bar(e,'var(--pri)')}Real mashina: ${v.re}%${bar(v.re,'var(--hot)')}${v.re>e?'<span class="no">Real FIK Karno FIKidan katta bo\'la olmaydi!</span>':'Real FIK Karno FIKidan kichik: '+f1(e-v.re)+'% farq.'}`},
+task:{q:`T₁ = 600 K, T₂ = 300 K. η_max necha foiz?`,a:50,u:'%'}},
+{n:'Tabiatga ta\'siri',h:'5-reja. Issiqlik mashinalarining tabiatga ta\'siri',
+th:`Yoqilg\'i yonganda atmosferaga <b>CO₂</b>, <b>azot oksidlari</b>, <b>is gazi (CO)</b>, qurum chiqadi, shuningdek issiqlik ifloslanishi ham bo\'ladi.<p>Oqibatlari: issiqxona effekti va global isish, kislotali yomg\'ir, shahar havosining ifloslanishi.</p><p>Chiqqan CO₂ miqdori yoqilgan yoqilg\'iga <b>to\'g\'ri mutanosib</b>: yoqilg\'i 2 marta ko\'p bo\'lsa, CO₂ ham 2 marta ko\'p.</p>`,
+fm:`m(CO₂) ≈ 2,3 kg × V(benzin, litr)<br>V = n · s/100 · k`,
+ex:`Katta shaharda minglab avtomobil har kuni yuz minglab litr yoqilg\'i yoqadi, shuning uchun havo tez ifloslanadi.`,
+sl:[['n','Avtomobillar soni',10,2000,200,'ta'],['cons','Sarf (100 km ga)',4,20,8,'L']],
+f:v=>{const L=v.n*40/100*v.cons,co=L*2.3;return`Har biri kuniga 40 km yursa:<br>Yoqilg\'i: <b>${Math.round(L)} L</b><br>CO₂: <b>${Math.round(co)} kg</b> (${f1(co/1000)} t) kuniga${bar(co/150,'var(--bad)')}<small>Sarf 2 marta oshsa, CO₂ ham 2 marta oshadi.</small>`},
+task:{q:`100 ta avtomobil har biri kuniga 40 km yuradi, sarfi 100 km ga 10 L. 1 L benzin yonganda 2,3 kg CO₂ chiqadi. Kuniga necha kg CO₂ chiqadi?`,a:920,u:'kg'}},
+{n:'Muhofaza',h:'6-reja. Tabiatni muhofaza qilish yo\'llari',
+th:`<b>Texnik yo\'llar:</b> dvigatellar FIKni oshirish, katalizatorli filtrlar, tozalash qurilmalari.<br><b>Muqobil energiya:</b> elektromobillar, gibrid avtomobillar, quyosh va shamol energiyasi, GES.<br><b>Kundalik:</b> yoqilg\'ini tejash, jamoat transportidan foydalanish, daraxt ekish.<p><b>O\'zbekistonda:</b> yirik quyosh elektr stansiyalari qurilmoqda (Navoiy, Samarqand, Buxoro viloyatlarida) va "Yashil makon" loyihasi doirasida har yili ko\'plab daraxt ko\'chatlari ekiladi.</p>`,
+fm:`η ↑ ⇒ bir xil ish uchun yoqilg\'i ↓ ⇒ CO₂ ↓`,
+ex:`Elektromobil elektr motori yuqori FIKga ega va yo\'lda zararli gaz chiqarmaydi. Elektr quyosh yoki shamoldan olinsa, ta\'sir yanada kamayadi.`,
+sl:[['n','Avtomobillar soni',10,1000,100,'ta']],
+x:`<div class="row"><button class="b" onclick="setMode(0)">An\'anaviy rejim</button><button class="b" style="background:var(--ok)" onclick="setMode(1)">Ekologik rejim</button></div>`,
+y:`<button class="b alt" onclick="setMode(1-mode)">Shaharni almashtirish</button>`,
+f:v=>{const e=mode===1,co=e?0:v.n*40/100*8*2.3,eta=e?85:25;return`<b>${e?'Ekologik (elektromobil)':'An\'anaviy (benzin)'}</b><br>FIK: <b>${eta}%</b>${bar(eta,'var(--ok)')}CO₂: <b>${Math.round(co)} kg</b> kuniga${bar(co/100,'var(--bad)')}<small>An\'anaviy rejimda: sarf 8 L/100 km, 40 km/kun.</small>`},
+task:{custom:1,q:`O\'z hududingiz uchun tabiatni muhofaza qilishga oid 3 ta taklif yozing (har birini yangi qatordan).`}}
+];
+/* ---- test ---- */
+const Q=[
+['Q₁ = 400 kJ, Q₂ = 300 kJ bo\'lsa, FIK necha foiz?',['75%','25%','10%','100%'],1],
+['T₁ = 500 K, T₂ = 300 K bo\'lsa, Karno FIKi qancha?',['20%','40%','60%','80%'],1],
+['Qaysi biri issiqlik mashinasining asosiy qismi emas?',['Isitgich','Ishchi jism','Sovitgich','Shamol turbinasi'],3],
+['Issiqxona effektini kuchaytiruvchi asosiy gaz qaysi?',['Azot','Kislorod','Karbonat angidrid (CO₂)','Argon'],2],
+['Karno mashinasining FIKini qanday oshirish mumkin?',['T₁ ni oshirish, T₂ ni kamaytirish','T₁ ni kamaytirish','T₂ ni oshirish','Isitgichni o\'chirish'],0]];
+let qi=0,sc=0,ans=false;
+function test(){const m=$('#main');if(qi>=Q.length){m.innerHTML=`<div class="c"><h2>Natija</h2><p style="font-size:1.4rem"><b>${sc} / ${Q.length}</b></p><p>${sc===5?'Ajoyib!':sc>=3?'Yaxshi, yana takrorlang.':'Nazariyani qayta o\'qib chiqing.'}</p><button class="b" onclick="qi=0;sc=0;test()">Qayta boshlash</button></div>`;return}
+ const q=Q[qi];ans=false;m.innerHTML=`<div class="c"><h2>Savol ${qi+1} / ${Q.length}</h2><p>${q[0]}</p>${q[1].map((o,i)=>`<button class="opt" onclick="pick(${i},this)">${'ABCD'[i]}) ${o}</button>`).join('')}<div id="nx"></div></div>`}
+function pick(i,el){if(ans)return;ans=true;const q=Q[qi],bs=document.querySelectorAll('.opt');
+ bs[q[2]].classList.add('g');if(i!==q[2])el.classList.add('r');else sc++;
+ $('#nx').innerHTML=`<button class="b" onclick="qi++;test()">${qi===Q.length-1?'Natijani ko\'rish':'Keyingi savol'}</button>`}
+/* ---- asosiy ---- */
+function nav(){$('#nav').innerHTML=P.map((p,i)=>`<button class="${cur===i?'on':''}" onclick="go(${i})">${i+1}. ${p.n}</button>`).join('')+`<button class="${cur===6?'on':''}" onclick="go(6)">Test</button>`}
+function go(i){cur=i;cancelAnimationFrame(raf);nav();scrollTo(0,0);if(i===6){test();return}
+ const p=P[i];$('#main').innerHTML=`
+<div class="c"><h2>${p.h}</h2></div>
+<div class="c"><h2>Nazariya</h2>${p.th}</div>
+<div class="c f"><h2>Asosiy formulalar</h2><div class="fm">${p.fm}</div></div>
+<div class="c e"><h2>Hayotiy misol</h2>${p.ex}</div>
+<div class="c s"><h2>Simulyatsiya</h2>${p.x||''}${p.sl.map(s=>`<label>${s[1]}: <b id="o_${s[0]}">${s[4]}</b> ${s[5]}</label><input type="range" id="s_${s[0]}" min="${s[2]}" max="${s[3]}" value="${s[4]}">`).join('')}<div class="out" id="out"></div></div>
+<div class="c a"><h2>Animatsiya</h2><canvas id="cv" width="320" height="170"></canvas>${p.y||''}</div>
+<div class="c m"><h2>Mustaqil masala</h2><p>${p.task.q}</p>${p.task.custom?'<textarea id="ta" rows="4" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea>':'<input type="number" id="ai" inputmode="decimal" placeholder="Javob ('+p.task.u+')">'}<button class="b" onclick="chk()">Tekshirish</button><div class="msg" id="mg"></div></div>`;
+ p.sl.forEach(s=>$('#s_'+s[0]).oninput=upd);upd();T0=performance.now();loop()}
+function upd(){const p=P[cur];p.sl.forEach(s=>V[s[0]]=+$('#s_'+s[0]).value);
+ $('#out').innerHTML=p.f(V);p.sl.forEach(s=>{$('#o_'+s[0]).textContent=V[s[0]];$('#s_'+s[0]).value=V[s[0]]})}
+function loop(){const cv=$('#cv');if(!cv||cur>5)return;const c=cv.getContext('2d'),t=(performance.now()-T0)/1000;
+ c.clearRect(0,0,320,170);D[cur](c,t,V,320,170);raf=requestAnimationFrame(loop)}
+function chk(){const k=P[cur].task,m=$('#mg');
+ if(k.custom){const n=$('#ta').value.split('\n').filter(s=>s.trim().length>5).length;m.className='msg '+(n>=3?'ok':'no');m.textContent=n>=3?'Ajoyib! 3 ta taklif yozildi. Ularni sinfda muhokama qiling.':'Kamida 3 ta taklif yozing (har biri yangi qatordan).';return}
+ const v=parseFloat($('#ai').value.replace(',','.'));
+ if(isNaN(v)){m.className='msg no';m.textContent='Javobni raqam bilan kiriting.';return}
+ const ok=Math.abs(v-k.a)<=Math.abs(k.a)*.01;m.className='msg '+(ok?'ok':'no');m.textContent=ok?'To\'g\'ri! ✔':'Noto\'g\'ri. Formulani qayta tekshirib ko\'ring.'}
+go(0);
+</script>
+</body>
+</html>
