@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Masalalar ishlash — Issiqlik mashinalari</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--fg:#1c2733;--mut:#5b6b7b;--bd:#d6dee8;--acc:#2563eb;--hot:#e5533d;--cold:#2b9bd6;--ok:#1f9d55;--bad:#d64545}
+[data-theme=dark]{--bg:#0f1720;--card:#18232f;--fg:#e8eef5;--mut:#9fb0c1;--bd:#2c3b4a;--acc:#5b9bff;--hot:#ff7a62;--cold:#4cb8f0;--ok:#3ccf7b;--bad:#ff6b6b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:5}
+header h1{font-size:18px;margin:0}
+header small{display:block;color:var(--mut);font-size:13px;font-weight:400}
+nav{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:var(--bg);position:sticky;top:58px;z-index:4}
+nav button{flex:0 0 auto;background:var(--card);color:var(--fg);border:1px solid var(--bd)}
+nav button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+main{max-width:860px;margin:0 auto;padding:4px 12px 40px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
+h2{font-size:20px;margin:0 0 8px}h3{font-size:17px;margin:0 0 10px;color:var(--acc)}
+button{font:600 16px inherit;font-family:inherit;min-height:46px;padding:0 18px;border:0;border-radius:12px;background:var(--acc);color:#fff;cursor:pointer}
+button.sec{background:var(--mut)}button:disabled{opacity:.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.g2{grid-template-columns:1fr}}
+.g2>div{background:var(--bg);border-radius:10px;padding:10px}
+.step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--bd)}
+.step span{flex:0 0 28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;text-align:center;line-height:28px;font-size:14px}
+label{display:block;margin:8px 0;font-size:15px}
+input[type=range]{width:100%;height:32px;accent-color:var(--acc)}
+input[type=text]{flex:1;min-width:140px;min-height:46px;font-size:17px;padding:0 12px;border-radius:12px;border:2px solid var(--bd);background:var(--bg);color:var(--fg)}
+.res{margin-top:8px;padding:12px;border-radius:10px;background:var(--bg);font-weight:700;border-left:5px solid var(--ok)}
+canvas{width:100%;display:block;background:var(--bg);border-radius:10px}
+.msg{margin-top:10px;font-weight:700}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;background:var(--bg);color:var(--fg);border:2px solid var(--bd)}
+.opt.ok{background:var(--ok);color:#fff;border-color:var(--ok)}.opt.no{background:var(--bad);color:#fff;border-color:var(--bad)}
+</style>
+</head>
+<body>
+<header><h1>30-mavzu. Masalalar ishlash<small>Issiqlik mashinalari · 9-sinf fizika</small></h1><button id="th" class="sec" aria-label="Mavzu">🌓</button></header>
+<nav id="tabs"></nav>
+<main id="main"></main>
+<script>
+const $=(s,e=document)=>e.querySelector(s),f=x=>String(Math.round(x*100)/100).replace('.',','),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let C={},cur=0;const H=260,A={run:false,t:0,last:0,raf:0};
+function T(c,s,x,y,col,sz=14,al='center'){c.fillStyle=col;c.font=`bold ${sz}px system-ui,sans-serif`;c.textAlign=al;c.fillText(s,x,y)}
+function box(c,x,y,w,h,col,s){c.fillStyle=col;c.fillRect(x,y,w,h);T(c,s,x+w/2,y+h/2+5,'#fff',12)}
+function arr(c,x1,y1,x2,y2,th,col,t){const a=Math.atan2(y2-y1,x2-x1),hl=th+8;c.strokeStyle=col;c.fillStyle=col;c.lineWidth=th;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2-Math.cos(a)*hl*.6,y2-Math.sin(a)*hl*.6);c.stroke();c.save();c.translate(x2,y2);c.rotate(a);c.beginPath();c.moveTo(0,0);c.lineTo(-hl,-hl*.7);c.lineTo(-hl,hl*.7);c.fill();c.restore();c.fillStyle='#fff';for(let i=0;i<3;i++){const u=(t*.6+i/3)%1;c.beginPath();c.arc(x1+(x2-x1)*u*.85,y1+(y2-y1)*u*.85,Math.max(2,th/4),0,7);c.fill()}}
+
+const P=[
+{t:"Issiqlik dvigatelining ishi",
+ text:p=>`Issiqlik dvigateli isitkichdan ${p.Q1} kJ issiqlik oldi va sovitkichga ${p.Q2} kJ issiqlik berdi. Dvigatelning foydali ishi A va FIK ni toping.`,
+ given:p=>[`Q₁ = ${p.Q1} kJ`,`Q₂ = ${p.Q2} kJ`],find:["A = ? (kJ)","η = ? (%)"],
+ sl:[["Q1","Q₁ (kJ)",200,1000,10,800],["Q2","Q₂ (kJ)",50,950,10,600]],
+ calc:p=>{p.Q2=Math.min(p.Q2,p.Q1);const A=p.Q1-p.Q2;return{A,eta:A/p.Q1*100}},
+ steps:(p,r)=>["Foydali ish: <b>A = Q₁ − Q₂</b>",`A = ${p.Q1} kJ − ${p.Q2} kJ = <b>${f(r.A)} kJ</b>`,"FIK: <b>η = A / Q₁ · 100%</b>",`η = ${f(r.A)} kJ / ${p.Q1} kJ · 100% = <b>${f(r.eta)}%</b>`,`Javob: A = ${f(r.A)} kJ, η = ${f(r.eta)}%.`],
+ res:(p,r)=>`A = ${f(r.A)} kJ · η = ${f(r.eta)}%`,
+ ind:{q:"Dvigatel isitkichdan Q₁ = 500 kJ oldi, sovitkichga Q₂ = 400 kJ berdi. FIK ni toping (%).",a:20,u:"%",h:"η = (Q₁ − Q₂)/Q₁ · 100%"},
+ draw(c,w,h,t,p,r){const k=p.Q1,bw=w*.2;box(c,6,h*.32,bw,h*.36,C.hot,"Isitkich");box(c,w*.4,h*.25,bw*1.1,h*.5,C.acc,"Dvigatel");box(c,w-6-bw,h*.32,bw,h*.36,C.cold,"Sovitkich");
+  arr(c,bw+10,h*.5,w*.4-2,h*.5,p.Q1/k*10+2,C.hot,t);T(c,`Q₁=${p.Q1}`,(bw+w*.4)/2,h*.5-22,C.fg,12);
+  arr(c,w*.4+bw*1.1+2,h*.5,w-bw-10,h*.5,p.Q2/k*10+2,C.cold,t);T(c,`Q₂=${p.Q2}`,(w*.4+bw*1.1+w-bw)/2,h*.5-22,C.fg,12);
+  arr(c,w*.4+bw*.55,h*.25-2,w*.4+bw*.55,h*.05+8,r.A/k*10+2,C.ok,t);T(c,`A=${f(r.A)} kJ`,w*.4+bw*.55+14,h*.1,C.ok,13,'left');
+  const bx=w*.1,bh=16,by=h-44;c.fillStyle=C.bd;c.fillRect(bx,by,w*.8,bh);c.fillStyle=C.ok;c.fillRect(bx,by,w*.8*r.eta/100,bh);T(c,`Ish ulushi: η = ${f(r.eta)}%`,w/2,h-10,C.fg,14)}},
+{t:"FIK dan ish topish",
+ text:p=>`Dvigatelning FIK ${p.eta}% ga teng. U isitkichdan ${p.Q1} kJ issiqlik oladi. Foydali ish A va sovitkichga beriladigan Q₂ ni toping.`,
+ given:p=>[`η = ${p.eta}%`,`Q₁ = ${p.Q1} kJ`],find:["A = ? (kJ)","Q₂ = ? (kJ)"],
+ sl:[["eta","η (%)",5,60,1,25],["Q1","Q₁ (kJ)",500,5000,100,2000]],
+ calc:p=>{const A=p.eta/100*p.Q1;return{A,Q2:p.Q1-A,a:p.eta/100}},
+ steps:(p,r)=>["η = A / Q₁ · 100% dan: <b>A = η · Q₁ / 100%</b>",`A = ${p.eta}% · ${p.Q1} kJ / 100% = <b>${f(r.A)} kJ</b>`,"A = Q₁ − Q₂ dan: <b>Q₂ = Q₁ − A</b>",`Q₂ = ${p.Q1} kJ − ${f(r.A)} kJ = <b>${f(r.Q2)} kJ</b>`,`Javob: A = ${f(r.A)} kJ, Q₂ = ${f(r.Q2)} kJ.`],
+ res:(p,r)=>`A = ${f(r.A)} kJ · Q₂ = ${f(r.Q2)} kJ`,
+ ind:{q:"Dvigatel FIK 40%, Q₁ = 1500 kJ. Sovitkichga berilgan Q₂ ni toping (kJ).",a:900,u:"kJ",h:"A = η·Q₁/100%, Q₂ = Q₁ − A"},
+ draw(c,w,h,t,p,r){const k=Math.min(1,t/2),a=r.a,ang=Math.sin(t*3)*.07*Math.exp(-t*.5),cx=w/2,L=w*.36,dy=Math.sin(ang)*L;
+  c.strokeStyle=C.fg;c.lineWidth=3;c.beginPath();c.moveTo(cx-L,36+dy);c.lineTo(cx+L,36-dy);c.stroke();c.beginPath();c.moveTo(cx,36);c.lineTo(cx-10,70);c.lineTo(cx+10,70);c.closePath();c.stroke();
+  c.lineWidth=1.5;[[cx-L,36+dy,`Q₁ = ${p.Q1}`,C.hot],[cx+L,36-dy,"A + Q₂",C.ok]].forEach(([x,y,s,col])=>{c.beginPath();c.moveTo(x,y);c.lineTo(x,y+22);c.stroke();c.fillStyle=col;c.fillRect(x-34,y+22,68,8);T(c,s,x,y+46,C.fg,12)});
+  const x0=w*.05,bw=w*.9,by=108;c.fillStyle=C.bd;c.fillRect(x0,by,bw,30);c.fillStyle=C.ok;c.fillRect(x0,by,bw*a*k,30);c.fillStyle=C.cold;c.fillRect(x0+bw*a*k,by,bw*(1-a)*k,30);
+  T(c,`A = ${f(r.A*k)} kJ`,x0,by+50,C.ok,13,'left');T(c,`Q₂ = ${f(r.Q2*k)} kJ`,x0+bw,by+50,C.cold,13,'right');
+  const px=w*.3,py=205,R=Math.min(42,w*.13);let s=-Math.PI/2;[[a,C.ok],[1-a,C.cold]].forEach(([v,col])=>{c.fillStyle=col;c.beginPath();c.moveTo(px,py);c.arc(px,py,R,s,s+Math.PI*2*v*k);c.fill();s+=Math.PI*2*v*k});
+  T(c,`Foydali ish: ${f(a*100)}%`,w*.52,py-6,C.ok,14,'left');T(c,`Yo'qotish: ${f((1-a)*100)}%`,w*.52,py+16,C.cold,14,'left')}},
+{t:"Yoqilg'i sarfi",
+ text:p=>`Benzinli dvigatel ${p.m} kg benzin yoqadi (q = 46 MJ/kg). Dvigatelning FIK ${p.eta}% ga teng. Foydali ish va chiqindi issiqlikni toping.`,
+ given:p=>[`m = ${p.m} kg`,"q = 46 MJ/kg",`η = ${p.eta}%`],find:["Q₁ = ? (MJ)","A = ? (MJ)","Q₂ = ? (MJ)"],
+ sl:[["m","m (kg)",1,10,1,5],["eta","η (%)",10,45,1,30]],
+ calc:p=>{const Q1=46*p.m,A=p.eta/100*Q1;return{Q1,A,Q2:Q1-A,a:p.eta/100}},
+ steps:(p,r)=>["Yonish issiqligi: <b>Q₁ = q · m</b>",`Q₁ = 46 MJ/kg · ${p.m} kg = <b>${f(r.Q1)} MJ</b>`,"Foydali ish: <b>A = η · Q₁ / 100%</b>",`A = ${p.eta}% · ${f(r.Q1)} MJ / 100% = <b>${f(r.A)} MJ</b>`,"Chiqindi issiqlik: <b>Q₂ = Q₁ − A</b>",`Q₂ = ${f(r.Q1)} − ${f(r.A)} = <b>${f(r.Q2)} MJ</b>`,`Javob: A = ${f(r.A)} MJ, Q₂ = ${f(r.Q2)} MJ.`],
+ res:(p,r)=>`Q₁ = ${f(r.Q1)} MJ · A = ${f(r.A)} MJ · Q₂ = ${f(r.Q2)} MJ`,
+ ind:{q:"Dvigatel 2 kg yoqilg'i (q = 46 MJ/kg) yoqadi, FIK 25%. Foydali ish A ni toping (MJ).",a:23,u:"MJ",h:"Q₁ = q·m, A = η·Q₁/100%"},
+ draw(c,w,h,t,p,r){const k=Math.min(1,t/2),x0=w*.06,cw=w*.3,y0=24,ch=180,py=y0+20+(1+Math.sin(t*6))*30;
+  c.strokeStyle=C.fg;c.lineWidth=4;c.beginPath();c.moveTo(x0,y0);c.lineTo(x0,y0+ch);c.lineTo(x0+cw,y0+ch);c.lineTo(x0+cw,y0);c.stroke();
+  c.fillStyle=C.acc;c.fillRect(x0+3,py,cw-6,14);c.fillRect(x0+cw/2-3,y0-14,6,py-y0+14);
+  const fl=Math.max(0,Math.cos(t*6))*.6+.4;for(let i=0;i<5;i++){const fx=x0+12+i*(cw-24)/4,fh=(26+10*Math.sin(t*30+i*2))*fl*(1-(p.m>0?0:0));c.fillStyle=i%2?'#ffb020':C.hot;c.beginPath();c.moveTo(fx-9,y0+ch-2);c.lineTo(fx,y0+ch-2-fh-8);c.lineTo(fx+9,y0+ch-2);c.fill()}
+  T(c,"Benzin yonishi",x0+cw/2,y0+ch+24,C.fg,12);
+  const bx=w*.5,bw=w*.46;[["Q₁",r.Q1,1,C.hot],["A",r.A,r.a,C.ok],["Q₂",r.Q2,1-r.a,C.cold]].forEach(([s,v,u,col],i)=>{const y=50+i*62;T(c,`${s} = ${f(v*(i?k:1))} MJ`,bx,y-8,C.fg,13,'left');c.fillStyle=C.bd;c.fillRect(bx,y,bw,26);c.fillStyle=col;c.fillRect(bx,y,bw*u*(i?k:1),26)})}},
+{t:"Karno sikli",
+ text:p=>`Ideal issiqlik mashinasining isitkichi temperaturasi ${p.T1} °C, sovitkichiniki ${p.T2} °C. Mashinaning FIK ni toping.`,
+ given:p=>[`t₁ = ${p.T1} °C`,`t₂ = ${p.T2} °C`],find:["T₁, T₂ = ? (K)","η = ? (%)"],
+ sl:[["T1","t₁ (°C)",200,900,10,527],["T2","t₂ (°C)",0,400,5,27]],
+ calc:p=>{p.T2=Math.min(p.T2,p.T1-10);const a=p.T1+273,b=p.T2+273;return{T1K:a,T2K:b,eta:(a-b)/a*100}},
+ steps:(p,r)=>["Kelvinga o'tkazamiz: <b>T = t + 273</b>",`T₁ = ${p.T1} + 273 = <b>${r.T1K} K</b>`,`T₂ = ${p.T2} + 273 = <b>${r.T2K} K</b>`,"Karno FIK: <b>η = (T₁ − T₂) / T₁ · 100%</b>",`η = (${r.T1K} − ${r.T2K}) / ${r.T1K} · 100% = <b>${f(r.eta)}%</b>`,`Javob: η = ${f(r.eta)}%.`],
+ res:(p,r)=>`T₁ = ${r.T1K} K · T₂ = ${r.T2K} K · η = ${f(r.eta)}%`,
+ ind:{q:"Karno mashinasida t₁ = 727 °C, t₂ = 27 °C. FIK ni toping (%).",a:70,u:"%",h:"T = t + 273; η = (T₁ − T₂)/T₁ · 100%"},
+ draw(c,w,h,t,p,r){const l1=Math.log(r.T1K),l2=Math.log(r.T2K),d=(l1-l2)/.4,pts=[[0,l1],[.7,l1-.7],[.7+d,l2-.7-d],[d,l2-d]],xs=pts.map(q=>q[0]),ys=pts.map(q=>q[1]),mx=Math.min(...xs),Mx=Math.max(...xs),my=Math.min(...ys),My=Math.max(...ys);
+  const X=v=>36+(v-mx)/(Mx-mx)*(w-66),Y=v=>h-34-(v-my)/(My-my)*(h-76),Q=pts.map(q=>[X(q[0]),Y(q[1])]);
+  c.strokeStyle=C.mut;c.lineWidth=1;c.beginPath();c.moveTo(24,h-22);c.lineTo(w-6,h-22);c.moveTo(24,h-22);c.lineTo(24,34);c.stroke();T(c,"lnV →",w-26,h-6,C.mut,12);T(c,"ln p ↑",34,28,C.mut,12);
+  c.fillStyle=C.acc;c.globalAlpha=.12;c.beginPath();Q.forEach((q,i)=>i?c.lineTo(...q):c.moveTo(...q));c.fill();c.globalAlpha=1;
+  const cl=[C.hot,C.mut,C.cold,C.mut];c.lineWidth=4;Q.forEach((q,i)=>{const n=Q[(i+1)%4];c.strokeStyle=cl[i];c.beginPath();c.moveTo(...q);c.lineTo(...n);c.stroke()});
+  ["A","B","C","D"].forEach((s,i)=>T(c,s,Q[i][0]+(i==0||i==3?-14:14),Q[i][1]+(i<2?-8:16),C.fg,14));
+  const s=(t*.2)%1*4,i=Math.floor(s),u=s-i,a=Q[i],b=Q[(i+1)%4];c.fillStyle=C.ok;c.beginPath();c.arc(a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u,8,0,7);c.fill();
+  T(c,`p–V sikl (log. o'qlar) · η = ${f(r.eta)}%`,w/2,16,C.fg,13)}},
+{t:"Real va ideal dvigatel",
+ text:p=>`Real dvigatelning FIK ${p.etaR}%. Uning isitkichi ${p.T1} K, sovitkichi ${p.T2} K temperaturada ishlaydi. Shu temperaturalardagi ideal mashinaning FIK ni toping va ikkalasini solishtiring.`,
+ given:p=>[`η_real = ${p.etaR}%`,`T₁ = ${p.T1} K`,`T₂ = ${p.T2} K`],find:["η_ideal = ? (%)","Farq = ? (%)"],
+ sl:[["etaR","η real (%)",10,45,1,35],["T1","T₁ (K)",400,1000,10,600],["T2","T₂ (K)",200,500,10,300]],
+ calc:p=>{p.T2=Math.min(p.T2,p.T1-10);const id=(p.T1-p.T2)/p.T1*100;return{id,diff:id-p.etaR}},
+ steps:(p,r)=>["Ideal (Karno) FIK: <b>η_id = (T₁ − T₂) / T₁ · 100%</b>",`η_id = (${p.T1} − ${p.T2}) / ${p.T1} · 100% = <b>${f(r.id)}%</b>`,`Solishtiramiz: η_real = ${p.etaR}%, η_id = ${f(r.id)}%`,`Farq: ${f(r.id)}% − ${p.etaR}% = <b>${f(r.diff)}%</b>`,r.diff>=0?"Real FIK ideal FIK dan kichik: ishqalanish va issiqlik yo'qotishlari tufayli.":"Real FIK ideal FIK dan katta bo'la olmaydi — bunday bo'lishi mumkin emas!"],
+ res:(p,r)=>`η_ideal = ${f(r.id)}% · Farq = ${f(r.diff)}%`,
+ ind:{q:"Isitkich T₁ = 500 K, sovitkich T₂ = 400 K. Ideal mashinaning FIK ni toping (%).",a:20,u:"%",h:"η = (T₁ − T₂)/T₁ · 100%"},
+ draw(c,w,h,t,p,r){const k=Math.min(1,t/1.5),b=h-44,HH=h-90,bw=w*.22,yr=b-p.etaR/100*HH*k,yi=b-r.id/100*HH*k;
+  [[w*.28,p.etaR,C.cold,"Real"],[w*.62,r.id,C.ok,"Ideal"]].forEach(([x,v,col,s])=>{const hh=v/100*HH*k;c.fillStyle=col;c.fillRect(x-bw/2,b-hh,bw,hh);T(c,f(v*k)+"%",x,b-hh-6,C.fg,14);T(c,s,x,b+22,C.fg,14)});
+  c.setLineDash([5,4]);c.strokeStyle=C.mut;c.lineWidth=1.5;c.beginPath();c.moveTo(w*.28,yr);c.lineTo(w*.9,yr);c.stroke();c.setLineDash([]);
+  arr(c,w*.88,yr,w*.88,yi+(yr>yi?0:0),3,C.hot,t);T(c,`Δ = ${f(r.diff*k)}%`,w*.88,Math.min(yr,yi)-12,C.hot,14)}},
+{t:"Avtomobil dvigateli",
+ text:p=>`Avtomobil dvigatelining quvvati ${p.N} kW. U 1 soatda ${p.m} kg dizel yoqilg'isini sarflaydi (q = 42 MJ/kg). Dvigatelning FIK ni toping.`,
+ given:p=>[`N = ${p.N} kW = ${p.N*1000} W`,"t = 1 soat = 3600 s",`m = ${p.m} kg`,"q = 42 MJ/kg"],find:["A = ? (MJ)","Q₁ = ? (MJ)","η = ? (%)"],
+ sl:[["N","N (kW)",10,40,1,30],["m","m (kg)",5,15,1,9]],
+ calc:p=>{const A=p.N*3.6,Q1=42*p.m;return{A,Q1,eta:A/Q1*100}},
+ steps:(p,r)=>["Foydali ish: <b>A = N · t</b>",`A = ${p.N*1000} W · 3600 s = ${p.N*3600000} J = <b>${f(r.A)} MJ</b>`,"Yoqilg'i issiqligi: <b>Q₁ = q · m</b>",`Q₁ = 42 MJ/kg · ${p.m} kg = <b>${f(r.Q1)} MJ</b>`,"FIK: <b>η = A / Q₁ · 100%</b>",`η = ${f(r.A)} / ${f(r.Q1)} · 100% = <b>${f(r.eta)}%</b>`,`Javob: η = ${f(r.eta)}%.`],
+ res:(p,r)=>`A = ${f(r.A)} MJ · Q₁ = ${f(r.Q1)} MJ · η = ${f(r.eta)}%`,
+ ind:{q:"Dvigatel quvvati 20 kW, 1 soatda 6 kg yoqilg'i (q = 40 MJ/kg) yonadi. FIK ni toping (%).",a:30,u:"%",h:"A = N·t, Q₁ = q·m, η = A/Q₁·100%"},
+ draw(c,w,h,t,p,r){const s=Math.min(1,t/10),ry=h*.8,dist=Math.min(t,10)*120,cx=w*.4,cy=ry-8;
+  c.fillStyle=C.mut;c.fillRect(0,ry,w,8);c.fillStyle='#fff';for(let i=-1;i<w/40+1;i++)c.fillRect(i*40-dist%40+10,ry+3,20,2);
+  c.fillStyle=C.acc;c.fillRect(cx,cy-34,80,26);c.fillRect(cx+16,cy-52,44,20);c.fillStyle=C.cold;c.fillRect(cx+22,cy-48,14,12);c.fillRect(cx+40,cy-48,14,12);
+  [cx+16,cx+64].forEach(x=>{c.fillStyle=C.fg;c.beginPath();c.arc(x,cy-6,10,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.moveTo(x,cy-6);c.lineTo(x+8*Math.cos(dist/10),cy-6+8*Math.sin(dist/10));c.stroke()});
+  c.strokeStyle=C.fg;c.lineWidth=3;c.strokeRect(10,14,58,76);c.fillStyle=C.hot;c.fillRect(12,16+72*s,54,72*(1-s));T(c,"Bak",39,108,C.fg,12);T(c,`${f(p.m*(1-s))} kg`,39,128,C.fg,13);
+  T(c,`t = ${f(s*60)} min`,w-10,26,C.fg,14,'right');T(c,`Q₁ = ${f(r.Q1*s)} MJ`,w-10,50,C.hot,14,'right');T(c,`A = ${f(r.A*s)} MJ`,w-10,74,C.ok,14,'right');T(c,`η = ${f(r.eta)}%`,w-10,98,C.fg,14,'right')}}
+];
+
+const Q=[
+{q:"Isitkichdan Q₁ = 300 kJ olindi, sovitkichga Q₂ = 240 kJ berildi. Foydali ish A qancha?",o:["540 kJ","60 kJ","1,25 kJ","0,2 kJ"],c:1},
+{q:"Karno siklida T₁ = 500 K, T₂ = 300 K bo'lsa, FIK qancha?",o:["60%","150%","40%","20%"],c:2},
+{q:"2 kg yoqilg'i (q = 44 MJ/kg) to'liq yonganda qancha issiqlik ajraladi?",o:["22 MJ","46 MJ","88 MJ","0,045 MJ"],c:2},
+{q:"Dvigatel FIK 20%, Q₁ = 1000 kJ. Sovitkichga berilgan Q₂ qancha?",o:["200 kJ","800 kJ","1200 kJ","500 kJ"],c:1},
+{q:"Karno mashinasining FIK ni oshirish uchun nima qilish kerak?",o:["T₁ ni kamaytirish","T₂ ni oshirish","T₁ ni oshirish yoki T₂ ni kamaytirish","FIK ga temperatura ta'sir qilmaydi"],c:2}];
+
+const vals=P.map(x=>Object.fromEntries(x.sl.map(s=>[s[0],s[5]]))),shown=P.map(()=>0);
+
+function fit(){const cv=$('#cv');if(!cv)return;const w=cv.parentElement.clientWidth-28,d=window.devicePixelRatio||1;cv.width=w*d;cv.height=H*d;cv.style.width=w+'px';cv.style.height=H+'px';cv._w=w;cv._d=d}
+function draw(){const cv=$('#cv');if(!cv)return;C={hot:css('--hot'),cold:css('--cold'),acc:css('--acc'),ok:css('--ok'),fg:css('--fg'),mut:css('--mut'),bd:css('--bd')};const c=cv.getContext('2d');c.setTransform(cv._d,0,0,cv._d,0,0);c.clearRect(0,0,cv._w,H);const x=P[cur];x.draw(c,cv._w,H,A.t,vals[cur],x.calc(vals[cur]))}
+function loop(ts){if(!A.run)return;A.t+=Math.min(.1,(ts-A.last)/1000);A.last=ts;draw();A.raf=requestAnimationFrame(loop)}
+function stop(){A.run=false;cancelAnimationFrame(A.raf)}
+
+function upd(){const x=P[cur],p=vals[cur],r=x.calc(p);
+ x.sl.forEach(s=>{$('#r_'+s[0]).value=p[s[0]];$('#v_'+s[0]).textContent=p[s[0]]});
+ $('#txt').textContent=x.text(p);$('#giv').innerHTML=x.given(p).join('<br>');
+ const st=x.steps(p,r);$('#st').innerHTML=st.slice(0,shown[cur]).map((s,n)=>`<div class="step"><span>${n+1}</span><div>${s}</div></div>`).join('');
+ const nx=$('#nx');nx.disabled=shown[cur]>=st.length;nx.textContent=nx.disabled?"Yechim tugadi":"Keyingi qadam";
+ $('#out').textContent=x.res(p,r);draw()}
+
+function show(i){stop();A.t=0;cur=i;
+ document.querySelectorAll('#tabs button').forEach((b,n)=>b.classList.toggle('on',n==i));
+ if(i==6)return test();
+ const x=P[i];
+ $('#main').innerHTML=`<section class="card"><h2>${i+1}-masala. ${x.t}</h2><p id="txt"></p><div class="g2"><div><b>Berilgan:</b><div id="giv"></div></div><div><b>Topish kerak:</b><div>${x.find.join('<br>')}</div></div></div></section>
+<section class="card"><h3>Bosqichma-bosqich yechim</h3><div id="st"></div><div class="row"><button id="nx">Keyingi qadam</button></div></section>
+<section class="card"><h3>Simulyatsiya</h3><div id="sl">${x.sl.map(s=>`<label>${s[1]}: <b id="v_${s[0]}"></b><input type="range" id="r_${s[0]}" min="${s[2]}" max="${s[3]}" step="${s[4]}" value="${vals[i][s[0]]}"></label>`).join('')}</div><div id="out" class="res"></div></section>
+<section class="card"><h3>Animatsiya</h3><canvas id="cv"></canvas><div class="row"><button id="b1">Boshlash</button><button id="b2" class="sec">To'xtatish</button><button id="b3" class="sec">Qayta</button></div></section>
+<section class="card"><h3>Mustaqil masala</h3><p>${x.ind.q}</p><div class="row"><input type="text" id="ans" inputmode="decimal" placeholder="Javob (${x.ind.u})"><button id="chk">Tekshirish</button></div><div id="msg" class="msg"></div></section>`;
+ x.sl.forEach(s=>$('#r_'+s[0]).oninput=e=>{vals[i][s[0]]=+e.target.value;upd()});
+ $('#nx').onclick=()=>{shown[i]++;upd()};
+ $('#b1').onclick=()=>{if(!A.run){A.run=true;A.last=performance.now();A.raf=requestAnimationFrame(loop)}};
+ $('#b2').onclick=stop;
+ $('#b3').onclick=()=>{A.t=0;draw()};
+ $('#chk').onclick=()=>{const v=parseFloat($('#ans').value.replace(',','.')),m=$('#msg');if(isNaN(v)){m.style.color=css('--mut');m.textContent="Son kiriting.";return}
+  if(Math.abs(v-x.ind.a)<.05){m.style.color=css('--ok');m.textContent="✅ To'g'ri! Barakalla!"}else{m.style.color=css('--bad');m.textContent=`❌ Noto'g'ri. Eslatma: ${x.ind.h}`}};
+ fit();upd();window.scrollTo(0,0)}
+
+function test(){const TA=Array(5).fill(null),L=['A','B','C','D'];
+ const m=$('#main');
+ const rd=()=>{const n=TA.filter(v=>v!==null).length,sc=TA.filter((v,i)=>v===Q[i].c).length;
+  m.innerHTML=`<section class="card"><h2>Test</h2><p>Har bir savolga bir marta javob bering.</p></section>`+Q.map((q,i)=>`<section class="card"><b>${i+1}. ${q.q}</b>${q.o.map((o,j)=>`<button class="opt ${TA[i]!==null?(j==q.c?'ok':(j==TA[i]?'no':'')):''}" data-i="${i}" data-j="${j}">${L[j]}) ${o}</button>`).join('')}</section>`).join('')+
+  (n==5?`<section class="card"><h2>Natija: ${sc} / 5 ball</h2><p><b>${sc*20}%</b> — ${sc==5?"A'lo!":sc>=3?"Yaxshi!":"Mavzuni yana takrorlang."}</p></section>`:`<section class="card">Javob berildi: ${n} / 5</section>`)+`<div class="row"><button id="rs">Qayta boshlash</button></div>`;
+  m.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(TA[i]!==null)return;TA[i]=+b.dataset.j;const y=window.scrollY;rd();window.scrollTo(0,y)});
+  $('#rs').onclick=()=>{TA.fill(null);rd();window.scrollTo(0,0)}};
+ rd();window.scrollTo(0,0)}
+
+$('#tabs').innerHTML=P.map((x,i)=>`<button>${i+1}-masala</button>`).join('')+'<button>Test</button>';
+document.querySelectorAll('#tabs button').forEach((b,i)=>b.onclick=()=>show(i));
+$('#th').onclick=()=>{const d=document.documentElement;d.dataset.theme=d.dataset.theme=='dark'?'light':'dark';draw()};
+window.addEventListener('resize',()=>{fit();draw()});
+show(0);
+</script>
+</body>
+</html>
