@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bug'lanish va kondensatsiya</title>
+<style>
+:root{--bg:#f1f7fb;--card:#fff;--fg:#1c2b36;--mut:#5d7283;--pri:#0288d1;--liq:#29b6f6;--heat:#fb8c00;--cold:#1e88e5;--cv:#f4f9fd;--fm:#fff3e0;--ok:#2e7d32;--bad:#c62828;--sh:0 4px 14px rgba(0,60,100,.12);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=dark]{--bg:#0f1820;--card:#18242f;--fg:#e6eef4;--mut:#9db2c2;--pri:#4fc3f7;--cv:#101b25;--fm:#3a2a14;--ok:#66bb6a;--bad:#ef5350;--sh:0 4px 14px rgba(0,0,0,.4)}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px}
+header h1{font-size:1.05rem;margin:0}
+button,select,input{font:inherit;color:inherit}
+.btn{min-height:46px;padding:0 16px;border:0;border-radius:14px;background:var(--pri);color:#fff;font-weight:600;cursor:pointer;box-shadow:var(--sh)}
+.btn.o{background:var(--heat)}.btn.g{background:#78909c}
+.btn:disabled{opacity:.5}
+#tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 14px 10px;position:sticky;top:0;background:var(--bg);z-index:5;scrollbar-width:none}
+#tabs button{flex:none;min-height:44px;padding:0 14px;border:0;border-radius:22px;background:var(--card);color:var(--fg);box-shadow:var(--sh);font-weight:600;cursor:pointer}
+#tabs button.on{background:var(--pri);color:#fff}
+main{max-width:760px;margin:0 auto;padding:0 14px}
+.card{background:var(--card);border-radius:20px;box-shadow:var(--sh);padding:16px;margin:0 0 14px}
+.card h2,.card h3{margin:0 0 8px}.card h2{color:var(--pri)}
+.fm{background:var(--fm);border-left:6px solid var(--heat);border-radius:14px;padding:14px;font-size:1.5rem;font-weight:700;text-align:center;margin:8px 0}
+.ex{background:rgba(41,182,246,.13);border-radius:14px;padding:10px 12px}
+label{display:block;margin:10px 0;font-weight:600}
+input[type=range]{width:100%;height:34px;accent-color:var(--heat)}
+select,input[type=text]{width:100%;min-height:46px;border-radius:12px;border:2px solid var(--pri);background:var(--card);padding:0 10px;margin-top:4px}
+.out{background:var(--cv);border-radius:14px;padding:12px;margin-top:8px}
+.big{font-size:1.5rem;font-weight:800;color:var(--heat)}
+.bar{height:14px;border-radius:7px;background:rgba(120,144,156,.3);overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--liq),var(--heat));transition:width .2s}
+canvas{width:100%;height:auto;border-radius:14px;background:var(--cv);display:block}
+.row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.row .btn{flex:1;min-width:90px}
+table{width:100%;border-collapse:collapse;margin:8px 0}td,th{border:1px solid rgba(120,144,156,.4);padding:6px;text-align:center}
+.msg{margin-top:8px;font-weight:700}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.st{background:var(--cv);border-radius:12px;padding:8px 10px;margin:6px 0}
+.opt{display:block;width:100%;text-align:left;min-height:50px;margin:8px 0;padding:8px 12px;border-radius:14px;border:2px solid var(--pri);background:var(--card);cursor:pointer}
+.opt.r{border-color:var(--ok);background:rgba(76,175,80,.2)}.opt.w{border-color:var(--bad);background:rgba(239,83,80,.2)}
+</style>
+</head>
+<body>
+<header><h1>40-mavzu. Bug'lanish va kondensatsiya</h1><button class="btn g" id="th">🌙 / ☀️</button></header>
+<nav id="tabs"></nav>
+<main id="view"></main>
+<script>
+const $=s=>document.querySelector(s),rnd=(a,b)=>a+Math.random()*(b-a);
+const sp=x=>Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const fx=(x,d=1)=>(+x.toFixed(d)).toString().replace('.',',');
+const bar=p=>`<div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>`;
+const big=t=>`<div class="big">${t}</div>`;
+const L={suv:2.3e6,spirt:.9e6,efir:.4e6,simob:.3e6};
+let fg='#000';
+const dot=(c,x,y,r,f,s)=>{c.beginPath();c.arc(x,y,r,0,7);c.fillStyle=f;c.fill();if(s){c.strokeStyle=s;c.lineWidth=1;c.stroke()}};
+const tx=(c,s,x,y,col,z,al)=>{c.fillStyle=col||fg;c.font=`bold ${z||13}px system-ui`;c.textAlign=al||'left';c.fillText(s,x,y)};
+const vap=(c,x,y)=>dot(c,x,y,4,'#eceff1','#78909c');
+const mol=(x0,x1,y0,y1,s)=>{const a=rnd(0,6.283),v=rnd(30,s);return{x:rnd(x0,x1),y:rnd(y0,y1),vx:Math.cos(a)*v,vy:Math.sin(a)*v}};
+const arrow=(c,x,y1,y2,w,col)=>{c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.beginPath();c.moveTo(x,y1);c.lineTo(x,y2);c.stroke();const d=y2>y1?1:-1;c.beginPath();c.moveTo(x-8-w/2,y2);c.lineTo(x+8+w/2,y2);c.lineTo(x,y2+14*d);c.fill()};
+
+const P=[
+{n:"Bug'lanish hodisasi",
+th:["Bug'lanish — suyuqlikning bug'ga aylanishi. U har qanday temperaturada, faqat suyuqlik sirtidan sodir bo'ladi.","Sirtdagi tez harakatlanuvchi molekulalar tortishish kuchini yengib, suyuqlikdan uchib chiqadi. Shuning uchun qolgan suyuqlik soviydi."],
+fm:"Bug'lanish: suyuqlik → bug'",
+ex:"Ho'l kiyim havoda quriydi. Ter bug'langanda tana soviydi — shuning uchun issiq kunda terlash bizni sovitadi.",
+sim:{c:[{id:'T',l:"Suyuqlik temperaturasi",min:0,max:100,st:1,v:20,u:"°C"}],f:v=>{const n=Math.round(2*Math.exp(.045*v.T)),s=Math.sqrt((v.T+273)/273)*70;return big(n+" ta/s")+"sirtdan uchib chiqayotgan molekulalar<br>Molekulalarning o'rtacha tezligi: "+fx(s,0)+" %"+bar(n/1.8)}},
+an:{init:s=>{s.m=[];for(let i=0;i<36;i++){const m=mol(80,280,125,210,120);m.g=0;s.m.push(m)}s.o=0},
+step:(c,s,dt)=>{c.fillStyle='rgba(41,182,246,.35)';c.fillRect(70,110,220,110);c.strokeStyle=fg;c.lineWidth=3;c.beginPath();c.moveTo(70,60);c.lineTo(70,220);c.lineTo(290,220);c.lineTo(290,60);c.stroke();
+s.m.forEach(m=>{m.x+=m.vx*dt;m.y+=m.vy*dt;if(!m.g){if(m.x<78||m.x>282)m.vx=-m.vx;if(m.y>214)m.vy=-Math.abs(m.vy);if(m.y<114){if(Math.hypot(m.vx,m.vy)>95){m.g=1;m.vy=-Math.abs(m.vy)-20;s.o++}else m.vy=Math.abs(m.vy)}dot(c,m.x,m.y,5,'#0277bd')}else{if(m.x<5||m.x>355)m.vx=-m.vx;if(m.y<4){Object.assign(m,mol(80,280,150,210,90));m.g=0}vap(c,m.x,m.y)}});
+tx(c,"Uchib chiqqan molekulalar: "+s.o,10,20,fg,14);tx(c,"Tez molekulalar sirtdan chiqadi",10,40,'#78909c',12)}},
+task:{q:"Idishdan 1 soatda 3 g suv bug'landi. Bug'lanish tezligi o'zgarmasa, 8 soatda necha gramm suv bug'lanadi?",a:24,u:"g",sol:"m = 3 g/soat · 8 soat = 24 g"}},
+
+{n:"Bug'lanish tezligiga ta'sir etuvchi omillar",
+th:["Bug'lanish tezligi quyidagilarga bog'liq: temperatura (yuqori bo'lsa tez), suyuqlik sirtining yuzasi (katta bo'lsa tez), shamol (havo harakati bug'ni olib ketadi), suyuqlik turi va havo namligi (quruq havoda tez).","Spirt va efir suvdan tez bug'lanadi, chunki ularning molekulalari kuchsizroq tortishadi."],
+fm:"v ↑ : t ↑, S ↑, shamol ↑, namlik ↓",
+ex:"Kir keng yoyilsa va shamolda tez quriydi. Spirt qo'lga tekkanda suvdan tezroq bug'lanib, sovuq his qilinadi.",
+sim:{c:[{id:'L',l:"Suyuqlik turi",o:["Suv","Spirt","Efir"]},{id:'T',l:"Temperatura",min:0,max:80,st:1,v:20,u:"°C"},{id:'S',l:"Sirt yuzasi",min:10,max:100,st:1,v:50,u:"sm²"},{id:'W',l:"Shamol tezligi",min:0,max:10,st:1,v:0,u:"m/s"}],f:v=>{const k=[1,2.5,6][v.L],r=k*(.4+v.T/50)*(v.S/50)*(1+.5*v.W),p=r/144*100;return big(fx(p)+" shartli birlik")+"Bug'lanish tezligi ko'rsatkichi"+bar(p*1.5)}},
+an:{init:s=>{s.a=1;s.b=1},
+step:(c,s,dt)=>{s.a=Math.max(.15,s.a-.012*dt);s.b=Math.max(.15,s.b-.05*dt);
+[[40,"Oddiy",s.a],[210,"Issiq + shamol",s.b]].forEach(([x,t,l],i)=>{c.strokeStyle=fg;c.lineWidth=3;c.beginPath();c.moveTo(x,60);c.lineTo(x,200);c.lineTo(x+110,200);c.lineTo(x+110,60);c.stroke();const h=135*l;c.fillStyle='rgba(41,182,246,.6)';c.fillRect(x+2,198-h,106,h);tx(c,t,x+55,222,fg,13,'center');
+const n=i?9:3;for(let k=0;k<n;k++){const y=58-((s.t*(i?40:15)+k*19)%45);vap(c,x+12+((k*37)%86)+Math.sin(s.t*3+k)*4+(i?(58-y)*.6:0),y)}});
+for(let k=0;k<3;k++){const y=100+k*22;c.strokeStyle='#90a4ae';c.lineWidth=2;c.beginPath();c.moveTo(180,y);c.lineTo(205,y);c.stroke();c.beginPath();c.moveTo(200,y-4);c.lineTo(206,y);c.lineTo(200,y+4);c.stroke()}
+c.fillStyle='#fb8c00';c.beginPath();c.moveTo(235,225);c.quadraticCurveTo(255+Math.sin(s.t*8)*5,200,265,225);c.fill();c.beginPath();c.moveTo(270,225);c.quadraticCurveTo(285+Math.sin(s.t*7)*5,203,295,225);c.fill();
+tx(c,"Sath: "+fx(s.a*100,0)+" %",40,25,fg,13);tx(c,"Sath: "+fx(s.b*100,0)+" %",210,25,fg,13)}},
+task:{q:"Suvning bug'lanish tezligi sirt yuzasiga to'g'ri proporsional. Yuzasi 50 sm² bo'lganda idishdan 2 g/soat bug'lanadi. Yuza 150 sm² bo'lsa, 5 soatda necha gramm bug'lanadi?",a:30,u:"g",sol:"Yuza 3 marta katta → tezlik 3·2 = 6 g/soat. m = 6·5 = 30 g"}},
+
+{n:"Kondensatsiya hodisasi",
+th:["Kondensatsiya — bug'ning suyuqlikka aylanishi. Bunda issiqlik ajralib chiqadi.","Bug'lanish va kondensatsiya o'zaro teskari jarayonlardir. Havodagi suv bug'i sovuq sirtga tegib sovisa, tomchilarga aylanadi. Bug' sovuq sirt temperaturasi shudring nuqtasidan pastga tushganda kondensatsiyalanadi."],
+fm:"Kondensatsiya: bug' → suyuqlik, Q ajraladi",
+ex:"Sovuq stakan sirtida tomchilar paydo bo'ladi, oyna «terlaydi». Tong otganda shudring, havoda tuman va bulut ham kondensatsiya natijasi.",
+sim:{c:[{id:'T',l:"Sovuq sirt temperaturasi",min:0,max:25,st:1,v:15,u:"°C"},{id:'H',l:"Havo namligi (havo 25 °C)",min:20,max:100,st:1,v:60,u:"%"}],f:v=>{const td=25-(100-v.H)/5,k=Math.max(0,Math.round((td-v.T)*3));return big("Shudring nuqtasi ≈ "+fx(td)+" °C")+(v.T<td?"Tomchilar paydo bo'ladi<br>"+"●".repeat(Math.min(k,24)):"Sirt shudring nuqtasidan issiq — tomchi yo'q")}},
+an:{init:s=>{s.g=[];for(let i=0;i<30;i++)s.g.push(mol(15,240,15,215,70));s.d=[];s.n=0},
+step:(c,s,dt)=>{c.fillStyle='#1e88e5';c.fillRect(300,0,60,230);tx(c,"Sovuq sirt",330,115,'#fff',11,'center');
+s.g.forEach(m=>{m.x+=m.vx*dt;m.y+=m.vy*dt;if(m.x<8)m.vx=Math.abs(m.vx);if(m.y<8)m.vy=Math.abs(m.vy);if(m.y>222)m.vy=-Math.abs(m.vy);if(m.x>230)m.vx*=1-.8*dt;if(m.x>292){s.d.push({y:m.y,r:2});s.n++;Object.assign(m,mol(15,100,15,215,70))}vap(c,m.x,m.y)});
+s.d=s.d.filter(d=>{d.r=Math.min(8,d.r+dt*2);if(d.r>=8)d.y+=dt*25;dot(c,298-d.r,d.y,d.r,'#4fc3f7','#0277bd');return d.y<235});
+tx(c,"Tomchilar hosil bo'ldi: "+s.n,10,20,fg,14)}},
+task:{q:"Shudring nuqtasi 12 °C. Stakan sirti 9 °C gacha soviydi. Sirt shudring nuqtasidan necha °C past?",a:3,u:"°C",sol:"Δt = 12 − 9 = 3 °C. Sirt shudring nuqtasidan past, shuning uchun tomchilar paydo bo'ladi."}},
+
+{n:"Dinamik muvozanat",
+th:["Yopiq idishda suyuqlikdan chiqayotgan molekulalar soni qaytayotganlar soniga tenglashadi — bu dinamik muvozanat. Suyuqlik bilan muvozanatdagi bug' to'yingan bug' deyiladi; muvozanatda bo'lmagan bug' — to'yinmagan.","Temperatura oshsa, to'yingan bug'ning zichligi va bosimi ortadi."],
+fm:"N(bug'lanish) = N(kondensatsiya)",
+ex:"Yopiq choynak yoki yopiq bankadagi suv: bug' bir paytdan keyin ko'paymaydi, suyuqlik sathi ham o'zgarmaydi.",
+sim:{c:[{id:'T',l:"Temperatura",min:10,max:100,st:1,v:30,u:"°C"},{id:'t',l:"Vaqt",min:0,max:10,st:.5,v:1,u:"s"}],f:v=>{const e=Math.round(5*Math.exp(.04*(v.T-10))),b=Math.round(e*(1-Math.exp(-v.t/2))),p=.61*Math.exp(17.27*v.T/(v.T+237.3));return "Chiqayotgan: <b>"+e+"</b> ta/s &nbsp; Qaytayotgan: <b>"+b+"</b> ta/s<br>To'yingan bug' bosimi ≈ "+fx(p)+" kPa"+bar(b/e*100)+(b>=e*.98?big("Muvozanat!"):"Muvozanat hali o'rnatilmagan")}},
+an:{init:s=>{s.g=[];s.e=0;s.c=0;s.ev=[];s.cv=[]},
+step:(c,s,dt)=>{const n=s.t;c.fillStyle='rgba(41,182,246,.45)';c.fillRect(62,150,236,64);c.strokeStyle=fg;c.lineWidth=3;c.strokeRect(60,20,240,195);
+if(Math.random()<10*dt){s.g.push({x:rnd(80,280),y:149,vx:rnd(-50,50),vy:-rnd(60,140)});s.e++;s.ev.push(n)}
+s.g=s.g.filter(m=>{m.x+=m.vx*dt;m.y+=m.vy*dt;if(m.x<66||m.x>294)m.vx=-m.vx;if(m.y<26)m.vy=Math.abs(m.vy);if(m.y>=150){s.c++;s.cv.push(n);return false}vap(c,m.x,m.y);return true});
+s.ev=s.ev.filter(t=>n-t<4);s.cv=s.cv.filter(t=>n-t<4);const re=s.ev.length/4,rc=s.cv.length/4;
+arrow(c,30,140,60,2+re*.8,'#0277bd');arrow(c,330,60,140,2+rc*.8,'#1e88e5');
+tx(c,"Chiqish "+fx(re,0)+"/s",30,175,fg,11,'center');tx(c,"Qaytish "+fx(rc,0)+"/s",330,175,fg,11,'center');
+if(n>10)tx(c,"Muvozanat!",180,50,'#2e7d32',20,'center')}},
+task:{q:"Yopiq idishda har sekundda suyuqlikdan 50 ta molekula chiqmoqda. Dinamik muvozanat o'rnatilgach, 5 sekundda jami nechta molekula suyuqlikka qaytadi?",a:250,u:"ta",sol:"Muvozanatda qaytayotganlar soni chiqayotganlarga teng: 50 ta/s. 5 s da: 50·5 = 250 ta"}},
+
+{n:"Issiqlik miqdori Q = L·m",
+th:["Solishtirma bug'lanish issiqligi L — 1 kg suyuqlikni qaynash temperaturasida bug'ga aylantirish uchun kerak bo'lgan issiqlik miqdori (birligi J/kg).","Bug'lanishda issiqlik yutiladi, kondensatsiyada shuncha issiqlik ajraladi."],
+tb:"<table><tr><th>Modda</th><th>L, J/kg</th></tr><tr><td>Suv</td><td>2,3·10⁶</td></tr><tr><td>Spirt</td><td>0,9·10⁶</td></tr><tr><td>Efir</td><td>0,4·10⁶</td></tr><tr><td>Simob</td><td>0,3·10⁶</td></tr></table>",
+fm:"Q = L · m",
+ex:"Qaynayotgan suv bug'i kuyishi qaynoq suvdan xavfliroq: bug' teringizda kondensatsiyalanib, ko'p issiqlik ajratadi.",
+sim:{c:[{id:'M',l:"Modda",o:["Suv","Spirt","Efir","Simob"]},{id:'m',l:"Massa",min:.1,max:5,st:.1,v:1,u:"kg"}],f:v=>{const Q=[2.3e6,.9e6,.4e6,.3e6][v.M]*v.m;return big("Q = "+sp(Q)+" J")+"= "+fx(Q/1000,1)+" kJ"}},
+an:{init:s=>{s.m=0},
+step:(c,s,dt)=>{if(s.run)s.m=Math.min(.5,s.m+.02*dt);c.strokeStyle=fg;c.lineWidth=3;c.beginPath();c.moveTo(110,50);c.lineTo(110,180);c.lineTo(250,180);c.lineTo(250,50);c.stroke();const h=125*(1-s.m/.5)+4;c.fillStyle='rgba(41,182,246,.6)';c.fillRect(112,178-h,136,h);
+for(let k=0;k<6;k++)vap(c,125+k*22+Math.sin(s.t*4+k)*3,48-((s.t*30*(s.m>0?1:0)+k*13)%40));
+c.fillStyle='#fb8c00';for(let k=0;k<4;k++){c.beginPath();c.moveTo(125+k*34,205);c.quadraticCurveTo(135+k*34+Math.sin(s.t*9+k)*4,180,145+k*34,205);c.fill()}
+tx(c,"Bug'langan massa: "+fx(s.m,3)+" kg",10,20,fg,13);tx(c,"Yutilgan Q = "+sp(2.3e6*s.m)+" J",10,40,'#fb8c00',14)}},
+task:{q:"0,5 kg suvni qaynash temperaturasida bug'ga aylantirish uchun necha kJ issiqlik kerak? (L = 2,3·10⁶ J/kg)",a:1150,u:"kJ",sol:"Q = L·m = 2,3·10⁶ · 0,5 = 1,15·10⁶ J = 1150 kJ"},
+ext:[
+{t:"1-masala. 200 g spirtni qaynash temperaturasida bug'ga aylantirish uchun qancha issiqlik kerak?",g:"m = 0,2 kg; L = 0,9·10⁶ J/kg",f:"Q − ?",s:["Formulani yozamiz: Q = L·m","Qiymatlarni qo'yamiz: Q = 0,9·10⁶ · 0,2","Hisoblaymiz: Q = 1,8·10⁵ J"],a:"Q = 180 kJ"},
+{t:"2-masala. 3 kg suv bug'i kondensatsiyalanganda qancha issiqlik ajraladi?",g:"m = 3 kg; L = 2,3·10⁶ J/kg",f:"Q − ?",s:["Kondensatsiyada bug'lanishdagi bilan bir xil issiqlik ajraladi: Q = L·m","Q = 2,3·10⁶ · 3","Q = 6,9·10⁶ J"],a:"Q = 6,9 MJ"},
+{t:"3-masala. 50 g efir bug'langanda qancha issiqlik yutiladi?",g:"m = 0,05 kg; L = 0,4·10⁶ J/kg",f:"Q − ?",s:["50 g = 0,05 kg","Q = L·m = 0,4·10⁶ · 0,05","Q = 2·10⁴ J"],a:"Q = 20 kJ"}]},
+
+{n:"Qo'llanilishi va masalalar",
+th:["Tabiatda: suv aylanishi (okeandan bug'lanish → bulut → yomg'ir → daryo), shudring va tuman.","Texnikada: sovutgich va konditsioner, distillash (suv tozalash), kir quritgich, bug' turbinalari, sho'rlangan suvdan chuchuk suv olish.","Ekologiya: Orol dengizi qurib borgani sababli bug'lanish ko'paydi, namlik kamaydi, iqlim quruqlashdi."],
+fm:"Q = L·m ; Q = c·m·Δt",
+ex:"Distillyatorda suv qizdirilib bug'ga aylanadi, sovutgichda kondensatsiyalanib toza suv sifatida idishga tomadi.",
+sim:{c:[{id:'P',l:"Qizdirish quvvati",min:100,max:2000,st:50,v:800,u:"Vt"}],f:v=>{const m=v.P*600*.8/2.3e6*1000;return big(fx(m,0)+" g toza suv")+"10 minutda (FIK 80 %, suv qaynash temperaturasida)"+bar(m/4.2)}},
+an:{init:s=>{s.p=[];for(let i=0;i<26;i++)s.p.push({x:rnd(20,130),y:rnd(60,190),s:0,u:rnd(0,1)})},
+step:(c,s,dt)=>{c.fillStyle='rgba(41,182,246,.5)';c.fillRect(0,180,140,50);c.fillStyle='#8d6e63';c.fillRect(140,200,220,30);c.beginPath();c.moveTo(270,200);c.lineTo(320,120);c.lineTo(360,200);c.fill();c.fillStyle='#4fc3f7';c.fillRect(140,195,120,10);
+dot(c,320,30,16,'#fb8c00');c.fillStyle='#cfd8dc';[[190,45,22],[215,38,26],[240,46,20]].forEach(a=>dot(c,a[0],a[1],a[2],'#cfd8dc'));
+s.p.forEach(p=>{if(p.s==0){p.y-=30*dt;p.x+=5*dt;if(p.y<62)p.s=1}else if(p.s==1){p.x+=45*dt;if(p.x>175){p.s=2;p.x=rnd(190,250);p.y=70}}else if(p.s==2){p.y+=70*dt;if(p.y>192)p.s=3}else{p.x-=40*dt;p.y=200;if(p.x<130){p.s=0;p.x=rnd(20,130);p.y=185}}
+if(p.s<2)vap(c,p.x,p.y);else dot(c,p.x,p.y,3,'#0277bd')});
+tx(c,"Bug'lanish",8,172,fg,11);tx(c,"Bulut",195,18,fg,11);tx(c,"Yomg'ir",250,110,fg,11);tx(c,"Daryo",160,222,fg,11);tx(c,"Okean",50,222,fg,11)}},
+task:{q:"2 kg 100 °C li suv bug'i kondensatsiyalanganda necha MJ issiqlik ajraladi? (L = 2,3·10⁶ J/kg)",a:4.6,u:"MJ",sol:"Q = L·m = 2,3·10⁶ · 2 = 4,6·10⁶ J = 4,6 MJ"},
+ext:[
+{t:"1-masala. 2 kg suvni 20 °C dan 100 °C gacha qizdirib, 0,5 kg ini bug'ga aylantirish uchun qancha issiqlik kerak? (c = 4200 J/(kg·°C))",g:"m = 2 kg; m₁ = 0,5 kg; t₁ = 20 °C; t₂ = 100 °C; c = 4200; L = 2,3·10⁶",f:"Q − ?",s:["Qizdirish: Q₁ = c·m·Δt = 4200·2·80 = 672 000 J","Bug'lanish: Q₂ = L·m₁ = 2,3·10⁶·0,5 = 1 150 000 J","Jami: Q = Q₁ + Q₂ = 1 822 000 J"],a:"Q ≈ 1822 kJ"},
+{t:"2-masala. 0,1 kg 100 °C li bug' kondensatsiyalanib suvga aylandi va 40 °C gacha soviydi. Qancha issiqlik ajraladi?",g:"m = 0,1 kg; t₁ = 100 °C; t₂ = 40 °C; c = 4200; L = 2,3·10⁶",f:"Q − ?",s:["Kondensatsiya: Q₁ = L·m = 2,3·10⁶·0,1 = 230 000 J","Sovish: Q₂ = c·m·Δt = 4200·0,1·60 = 25 200 J","Jami: Q = 230 000 + 25 200 = 255 200 J"],a:"Q ≈ 255 kJ"},
+{t:"3-masala. Suvga 460 kJ issiqlik berilganda (qaynash temperaturasida) necha kg suv bug'ga aylanadi?",g:"Q = 460 000 J; L = 2,3·10⁶ J/kg",f:"m − ?",s:["Q = L·m formulasidan m = Q / L","m = 460 000 / 2 300 000","m = 0,2 kg"],a:"m = 0,2 kg"},
+{t:"4-masala. 0,2 kg 100 °C li bug' kondensatsiyalanganda ajralgan issiqlik 20 °C li suvni 100 °C gacha qizdirishga sarflansa, necha kg suv qizdiriladi?",g:"m₁ = 0,2 kg; Δt = 80 °C; c = 4200; L = 2,3·10⁶",f:"m₂ − ?",s:["Ajralgan issiqlik: Q = L·m₁ = 2,3·10⁶·0,2 = 460 000 J","Qizdirish uchun: Q = c·m₂·Δt → m₂ = Q/(c·Δt)","m₂ = 460 000 / (4200·80) = 460 000 / 336 000 ≈ 1,37 kg"],a:"m₂ ≈ 1,37 kg"}]}
+];
+
+const TEST=[
+["Bug'lanish qaysi temperaturada sodir bo'ladi?",["Faqat 100 °C da","Har qanday temperaturada","Faqat 0 °C dan yuqorida","Faqat qaynash paytida"],1],
+["Quyidagilardan qaysi biri bug'lanishni tezlashtirmaydi?",["Temperaturaning ortishi","Shamol","Sirt yuzasining kamayishi","Spirt kabi uchuvchan suyuqlik"],2],
+["Kondensatsiya haqida qaysi fikr to'g'ri?",["Bug' suyuqlikka aylanadi, issiqlik ajraladi","Suyuqlik bug'ga aylanadi, issiqlik yutiladi","Qattiq jism suyuqlikka aylanadi","Issiqlik yutiladi, bug' hosil bo'ladi"],0],
+["Dinamik muvozanatda yopiq idishda:",["Bug'lanish to'xtaydi","Kondensatsiya to'xtaydi","Chiqayotgan va qaytayotgan molekulalar soni teng","Barcha suyuqlik bug'ga aylanadi"],2],
+["2 kg suv bug'ini kondensatsiyalaganda ajraladigan issiqlik (L = 2,3·10⁶ J/kg):",["2,3·10⁶ J","1,15·10⁶ J","4,6·10⁶ J","9,2·10⁶ J"],2]
+];
+
+let cur=0,raf=0,last=0,S={},cv,cx;
+const tabs=$('#tabs');
+P.forEach((p,i)=>{const b=document.createElement('button');b.textContent=(i+1)+". "+["Bug'lanish","Omillar","Kondensatsiya","Muvozanat","Issiqlik","Qo'llanish"][i];b.onclick=()=>render(i);tabs.appendChild(b)});
+const tb=document.createElement('button');tb.textContent="Test";tb.onclick=()=>render(6);tabs.appendChild(tb);
+
+function draw(dt){const st=getComputedStyle(document.documentElement);fg=st.getPropertyValue('--fg').trim();cx.fillStyle=st.getPropertyValue('--cv').trim();cx.fillRect(0,0,360,230);cx.lineWidth=2;S.t=(S.t||0)+dt;P[cur].an.step(cx,S,dt)}
+function loop(t){const dt=Math.min((t-last)/1000,.05);last=t;draw(dt);raf=requestAnimationFrame(loop)}
+function stop(){cancelAnimationFrame(raf);raf=0;S.run=0}
+function start(){if(!raf){S.run=1;last=performance.now();raf=requestAnimationFrame(loop)}}
+function reset(){stop();S={};P[cur].an.init(S);draw(0)}
+
+function render(i){stop();cur=i;[...tabs.children].forEach((b,k)=>b.classList.toggle('on',k==i));window.scrollTo(0,0);if(i==6)return renderTest();
+const p=P[i];let h=`<div class="card"><h2>${i+1}-reja. ${p.n}</h2><h3>Nazariya</h3>${p.th.map(t=>`<p>${t}</p>`).join('')}${p.tb||''}<h3>Asosiy formula / qoida</h3><div class="fm">${p.fm}</div><h3>Hayotiy misol</h3><div class="ex">${p.ex}</div></div>`;
+h+=`<div class="card"><h3>Simulyatsiya</h3>`+p.sim.c.map(c=>c.o?`<label>${c.l}<select id="s_${c.id}">${c.o.map((x,k)=>`<option value="${k}">${x}</option>`).join('')}</select></label>`:`<label>${c.l}: <b id="v_${c.id}">${c.v}</b> ${c.u}<input type="range" id="s_${c.id}" min="${c.min}" max="${c.max}" step="${c.st}" value="${c.v}"></label>`).join('')+`<div id="so" class="out"></div></div>`;
+h+=`<div class="card"><h3>Animatsiya</h3><canvas id="cv" width="360" height="230"></canvas><div class="row"><button class="btn" id="b1">▶ Boshlash</button><button class="btn o" id="b2">⏸ To'xtatish</button><button class="btn g" id="b3">↺ Qayta boshlash</button></div></div>`;
+if(p.ext)h+=`<div class="card"><h3>Bosqichma-bosqich masalalar</h3>${p.ext.map((e,k)=>`<div class="st" style="margin-bottom:12px"><b>${e.t}</b><br><u>Berilgan:</u> ${e.g}<br><u>Topish kerak:</u> ${e.f}<div id="e${k}"></div><button class="btn" id="n${k}" style="margin-top:8px">Keyingi qadam →</button></div>`).join('')}</div>`;
+h+=`<div class="card"><h3>Mustaqil masala</h3><p>${p.task.q}</p><input type="text" id="ti" inputmode="decimal" placeholder="Javob (${p.task.u})"><div class="row"><button class="btn" id="tc">Tekshirish</button><button class="btn g" id="ts">Yechimni ko'rsat</button></div><div id="tm" class="msg"></div></div>`;
+$('#view').innerHTML=h;
+const run=()=>{const v={};p.sim.c.forEach(c=>{const e=$('#s_'+c.id);v[c.id]=+e.value;if(!c.o)$('#v_'+c.id).textContent=e.value});$('#so').innerHTML=p.sim.f(v)};
+p.sim.c.forEach(c=>$('#s_'+c.id).addEventListener('input',run));run();
+cv=$('#cv');cx=cv.getContext('2d');S={};p.an.init(S);draw(0);$('#b1').onclick=start;$('#b2').onclick=stop;$('#b3').onclick=reset;
+if(p.ext)p.ext.forEach((e,k)=>{let n=0;$('#n'+k).onclick=()=>{const d=$('#e'+k);if(n<e.s.length){d.innerHTML+=`<div class="st">${n+1}) ${e.s[n]}</div>`;n++;if(n==e.s.length)$('#n'+k).textContent="Javobni ko'rish"}else{d.innerHTML+=`<div class="st"><b class="ok">Javob: ${e.a}</b></div>`;$('#n'+k).disabled=true}}});
+$('#tc').onclick=()=>{const x=parseFloat($('#ti').value.replace(',','.')),a=p.task.a;const m=$('#tm');if(isNaN(x)){m.className='msg bad';m.textContent="Raqam kiriting";return}
+if(Math.abs(x-a)<=Math.abs(a)*.02){m.className='msg ok';m.textContent="✔ To'g'ri!"}else{m.className='msg bad';m.textContent="✘ Noto'g'ri, qayta urinib ko'ring"}};
+$('#ts').onclick=()=>{const m=$('#tm');m.className='msg';m.innerHTML="Yechim: "+p.task.sol+"<br><b class='ok'>Javob: "+String(p.task.a).replace('.',',')+" "+p.task.u+"</b>"}}
+
+function renderTest(){let q=0,sc=0;const v=$('#view');
+const show=()=>{if(q>=TEST.length){const pc=Math.round(sc/TEST.length*100);v.innerHTML=`<div class="card"><h2>Natija</h2>${big(sc+" / "+TEST.length+" ball")}<p>To'g'ri javoblar: ${pc} %</p>${bar(pc)}<div class="row"><button class="btn" id="rs">↺ Qayta boshlash</button></div></div>`;$('#rs').onclick=renderTest;return}
+const t=TEST[q];v.innerHTML=`<div class="card"><h2>Test: ${q+1} / ${TEST.length}</h2><p><b>${t[0]}</b></p>${t[1].map((o,k)=>`<button class="opt" data-k="${k}"><b>${"ABCD"[k]}.</b> ${o}</button>`).join('')}<div id="fb" class="msg"></div><div class="row"><button class="btn" id="nx" style="display:none">${q==TEST.length-1?"Natijani ko'rish":"Keyingi →"}</button></div></div>`;
+document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const k=+b.dataset.k;document.querySelectorAll('.opt').forEach(o=>o.disabled=true);document.querySelectorAll('.opt')[t[2]].classList.add('r');if(k==t[2]){sc++;$('#fb').className='msg ok';$('#fb').textContent="✔ To'g'ri!"}else{b.classList.add('w');$('#fb').className='msg bad';$('#fb').textContent="✘ Noto'g'ri. To'g'ri javob: "+"ABCD"[t[2]]}$('#nx').style.display='block';$('#nx').onclick=()=>{q++;show()}})};show()}
+
+const root=document.documentElement;
+root.dataset.theme=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+$('#th').onclick=()=>{root.dataset.theme=root.dataset.theme=='dark'?'light':'dark';if(cx&&!raf)draw(0)};
+render(0);
+</script>
+</body>
+</html>
