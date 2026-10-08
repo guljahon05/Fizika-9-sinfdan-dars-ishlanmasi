@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>37-mavzu. Masalalar yechish — Qattiq jismlarning mexanik xossalari</title>
+<style>
+:root{--bg:#f3f6fc;--card:#ffffff;--ink:#17203a;--mut:#58637d;--pri:#2563eb;--pri2:#e1e9ff;--btn:#2563eb;--ok:#15a34a;--bad:#dc2626;--line:#d6deee;--fm:#eaf0ff;--warn:#e89b0c}
+[data-theme="dark"]{--bg:#0e1424;--card:#172038;--ink:#e9eefb;--mut:#9eabc8;--pri:#7aa8ff;--pri2:#25345a;--btn:#3a6fe0;--ok:#4ade80;--bad:#f87171;--line:#2b3859;--fm:#1d2849;--warn:#fbbf24}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:10px 12px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0}
+h1{font-size:1.25rem;margin:0;line-height:1.3}
+h2{font-size:1.15rem;margin:14px 0 4px}
+.sub{margin:2px 0 0;color:var(--mut);font-size:.9rem}
+.icon{width:48px;height:48px;flex:0 0 48px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:22px;cursor:pointer;color:var(--ink)}
+nav{display:flex;gap:8px;overflow-x:auto;padding:8px 0;position:sticky;top:0;background:var(--bg);z-index:5;-webkit-overflow-scrolling:touch}
+nav button{flex:0 0 auto;min-height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--btn);color:#fff;border-color:var(--btn)}
+section{display:none}
+section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
+.card h3{margin:0 0 8px;font-size:1.05rem}
+.card p{margin:6px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.grid2 .card{margin:0}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+.fm{background:var(--fm);border-left:4px solid var(--pri);border-radius:10px;padding:8px 12px;margin:8px 0;font:italic 1.1rem/1.5 Georgia,"Times New Roman",serif;overflow-x:auto}
+.step{display:none;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+.step.show{display:block;animation:fade .4s}
+.step b.t{color:var(--pri)}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.step.show{animation:none}}
+.btn{min-height:48px;padding:0 16px;border:0;border-radius:12px;background:var(--btn);color:#fff;font-size:16px;font-weight:600;cursor:pointer}
+.btn.sec{background:var(--pri2);color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.row .btn{flex:1 1 120px}
+.sl{margin:10px 0}
+.sl label{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:.95rem}
+.sl input{width:100%;height:36px;accent-color:var(--pri)}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0}
+.out div{background:var(--fm);border-radius:10px;padding:8px 10px;font-size:.85rem;color:var(--mut)}
+.out b{display:block;color:var(--ink);font-size:1.05rem}
+.note{background:var(--fm);border-radius:10px;padding:8px 12px;font-size:.95rem}
+canvas{display:block;width:100%;border-radius:12px;background:var(--bg);border:1px solid var(--line);margin:10px 0}
+input.ans{flex:1 1 140px;min-height:48px;font-size:18px;padding:0 12px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.unit{align-self:center;font-weight:700}
+.msg{font-weight:700;margin-top:6px}
+.msg.ok{color:var(--ok)}
+.msg.bad{color:var(--bad)}
+.sol{display:none;margin-top:8px}
+.sol.show{display:block}
+.opt{display:block;width:100%;text-align:left;min-height:50px;margin:8px 0;padding:10px 14px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;cursor:pointer}
+.opt.ok{border-color:var(--ok);background:rgba(34,197,94,.18)}
+.opt.bad{border-color:var(--bad);background:rgba(239,68,68,.18)}
+.big{font-size:1.8rem;font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>37-mavzu. Masalalar yechish</h1>
+      <p class="sub">9-sinf fizika · Qattiq jismlarning mexanik xossalari</p>
+    </div>
+    <button id="themeBtn" class="icon" aria-label="Och / to'q mavzu">🌙</button>
+  </header>
+  <nav id="tabs"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s);};
+var SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+
+/* ---------- yordamchi funksiyalar ---------- */
+function fmt(x,d){
+  if(d===undefined)d=2;
+  var n=+(+x).toFixed(d),s=String(n);
+  if(s.indexOf('e')>-1)s=n.toFixed(d);
+  var p=s.split('.');
+  p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0');
+  return p.join(',');
+}
+function sciT(x,d){
+  if(x===0)return '0';
+  d=(d===undefined)?2:d;
+  var e=Math.floor(Math.log10(Math.abs(x))),m=+(x/Math.pow(10,e)).toFixed(d);
+  if(Math.abs(m)>=10){m/=10;e++;}
+  var es=String(e).split('').map(function(ch){return SUP[ch];}).join('');
+  return (m===1?'':fmt(m,d)+'·')+'10'+es;
+}
+function nice(x){
+  var p=Math.pow(10,Math.floor(Math.log10(x))),m=x/p,s=[1,2,4,5,8,10];
+  for(var i=0;i<s.length;i++){if(m<=s[i]+1e-9)return s[i]*p;}
+  return 10*p;
+}
+function tickfmt(v){return fmt(+(+v).toPrecision(3),3);}
+function line(c,a,b,d,e){c.beginPath();c.moveTo(a,b);c.lineTo(d,e);c.stroke();}
+function dot(c,x,y,r,f){c.beginPath();c.arc(x,y,r,0,6.2832);c.fillStyle=f;c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
+function txt(c,s,x,y,color,size,al,bold){c.fillStyle=color;c.font=(bold?'700 ':'')+size+'px system-ui,sans-serif';c.textAlign=al||'left';c.fillText(s,x,y);}
+function poly(c,p,f,s){c.beginPath();p.forEach(function(q,i){if(i)c.lineTo(q[0],q[1]);else c.moveTo(q[0],q[1]);});c.closePath();c.fillStyle=f;c.fill();if(s){c.strokeStyle=s;c.lineWidth=1.5;c.stroke();}}
+function arrow(c,x1,y1,x2,y2,color,wd){
+  var dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);if(len<4)return;
+  var a=Math.atan2(dy,dx),hl=11;
+  c.strokeStyle=color;c.fillStyle=color;c.lineWidth=wd||3;c.lineCap='butt';
+  line(c,x1,y1,x2-Math.cos(a)*hl*0.6,y2-Math.sin(a)*hl*0.6);
+  c.beginPath();c.moveTo(x2,y2);
+  c.lineTo(x2-hl*Math.cos(a-0.4),y2-hl*Math.sin(a-0.4));
+  c.lineTo(x2-hl*Math.cos(a+0.4),y2-hl*Math.sin(a+0.4));
+  c.closePath();c.fill();
+}
+function ceil(c,cx,y,wd,k){
+  c.strokeStyle=k.ink;c.lineWidth=3;line(c,cx-wd/2,y,cx+wd/2,y);
+  c.lineWidth=1.5;
+  for(var x=cx-wd/2+6;x<=cx+wd/2;x+=9){line(c,x,y,x-7,y-9);}
+}
+function spring(c,x,y1,y2,n,amp,col){
+  c.strokeStyle=col;c.lineWidth=3;c.lineJoin='round';
+  var a=y1+8,b=y2-8;
+  c.beginPath();c.moveTo(x,y1);c.lineTo(x,a);
+  for(var i=1;i<=n*2;i++){c.lineTo(x+(i%2?amp:-amp),a+(b-a)*i/(n*2));}
+  c.lineTo(x,b);c.lineTo(x,y2);c.stroke();
+}
+function colors(){
+  var s=getComputedStyle(document.documentElement),g=function(n){return s.getPropertyValue(n).trim();};
+  return {ink:g('--ink'),mut:g('--mut'),pri:g('--pri'),ok:g('--ok'),bad:g('--bad'),line:g('--line'),warn:g('--warn'),fm:g('--fm')};
+}
+function axes(c,w,h,o,k){
+  var L=52,R=14,T=14,B=36,pw=w-L-R,ph=h-T-B,nx=o.nx||4,ny=o.ny||4;
+  var X=function(x){return L+x/o.xmax*pw;},Y=function(y){return T+ph-y/o.ymax*ph;};
+  c.lineWidth=1;c.strokeStyle=k.line;
+  for(var i=0;i<=nx;i++){var gx=L+pw*i/nx;line(c,gx,T,gx,T+ph);txt(c,tickfmt(o.xmax*i/nx),gx,T+ph+15,k.mut,11,'center');}
+  for(var j=0;j<=ny;j++){var gy=T+ph-ph*j/ny;line(c,L,gy,L+pw,gy);txt(c,tickfmt(o.ymax*j/ny),L-5,gy+4,k.mut,11,'right');}
+  c.strokeStyle=k.ink;c.lineWidth=2;c.beginPath();c.moveTo(L,T);c.lineTo(L,T+ph);c.lineTo(L+pw,T+ph);c.stroke();
+  txt(c,o.xl,L+pw/2,h-5,k.ink,12,'center',1);
+  c.save();c.translate(11,T+ph/2);c.rotate(-Math.PI/2);txt(c,o.yl,0,0,k.ink,12,'center',1);c.restore();
+  return {X:X,Y:Y,L:L,T:T,pw:pw,ph:ph};
+}
+/* sim / sterjen sahnasi (3 va 4-masala uchun umumiy) */
+function wire(c,w,h,k,o){
+  var cx=w*0.34,y0=14;ceil(c,cx,y0,100,k);
+  var y1=y0+o.L+o.ext;
+  c.strokeStyle=k.pri;c.lineWidth=o.wd;line(c,cx,y0,cx,y1);
+  c.setLineDash([4,4]);c.strokeStyle=k.mut;c.lineWidth=1;line(c,cx+10,y0+o.L,cx+72,y0+o.L);c.setLineDash([]);
+  c.strokeStyle=k.ok;c.lineWidth=2;
+  line(c,cx-32,y0,cx-32,y0+o.L);line(c,cx-38,y0,cx-26,y0);line(c,cx-38,y0+o.L,cx-26,y0+o.L);
+  txt(c,'l₀',cx-44,y0+o.L/2+5,k.ok,14,'right',1);
+  if(o.ext>1.5){
+    c.strokeStyle=k.bad;c.lineWidth=2;
+    line(c,cx+55,y0+o.L,cx+55,y1);line(c,cx+49,y0+o.L,cx+61,y0+o.L);line(c,cx+49,y1,cx+61,y1);
+    txt(c,'Δl',cx+64,y0+o.L+o.ext/2+5,k.bad,14,'left',1);
+  }
+  c.fillStyle=k.warn;c.fillRect(cx-20,y1,40,26);txt(c,'yuk',cx,y1+18,'#222',12,'center');
+  arrow(c,cx,y1+26,cx,y1+26+Math.max(8,o.al),k.bad);
+  o.lines.forEach(function(s,i){txt(c,s[0],w*0.6,56+i*26,s[1]||k.ink,14,'left',1);});
+}
+
+/* ---------- 5-masala: σ–ε diagramma ma'lumotlari ---------- */
+var CP=[[0,0],[0.2,240],[0.6,270],[6,400],[9,340]];
+function path5(s){
+  if(s>400)return {pts:CP.slice(),broke:true};
+  var out=[CP[0]];
+  for(var i=1;i<4;i++){
+    var a=CP[i-1],b=CP[i];
+    if(s>=b[1]){out.push(b);}
+    else{var f=(s-a[1])/(b[1]-a[1]);out.push([a[0]+f*(b[0]-a[0]),s]);break;}
+  }
+  return {pts:out,broke:false};
+}
+function cur5(s,t){
+  var P5=path5(s),pts=P5.pts,n=pts.length,L=[],tot=0,i;
+  for(i=1;i<n;i++){var d=Math.hypot((pts[i][0]-pts[i-1][0])/10,(pts[i][1]-pts[i-1][1])/450);L.push(d);tot+=d;}
+  var tg=t*tot,tr=[pts[0]],cur=pts[0];
+  for(i=1;i<n;i++){
+    if(tg>=L[i-1]-1e-9){tg-=L[i-1];tr.push(pts[i]);cur=pts[i];}
+    else{var f=tg/L[i-1];cur=[pts[i-1][0]+f*(pts[i][0]-pts[i-1][0]),pts[i-1][1]+f*(pts[i][1]-pts[i-1][1])];tr.push(cur);break;}
+  }
+  return {e:cur[0],s:cur[1],tr:tr,broke:P5.broke};
+}
+
+/* ---------- MASALALAR ---------- */
+var P=[];
+
+/* 1. Guk qonuni */
+P.push({
+  tab:'1. Guk qonuni',
+  title:'1-masala. Guk qonuni: prujinaning bikrligi',
+  cond:`Prujinaga <b>F = 20 N</b> kuch bilan ta'sir qilinganda u <b>Δl = 4 cm</b> ga cho'zildi. Prujinaning bikrligi <b>k</b> ni toping.`,
+  given:['F = 20 N','Δl = 4 cm = 0,04 m'],
+  find:['k = ? (N/m)'],
+  steps:[
+    ['Formula',`<div class="fm">F = k · Δl &nbsp;⟹&nbsp; k = F / Δl</div>Guk qonuni: elastik kuch cho'zilishga to'g'ri proporsional.`],
+    ["SI birligiga o'tkazish",`<div class="fm">Δl = 4 cm = 0,04 m</div>1 cm = 0,01 m ekanini eslang.`],
+    ["O'rniga qo'yish",`<div class="fm">k = 20 N / 0,04 m</div>`],
+    ['Hisoblash',`<div class="fm">k = 500 N/m</div>`],
+    ['Javob',`<div class="fm">k = 500 N/m</div>Har 1 cm cho'zilish uchun 5 N kuch kerak.`]
+  ],
+  sl:[{k:'F',l:'Kuch F',u:'N',min:1,max:100,step:1,v:20},{k:'dl',l:"Cho'zilish Δl",u:'cm',min:1,max:20,step:0.5,v:4}],
+  sim:function(v){
+    var kk=v.F/(v.dl/100);
+    return {out:[['Bikrlik k',fmt(kk,1)+' N/m'],['Δl (SI)',fmt(v.dl/100,3)+' m'],['1 cm uchun kuch',fmt(kk/100,2)+' N']],
+      note:'k = F / Δl = '+fmt(v.F,0)+' / '+fmt(v.dl/100,3)+' = <b>'+fmt(kk,1)+' N/m</b>'};
+  },
+  scene:function(c,w,h,v,t,k){
+    var cx=w*0.35,y0=14;ceil(c,cx,y0,90,k);
+    var L0=h*0.24,ext=(v.dl/20)*h*0.3*t,y2=y0+L0+ext,kk=v.F/(v.dl/100);
+    spring(c,cx,y0,y2,9,14,k.pri);
+    c.setLineDash([4,4]);c.strokeStyle=k.mut;c.lineWidth=1;line(c,cx+20,y0+L0,cx+85,y0+L0);c.setLineDash([]);
+    if(ext>2){c.strokeStyle=k.bad;c.lineWidth=2;line(c,cx+70,y0+L0,cx+70,y2);line(c,cx+64,y2,cx+76,y2);txt(c,'Δl',cx+76,y0+L0+ext/2+5,k.bad,14,'left',1);}
+    c.fillStyle=k.warn;c.fillRect(cx-22,y2,44,28);txt(c,'m',cx,y2+19,'#222',14,'center',1);
+    arrow(c,cx,y2+28,cx,y2+28+Math.max(8,(v.F/100)*h*0.17*t),k.bad);
+    txt(c,'F = '+fmt(v.F*t,0)+' N',w*0.62,56,k.bad,14,'left',1);
+    txt(c,'Δl = '+fmt(v.dl*t,1)+' cm',w*0.62,82,k.ink,14,'left',1);
+    txt(c,'k = '+fmt(kk,0)+' N/m',w*0.62,108,k.pri,14,'left',1);
+  },
+  graph:function(c,w,h,v,t,k){
+    var G=axes(c,w,h,{xmax:20,ymax:100,xl:'Δl, cm',yl:'F, N'},k),kk=v.F/v.dl,xe=Math.min(20,100/kk);
+    c.strokeStyle=k.mut;c.lineWidth=2;c.setLineDash([5,4]);line(c,G.X(0),G.Y(0),G.X(xe),G.Y(kk*xe));c.setLineDash([]);
+    var x=v.dl*t,y=v.F*t;
+    c.strokeStyle=k.pri;c.lineWidth=3.5;line(c,G.X(0),G.Y(0),G.X(x),G.Y(y));
+    dot(c,G.X(x),G.Y(y),7,k.bad);
+    txt(c,'F = k·Δl  (nishab = k)',G.L+8,G.T+14,k.ink,12,'left',1);
+  },
+  life:`Kuch o'lchaydigan prujinali tarozi (dinamometr) va avtomobil ressorlari Guk qonuniga asoslangan: yuk og'irroq bo'lsa, prujina proporsional ravishda ko'proq cho'ziladi.`,
+  ind:{q:`Bikrligi 300 N/m bo'lgan prujina 6 cm ga cho'zildi. Prujinaga ta'sir etgan kuch necha nyuton?`,u:'N',ans:18,sol:`<div class="fm">F = k · Δl = 300 N/m · 0,06 m = 18 N</div>`}
+});
+
+/* 2. Mexanik kuchlanish */
+P.push({
+  tab:'2. Kuchlanish',
+  title:'2-masala. Mexanik kuchlanish σ = F/S',
+  cond:`Po'lat sterjenga <b>F = 600 N</b> cho'zuvchi kuch ta'sir qiladi. Sterjenning ko'ndalang kesim yuzi <b>S = 2 mm²</b>. Mexanik kuchlanishni toping.`,
+  given:['F = 600 N','S = 2 mm² = 2·10⁻⁶ m²'],
+  find:['σ = ? (Pa, MPa)'],
+  steps:[
+    ['Formula',`<div class="fm">σ = F / S</div>Kuchlanish — ko'ndalang kesim birlik yuziga ta'sir qiluvchi kuch.`],
+    ["SI birligiga o'tkazish",`<div class="fm">S = 2 mm² = 2·10⁻⁶ m²</div>1 mm² = 10⁻⁶ m².`],
+    ["O'rniga qo'yish",`<div class="fm">σ = 600 N / (2·10⁻⁶ m²)</div>`],
+    ['Hisoblash',`<div class="fm">σ = 3·10⁸ Pa = 300 MPa</div>`],
+    ['Javob',`<div class="fm">σ = 300 MPa</div>1 MPa = 10⁶ Pa.`]
+  ],
+  sl:[{k:'F',l:'Kuch F',u:'N',min:100,max:2000,step:50,v:600},{k:'S',l:'Kesim yuzi S',u:'mm²',min:0.5,max:10,step:0.5,v:2}],
+  sim:function(v){
+    var s=v.F/v.S;
+    return {out:[['S (SI)',sciT(v.S*1e-6)+' m²'],['σ (Pa)',sciT(s*1e6)+' Pa'],['σ (MPa)',fmt(s,1)+' MPa']],
+      note:'σ = F / S = '+fmt(v.F,0)+' N / '+sciT(v.S*1e-6)+' m² = <b>'+fmt(s,1)+' MPa</b>'};
+  },
+  scene:function(c,w,h,v,t,k){
+    var cx=w*0.34,y0=14,sig=v.F/v.S,wr=8+8*Math.sqrt(v.S),len=h*0.5;
+    ceil(c,cx,y0,100,k);
+    var r=Math.min(1,sig/1000)*t,fc='hsl('+(120-120*r)+',70%,48%)';
+    c.fillStyle=fc;c.fillRect(cx-wr/2,y0,wr,len);
+    c.fillStyle=k.ink;c.fillRect(cx-wr/2-10,y0+len,wr+20,6);
+    var al=(v.F/2000)*h*0.28*t;
+    arrow(c,cx,y0+len+6,cx,y0+len+14+Math.max(6,al),k.bad);
+    txt(c,'F',cx+14,y0+len+34,k.bad,14,'left',1);
+    var cx2=w*0.76,cy=h*0.3,rr=8*Math.sqrt(v.S);
+    c.beginPath();c.arc(cx2,cy,rr,0,6.2832);c.fillStyle=fc;c.fill();c.strokeStyle=k.ink;c.lineWidth=1.5;c.stroke();
+    txt(c,'kesim',cx2,cy-rr-8,k.mut,12,'center');
+    txt(c,'S = '+fmt(v.S,1)+' mm²',cx2,cy+rr+18,k.ink,13,'center',1);
+    txt(c,'F = '+fmt(v.F*t,0)+' N',cx2,h*0.64,k.bad,14,'center',1);
+    txt(c,'σ = '+fmt(sig*t,0)+' MPa',cx2,h*0.64+22,k.ink,14,'center',1);
+  },
+  graph:function(c,w,h,v,t,k){
+    var ym=nice(2*v.F),G=axes(c,w,h,{xmax:10,ymax:ym,xl:'S, mm²',yl:'σ, MPa'},k),s;
+    c.strokeStyle=k.mut;c.lineWidth=2;c.setLineDash([5,4]);c.beginPath();
+    for(s=0.5;s<=10.001;s+=0.1){var X=G.X(s),Y=G.Y(v.F/s);if(s===0.5)c.moveTo(X,Y);else c.lineTo(X,Y);}
+    c.stroke();c.setLineDash([]);
+    var sc=10+(v.S-10)*t;
+    c.strokeStyle=k.pri;c.lineWidth=3.5;c.beginPath();c.moveTo(G.X(10),G.Y(v.F/10));
+    if(sc<10){for(s=10;s>sc;s-=0.1){c.lineTo(G.X(s),G.Y(v.F/s));}}
+    else{for(s=10;s<sc;s+=0.1){c.lineTo(G.X(s),G.Y(v.F/s));}}
+    c.lineTo(G.X(sc),G.Y(v.F/sc));c.stroke();
+    dot(c,G.X(sc),G.Y(v.F/sc),7,k.bad);
+    txt(c,'σ = F / S  (S kamaysa, σ ortadi)',G.L+8,G.T+14,k.ink,12,'left',1);
+  },
+  life:`Bir xil yukda ingichka sim qalin simga qaraganda ko'proq kuchlanish oladi va oldin uziladi — shuning uchun og'ir yuklar qalin tros bilan ko'tariladi.`,
+  ind:{q:`Sterjenga 1500 N kuch ta'sir qiladi, uning kesim yuzi 3 mm². Mexanik kuchlanish necha MPa?`,u:'MPa',ans:500,sol:`<div class="fm">σ = F / S = 1500 N / (3·10⁻⁶ m²) = 5·10⁸ Pa = 500 MPa</div>`}
+});
+
+/* 3. Nisbiy deformatsiya */
+P.push({
+  tab:'3. Nisbiy deformatsiya',
+  title:'3-masala. Nisbiy deformatsiya ε = Δl/l₀',
+  cond:`Uzunligi <b>l₀ = 2 m</b> bo'lgan sim yuk ostida <b>Δl = 1 mm</b> ga uzaydi. Simning nisbiy deformatsiyasini toping. Xuddi shunday nisbiy deformatsiyada shu materialdan yasalgan <b>4 m</b> uzunlikdagi simning absolyut uzayishi qancha bo'ladi?`,
+  given:['l₀ = 2 m','Δl = 1 mm = 10⁻³ m','l₀₂ = 4 m'],
+  find:['ε = ?','Δl₂ = ? (mm)'],
+  steps:[
+    ['Formula',`<div class="fm">ε = Δl / l₀</div>Nisbiy deformatsiya — o'lchamsiz kattalik.`],
+    ["SI birligiga o'tkazish",`<div class="fm">Δl = 1 mm = 0,001 m</div>`],
+    ["O'rniga qo'yish va hisoblash",`<div class="fm">ε = 0,001 m / 2 m = 5·10⁻⁴</div>Foizda: ε = 0,05 %.`],
+    ['Ikkinchi savol',`<div class="fm">Δl₂ = ε · l₀₂ = 5·10⁻⁴ · 4 m = 2·10⁻³ m</div>`],
+    ['Javob',`<div class="fm">ε = 5·10⁻⁴ (0,05 %); &nbsp;Δl₂ = 2 mm</div>Sim 2 marta uzun bo'lsa, uzayish ham 2 marta katta.`]
+  ],
+  sl:[{k:'l0',l:"Boshlang'ich uzunlik l₀",u:'m',min:0.5,max:5,step:0.1,v:2},{k:'dl',l:'Uzayish Δl',u:'mm',min:0.1,max:10,step:0.1,v:1}],
+  sim:function(v){
+    var e=v.dl/(v.l0*1000);
+    return {out:[['ε',sciT(e)],['ε, foizda',fmt(e*100,3)+' %'],['2l₀ da Δl',fmt(2*v.dl,2)+' mm']],
+      note:'ε = Δl / l₀ = '+fmt(v.dl/1000,4)+' m / '+fmt(v.l0,1)+' m = <b>'+sciT(e)+'</b>'};
+  },
+  scene:function(c,w,h,v,t,k){
+    var e=v.dl/(v.l0*1000);
+    wire(c,w,h,k,{L:h*0.18+h*0.2*(v.l0-0.5)/4.5,ext:Math.sqrt(v.dl/10)*h*0.26*t,wd:4,al:30*t+8,
+      lines:[['l₀ = '+fmt(v.l0,1)+' m',k.ok],['Δl = '+fmt(v.dl*t,2)+' mm',k.bad],['ε = '+sciT(e*t),k.ink]]});
+    txt(c,"(uzayish ko'rsatish uchun kattalashtirilgan)",w/2,h-6,k.mut,11,'center');
+  },
+  graph:function(c,w,h,v,t,k){
+    var ym=nice(1/v.l0),G=axes(c,w,h,{xmax:10,ymax:ym,xl:'Δl, mm',yl:'ε, %'},k),m=1/(10*v.l0);
+    c.strokeStyle=k.mut;c.lineWidth=2;c.setLineDash([5,4]);line(c,G.X(0),G.Y(0),G.X(10),G.Y(10*m));c.setLineDash([]);
+    var x=v.dl*t,y=x*m;
+    c.strokeStyle=k.pri;c.lineWidth=3.5;line(c,G.X(0),G.Y(0),G.X(x),G.Y(y));
+    dot(c,G.X(x),G.Y(y),7,k.bad);
+    txt(c,'ε = Δl / l₀',G.L+8,G.T+14,k.ink,12,'left',1);
+  },
+  life:`Uzun kran yoki lift trosi yuk ostida ko'proq uzayadi: nisbiy deformatsiya bir xil bo'lsa, tros qancha uzun bo'lsa, absolyut uzayish Δl shuncha katta.`,
+  ind:{q:`Uzunligi 4 m bo'lgan simning nisbiy deformatsiyasi 2·10⁻⁴ ga teng. Sim necha millimetrga uzaygan?`,u:'mm',ans:0.8,sol:`<div class="fm">Δl = ε · l₀ = 2·10⁻⁴ · 4 m = 8·10⁻⁴ m = 0,8 mm</div>`}
+});
+
+/* 4. Yung moduli */
+P.push({
+  tab:'4. Yung moduli',
+  title:'4-masala. Yung moduli E = σ/ε',
+  cond:`Uzunligi <b>2 m</b>, kesim yuzi <b>1 mm²</b> bo'lgan sim <b>200 N</b> yuk ostida <b>2 mm</b> ga uzaydi. Sim materialining Yung modulini toping. Bu qaysi materialga mos keladi?`,
+  given:['F = 200 N','S = 1 mm² = 10⁻⁶ m²','l₀ = 2 m','Δl = 2 mm = 2·10⁻³ m'],
+  find:['E = ? (Pa, GPa)'],
+  steps:[
+    ['Formulalar',`<div class="fm">σ = F / S, &nbsp; ε = Δl / l₀, &nbsp; E = σ / ε</div>`],
+    ['Kuchlanishni topamiz',`<div class="fm">σ = 200 N / 10⁻⁶ m² = 2·10⁸ Pa</div>`],
+    ['Nisbiy deformatsiya',`<div class="fm">ε = 2·10⁻³ m / 2 m = 10⁻³</div>`],
+    ['Yung moduli',`<div class="fm">E = 2·10⁸ Pa / 10⁻³ = 2·10¹¹ Pa = 200 GPa</div>`],
+    ['Javob',`<div class="fm">E = 200 GPa</div>Bu qiymat po'latga mos keladi. Qo'shimcha: Δl = F·l₀ / (E·S).`]
+  ],
+  sl:[{k:'F',l:'Kuch F',u:'N',min:50,max:400,step:10,v:200},{k:'S',l:'Kesim yuzi S',u:'mm²',min:0.5,max:2,step:0.1,v:1},{k:'l0',l:'Uzunlik l₀',u:'m',min:1,max:4,step:0.1,v:2},{k:'E',l:"Yung moduli E (po'lat≈200, mis≈120, alyuminiy≈70)",u:'GPa',min:50,max:250,step:5,v:200}],
+  sim:function(v){
+    var s=v.F/v.S,e=s/(v.E*1000),d=e*v.l0*1000;
+    return {out:[['σ = F/S',fmt(s,1)+' MPa'],['ε = σ/E',sciT(e)],['E (Pa)',sciT(v.E*1e9)+' Pa'],['Δl = ε·l₀',fmt(d,2)+' mm']],
+      note:'Δl = σ·l₀ / E = '+fmt(s,1)+' MPa · '+fmt(v.l0,1)+' m / '+fmt(v.E,0)+" GPa = <b>"+fmt(d,2)+" mm</b>. E katta bo'lsa — material qattiq, uzayish kichik."};
+  },
+  scene:function(c,w,h,v,t,k){
+    var s=v.F/v.S,e=s/(v.E*1000),d=e*v.l0*1000;
+    wire(c,w,h,k,{L:h*0.18+h*0.2*(v.l0-1)/3,ext:Math.sqrt(d/64)*h*0.26*t,wd:3+3*v.S,al:(v.F/400)*34*t+8,
+      lines:[['σ = '+fmt(s*t,0)+' MPa',k.ink],['ε = '+sciT(e*t),k.ink],['Δl = '+fmt(d*t,2)+' mm',k.bad],['E = '+fmt(v.E,0)+' GPa',k.pri]]});
+    txt(c,"(uzayish ko'rsatish uchun kattalashtirilgan)",w/2,h-6,k.mut,11,'center');
+  },
+  graph:function(c,w,h,v,t,k){
+    var G=axes(c,w,h,{xmax:1.6,ymax:800,xl:'ε, %',yl:'σ, MPa'},k),s=v.F/v.S,ep=s/(v.E*10),xe=Math.min(1.6,800/(v.E*10));
+    c.strokeStyle=k.mut;c.lineWidth=2;c.setLineDash([5,4]);line(c,G.X(0),G.Y(0),G.X(xe),G.Y(xe*v.E*10));c.setLineDash([]);
+    c.strokeStyle=k.pri;c.lineWidth=3.5;line(c,G.X(0),G.Y(0),G.X(ep*t),G.Y(s*t));
+    dot(c,G.X(ep*t),G.Y(s*t),7,k.bad);
+    txt(c,'E = σ / ε = '+fmt(v.E,0)+' GPa (nishab)',G.L+8,G.T+14,k.ink,12,'left',1);
+  },
+  life:`Po'latning Yung moduli katta (≈200 GPa), shuning uchun po'lat konstruksiyalar yuk ostida deyarli deformatsiyalanmaydi; rezinaniki juda kichik, shu sababli u oson cho'ziladi.`,
+  ind:{q:`Mis simning (E = 120 GPa) uzunligi 2 m, kesim yuzi 1 mm². Unga 360 N yuk osilganda sim necha millimetrga uzayadi?`,u:'mm',ans:6,sol:`<div class="fm">σ = 360 / 10⁻⁶ = 3,6·10⁸ Pa<br>ε = σ / E = 3,6·10⁸ / 1,2·10¹¹ = 3·10⁻³<br>Δl = ε · l₀ = 3·10⁻³ · 2 m = 6·10⁻³ m = 6 mm</div>`}
+});
+
+/* 5. σ–ε diagramma */
+P.push({
+  tab:'5. σ–ε diagramma',
+  title:'5-masala. σ–ε diagramma: elastiklik va mustahkamlik chegarasi',
+  cond:`Namuna σ–ε diagrammasining nuqtalari: <b>A</b> (ε = 0,2 %; σ = 240 MPa) — elastiklik chegarasi; <b>B</b> (0,6 %; 270 MPa); <b>C</b> (6 %; 400 MPa) — mustahkamlik chegarasi; <b>D</b> (9 %; 340 MPa) — uzilish. Namunaga <b>σ = 300 MPa</b> kuchlanish berilsa, u qanday holatda bo'ladi? Yuk olib tashlansa-chi?`,
+  given:['σ_el = 240 MPa','σ_m = 400 MPa','σ = 300 MPa'],
+  find:['Namuna holati = ?','ε = ? (%)'],
+  steps:[
+    ["Diagrammadan chegaralarni o'qiymiz",`<div class="fm">σ_el = 240 MPa, &nbsp; σ_m = 400 MPa</div>`],
+    ['Elastiklik chegarasi bilan solishtiramiz',`<div class="fm">300 MPa &gt; 240 MPa</div>Kuchlanish elastiklik chegarasidan oshgan — deformatsiya endi elastik emas.`],
+    ['Mustahkamlik chegarasi bilan solishtiramiz',`<div class="fm">300 MPa &lt; 400 MPa</div>Namuna uzilmaydi, plastik deformatsiya zonasida bo'ladi.`],
+    ["ε ni topamiz (B–C oralig'ida chiziqli deb olamiz)",`<div class="fm">ε ≈ 0,6 + (300 − 270)/(400 − 270) · (6 − 0,6) ≈ 1,85 %</div>`],
+    ['Javob',`<div class="fm">Plastik deformatsiya, ε ≈ 1,85 %</div>Yuk olib tashlansa, namuna to'liq tiklanmaydi — qoldiq (plastik) deformatsiya qoladi.`]
+  ],
+  sl:[{k:'s',l:'Beriladigan kuchlanish σ',u:'MPa',min:0,max:420,step:5,v:300}],
+  sim:function(v){
+    var s=v.s,P5=path5(s),e=P5.broke?null:P5.pts[P5.pts.length-1][0],hol,nt;
+    if(s<=240){hol='Elastik';nt="σ ≤ σ_el: deformatsiya elastik, yuk olinsa namuna to'liq tiklanadi.";}
+    else if(s<=400){hol='Plastik';nt="σ_el &lt; σ ≤ σ_m: plastik deformatsiya, yuk olinsa qoldiq uzayish qoladi, lekin namuna uzilmaydi.";}
+    else{hol='Uzilish';nt='σ &gt; σ_m: kuchlanish mustahkamlik chegarasidan oshdi — namuna uziladi.';}
+    return {out:[['Kuchlanish σ',fmt(s,0)+' MPa'],['ε',e===null?'—':fmt(e,2)+' %'],['Holat',hol]],note:nt};
+  },
+  scene:function(c,w,h,v,t,k){
+    var st=cur5(v.s,t),cx=w*0.34,y0=14;ceil(c,cx,y0,100,k);
+    var base=h*0.36,ext=h*0.26*st.e/9,Lt=base+ext,y1=y0+Lt,hw=15,broken=st.broke&&t>=1;
+    var f=broken?k.bad:(st.s<=240?k.ok:k.warn);
+    var nk=Math.min(1,Math.max(0,(st.e-3)/3))*0.55,nw=hw*(1-nk);
+    if(!broken){
+      poly(c,[[cx-hw,y0],[cx+hw,y0],[cx+hw,y0+Lt*.3],[cx+nw,y0+Lt*.5],[cx+hw,y0+Lt*.7],[cx+hw,y1],[cx-hw,y1],[cx-hw,y0+Lt*.7],[cx-nw,y0+Lt*.5],[cx-hw,y0+Lt*.3]],f,k.ink);
+    }else{
+      var m=y0+Lt/2,n2=hw*.45;
+      poly(c,[[cx-hw,y0],[cx+hw,y0],[cx+hw,y0+Lt*.3],[cx+n2,m-14],[cx+n2*.3,m-6],[cx-n2*.4,m-13],[cx-n2,m-5],[cx-hw,y0+Lt*.3]],f,k.ink);
+      poly(c,[[cx-hw,y1],[cx+hw,y1],[cx+hw,y0+Lt*.7],[cx+n2,m+14],[cx+n2*.3,m+6],[cx-n2*.4,m+13],[cx-n2,m+5],[cx-hw,y0+Lt*.7]],f,k.ink);
+    }
+    c.fillStyle=k.warn;c.fillRect(cx-18,y1,36,24);
+    if(st.s>2)arrow(c,cx,y1+24,cx,y1+24+Math.max(8,(st.s/450)*h*0.17),k.bad);
+    var ph=broken?'UZILDI':(st.s<=240?'Elastik zona':'Plastik zona');
+    txt(c,ph,w*0.6,56,f,15,'left',1);
+    txt(c,'σ = '+fmt(st.s,0)+' MPa',w*0.6,82,k.ink,14,'left',1);
+    txt(c,'ε = '+fmt(st.e,2)+' %',w*0.6,108,k.ink,14,'left',1);
+  },
+  graph:function(c,w,h,v,t,k){
+    var G=axes(c,w,h,{xmax:10,ymax:500,xl:'ε, %',yl:'σ, MPa',nx:5,ny:5},k),st=cur5(v.s,t);
+    c.strokeStyle=k.mut;c.lineWidth=2;c.setLineDash([5,4]);c.beginPath();
+    CP.forEach(function(p,i){var x=G.X(p[0]),y=G.Y(p[1]);if(i)c.lineTo(x,y);else c.moveTo(x,y);});
+    c.stroke();
+    c.lineWidth=1;line(c,G.L,G.Y(240),G.L+G.pw,G.Y(240));line(c,G.L,G.Y(400),G.L+G.pw,G.Y(400));c.setLineDash([]);
+    txt(c,'elastiklik chegarasi 240',G.L+G.pw-4,G.Y(240)-5,k.ok,11,'right',1);
+    txt(c,'mustahkamlik chegarasi 400',G.L+G.pw-4,G.Y(400)-5,k.bad,11,'right',1);
+    c.strokeStyle=k.pri;c.lineWidth=3.5;c.beginPath();
+    st.tr.forEach(function(p,i){var x=G.X(p[0]),y=G.Y(p[1]);if(i)c.lineTo(x,y);else c.moveTo(x,y);});
+    c.stroke();
+    [['A',CP[1]],['B',CP[2]],['C',CP[3]],['D',CP[4]]].forEach(function(q){
+      var x=G.X(q[1][0]),y=G.Y(q[1][1]);
+      c.beginPath();c.arc(x,y,3.5,0,6.2832);c.fillStyle=k.ink;c.fill();
+      txt(c,q[0],x+(q[0]==='A'?8:0),y-9,k.ink,13,q[0]==='A'?'left':'center',1);
+    });
+    dot(c,G.X(st.e),G.Y(st.s),7,k.bad);
+  },
+  life:`Metall qoshiqni biroz egsangiz, u o'z holiga qaytadi (elastik deformatsiya); kuchliroq egsangiz qiyshiq qoladi (plastik deformatsiya) — bu elastiklik chegarasidan oshganingizni bildiradi.`,
+  ind:{q:`Materialning elastiklik chegarasi 240 MPa. Kesim yuzi 2 mm² bo'lgan shu materialdan yasalgan sterjen elastiklik chegarasidan oshmasdan eng ko'pi bilan necha nyuton kuchga bardosh beradi?`,u:'N',ans:480,sol:`<div class="fm">F = σ_el · S = 240·10⁶ Pa · 2·10⁻⁶ m² = 480 N</div>`}
+});
+
+/* 6. Amaliy masala */
+P.push({
+  tab:'6. Amaliy masala',
+  title:'6-masala. Amaliy masala: lift trosi va xavfsizlik zaxirasi',
+  cond:`Lift kabinasining yo'lovchilar bilan massasi <b>m = 1500 kg</b>. Kabina bitta po'lat trosga osilgan, trosning kesim yuzi <b>S = 1 cm²</b>. Po'latning mustahkamlik chegarasi <b>σ_m = 600 MPa</b>, talab etilgan xavfsizlik zaxirasi <b>n = 5</b> (g = 10 m/s²; masala soddalashtirilgan). Tros xavfsizmi? Kesim yuzi kamida qancha bo'lishi kerak?`,
+  given:['m = 1500 kg','S = 1 cm² = 10⁻⁴ m²','σ_m = 600 MPa','n = 5','g = 10 m/s²'],
+  find:['σ = ?','[σ] = ?','S_min = ?'],
+  steps:[
+    ["Tortishish kuchi",`<div class="fm">F = m · g = 1500 · 10 = 15000 N</div>`],
+    ['Haqiqiy kuchlanish',`<div class="fm">σ = F / S = 15000 / 10⁻⁴ = 1,5·10⁸ Pa = 150 MPa</div>1 cm² = 10⁻⁴ m².`],
+    ['Ruxsat etilgan kuchlanish',`<div class="fm">[σ] = σ_m / n = 600 / 5 = 120 MPa</div>`],
+    ['Solishtiramiz',`<div class="fm">150 MPa &gt; 120 MPa</div>Haqiqiy zaxira: n = 600 / 150 = 4 &lt; 5 — tros xavfli.`],
+    ['Kerakli kesim yuzi',`<div class="fm">S_min = F / [σ] = 15000 / (1,2·10⁸) = 1,25·10⁻⁴ m² = 1,25 cm²</div>`],
+    ['Javob',`<div class="fm">Tros xavfli (n = 4 &lt; 5); S ≥ 1,25 cm²</div>`]
+  ],
+  sl:[{k:'m',l:'Kabina massasi m',u:'kg',min:500,max:3000,step:50,v:1500},{k:'S',l:'Tros kesim yuzi S',u:'cm²',min:0.5,max:3,step:0.05,v:1},{k:'n',l:'Talab etilgan zaxira n',u:'',min:2,max:8,step:0.5,v:5}],
+  sim:function(v){
+    var F=v.m*10,sig=F/(v.S*100),sa=600/v.n,hol=sig<=sa?'Xavfsiz ✓':(sig<600?'Xavfli ✗':'Uziladi!');
+    return {out:[['F = m·g',fmt(F/1000,1)+' kN'],['σ = F/S',fmt(sig,1)+' MPa'],['[σ] = σ_m/n',fmt(sa,1)+' MPa'],['Haqiqiy zaxira',fmt(600/sig,2)],['Holat',hol],['Eng kichik S',fmt(F/(sa*100),2)+' cm²']],
+      note:'σ = F / S = '+fmt(F,0)+' N / '+sciT(v.S*1e-4)+' m² = <b>'+fmt(sig,1)+' MPa</b>. Xavfsizlik sharti: σ ≤ [σ].'};
+  },
+  scene:function(c,w,h,v,t,k){
+    var cx=w*0.34,y0=14,F=v.m*10,sig=F/(v.S*100),sa=600/v.n;
+    ceil(c,cx,y0,120,k);
+    var colr=sig<=sa?k.ok:(sig<600?k.warn:k.bad),ext=Math.min(1,sig/600)*12*t,Lc=h*0.42,y1=y0+Lc+ext;
+    c.strokeStyle=colr;c.lineWidth=2+2.5*Math.sqrt(v.S);line(c,cx,y0,cx,y1);
+    c.fillStyle=k.fm;c.fillRect(cx-42,y1,84,60);c.strokeStyle=k.ink;c.lineWidth=2;c.strokeRect(cx-42,y1,84,60);
+    var np=Math.min(6,Math.max(1,Math.round(v.m/500)));
+    for(var i=0;i<np;i++){
+      var px=cx-30+i*12;
+      c.fillStyle=k.ink;c.beginPath();c.arc(px,y1+16,4,0,6.2832);c.fill();
+      c.strokeStyle=k.ink;c.lineWidth=2;line(c,px,y1+20,px,y1+34);
+    }
+    txt(c,fmt(v.m,0)+' kg',cx,y1+52,k.ink,12,'center',1);
+    arrow(c,cx,y1+60,cx,y1+60+Math.max(8,(F/30000)*h*0.18*t),k.bad);
+    var hol=sig<=sa?'XAVFSIZ ✓':(sig<600?'XAVFLI ✗':'UZILADI!');
+    txt(c,'F = '+fmt(F*t/1000,1)+' kN',w*0.62,40,k.bad,14,'left',1);
+    txt(c,'σ = '+fmt(sig*t,0)+' MPa',w*0.62,66,k.ink,14,'left',1);
+    txt(c,'[σ] = '+fmt(sa,0)+' MPa',w*0.62,92,k.pri,14,'left',1);
+    txt(c,'n = '+fmt(600/sig,2),w*0.62,118,k.ink,14,'left',1);
+    txt(c,hol,w*0.62,148,colr,15,'left',1);
+  },
+  graph:function(c,w,h,v,t,k){
+    var F=v.m*10,sig=F/(v.S*100),sa=600/v.n,L=96,R=16,T=14,pw=w-L-R,mx=700;
+    var X=function(x){return L+x/mx*pw;};
+    var colr=sig<=sa?k.ok:(sig<600?k.warn:k.bad);
+    var rows=[['σ haqiqiy',sig*t,colr,1],['[σ] ruxsat',sa,k.pri,1],['σ_m chegara',600,k.bad,0.45]];
+    c.lineWidth=1;c.strokeStyle=k.line;
+    [0,200,400,600].forEach(function(x){line(c,X(x),T,X(x),T+150);txt(c,String(x),X(x),T+166,k.mut,11,'center');});
+    txt(c,'MPa',L+pw,T+182,k.mut,11,'right');
+    rows.forEach(function(r,i){
+      var y=T+8+i*48,x2=X(r[1]);
+      txt(c,r[0],L-8,y+22,k.ink,12,'right',1);
+      c.globalAlpha=r[3];c.fillStyle=r[2];c.fillRect(L,y,Math.max(2,x2-L),30);c.globalAlpha=1;
+      var lab=fmt(r[1],0);
+      if(x2+46<w){txt(c,lab,x2+6,y+21,k.ink,13,'left',1);}
+      else{txt(c,lab,x2-6,y+21,'#fff',13,'right',1);}
+    });
+    c.setLineDash([5,4]);c.strokeStyle=k.pri;c.lineWidth=2;line(c,X(sa),T,X(sa),T+150);c.setLineDash([]);
+  },
+  life:`Ko'priklar, liftlar va kranlarda tros hamda ustunlar xavfsizlik zaxirasi bilan loyihalanadi: haqiqiy kuchlanish mustahkamlik chegarasidan bir necha marta kichik bo'lishi kerak.`,
+  ind:{q:`Ko'prik arqonining kesim yuzi 2 cm², unga 80 kN yuk ta'sir qiladi. Arqon materialining mustahkamlik chegarasi 800 MPa. Xavfsizlik zaxirasi n necha?`,u:'',ans:2,sol:`<div class="fm">σ = F / S = 80000 N / (2·10⁻⁴ m²) = 4·10⁸ Pa = 400 MPa<br>n = σ_m / σ = 800 / 400 = 2</div>`}
+});
+
+/* ---------- TEST ---------- */
+var Q=[
+  {q:'Guk qonunining formulasi qaysi?',o:['F = k / Δl','F = k · Δl','F = Δl / k','F = k · Δl²'],a:1},
+  {q:'Mexanik kuchlanishning SI dagi birligi qaysi?',o:['N','N·m','m²','Pa (N/m²)'],a:3},
+  {q:"Kesim yuzi 1 mm² bo'lgan simga 100 N kuch ta'sir qilmoqda. Kuchlanish necha MPa?",o:['1 MPa','10 MPa','100 MPa','1000 MPa'],a:2},
+  {q:"σ = 200 MPa va ε = 0,001 bo'lsa, Yung moduli E nimaga teng?",o:['200 GPa','200 MPa','20 GPa','2 GPa'],a:0},
+  {q:"Kuchlanish elastiklik chegarasidan oshib ketsa, nima sodir bo'ladi?",o:["Deformatsiya butunlay yo'qoladi","Yuk olingach ham qoldiq (plastik) deformatsiya qoladi","Jism darhol suyuqlikka aylanadi","Yung moduli nolga teng bo'ladi"],a:1}
+];
+
+/* ---------- DVIGATEL ---------- */
+var insts=[],tabBtns=[],tabsEl=$('#tabs'),mainEl=$('#main');
+function dec(step){var s=String(step).split('.');return s[1]?s[1].length:0;}
+
+function fit(cv,H){
+  var W=cv.clientWidth;if(!W)return null;
+  var d=Math.min(window.devicePixelRatio||1,2);
+  if(cv._w!==W||cv._d!==d){cv._w=W;cv._d=d;cv.width=Math.round(W*d);cv.height=Math.round(H*d);cv.style.height=H+'px';}
+  var c=cv.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,W,H);c.lineCap='butt';c.setLineDash([]);c.globalAlpha=1;
+  return {c:c,w:W,h:H};
+}
+function draw(I){
+  if(!I.sec.classList.contains('on'))return;
+  var k=colors(),a=fit(I.sc,260);
+  if(a)I.p.scene(a.c,a.w,a.h,I.v,I.t,k);
+  a=fit(I.gr,200);
+  if(a)I.p.graph(a.c,a.w,a.h,I.v,I.t,k);
+}
+function refresh(I){
+  var r=I.p.sim(I.v);
+  I.out.innerHTML=r.out.map(function(o){return '<div>'+o[0]+'<b>'+o[1]+'</b></div>';}).join('');
+  I.note.innerHTML=r.note;
+  if(!I.run)I.t=1;
+  draw(I);
+}
+function tick(I,now){
+  if(!I.run)return;
+  I.t=Math.min(1,I.t+(now-I.last)/3500);I.last=now;draw(I);
+  if(I.t>=1){I.run=false;}else{I.raf=requestAnimationFrame(function(f){tick(I,f);});}
+}
+function play(I,reset){
+  if(reset||I.t>=1)I.t=0;
+  if(I.run)return;
+  I.run=true;I.last=performance.now();
+  I.raf=requestAnimationFrame(function(f){tick(I,f);});
+}
+function pause(I){I.run=false;cancelAnimationFrame(I.raf);}
+
+function mk(p,i){
+  var sec=document.createElement('section');
+  sec.innerHTML='<h2>'+p.title+'</h2>'+
+  '<div class="card"><h3>📘 Masala sharti</h3><p>'+p.cond+'</p></div>'+
+  '<div class="grid2"><div class="card"><h3>Berilgan</h3>'+p.given.map(function(g){return '<div class="fm">'+g+'</div>';}).join('')+'</div>'+
+  '<div class="card"><h3>Topish kerak</h3>'+p.find.map(function(g){return '<div class="fm">'+g+'</div>';}).join('')+'</div></div>'+
+  '<div class="card"><h3>🧮 Bosqichma-bosqich yechim</h3>'+
+  p.steps.map(function(s,kk){return '<div class="step"><b class="t">'+(kk+1)+'-qadam. '+s[0]+'</b><div>'+s[1]+'</div></div>';}).join('')+
+  '<div class="row"><button class="btn nx">Keyingi qadam (0/'+p.steps.length+')</button><button class="btn sec rz">Qaytadan</button></div></div>'+
+  '<div class="card"><h3>🎛️ Simulyatsiya va animatsiya</h3><div class="sls"></div><div class="out"></div><div class="note"></div>'+
+  '<canvas class="sc"></canvas><canvas class="gr"></canvas>'+
+  '<div class="row"><button class="btn go">▶ Boshlash</button><button class="btn sec st">⏸ To\'xtatish</button><button class="btn sec rs">↻ Qayta boshlash</button></div></div>'+
+  '<div class="card"><h3>🌍 Hayotiy misol</h3><p>'+p.life+'</p></div>'+
+  '<div class="card"><h3>✍️ Mustaqil masala</h3><p>'+p.ind.q+'</p>'+
+  '<div class="row"><input class="ans" type="text" inputmode="decimal" placeholder="Javobni kiriting" aria-label="Javob"><span class="unit">'+p.ind.u+'</span></div>'+
+  '<div class="row"><button class="btn ck">Tekshirish</button></div><div class="msg"></div>'+
+  '<div class="sol"><b>To\'g\'ri yechim:</b>'+p.ind.sol+'</div></div>';
+  mainEl.appendChild(sec);
+
+  var I={p:p,sec:sec,v:{},t:1,run:false,sc:$('.sc',sec),gr:$('.gr',sec),out:$('.out',sec),note:$('.note',sec)};
+  insts.push(I);
+
+  /* yechim qadamlari */
+  var steps=sec.querySelectorAll('.step'),shown=0,nx=$('.nx',sec);
+  function upd(){
+    nx.textContent=shown>=steps.length?'Yechim tugadi ✓':'Keyingi qadam ('+shown+'/'+steps.length+')';
+    nx.disabled=shown>=steps.length;
+  }
+  nx.onclick=function(){if(shown<steps.length){steps[shown].classList.add('show');shown++;upd();}};
+  $('.rz',sec).onclick=function(){steps.forEach(function(s){s.classList.remove('show');});shown=0;upd();};
+
+  /* slayderlar */
+  var box=$('.sls',sec);
+  p.sl.forEach(function(s){
+    I.v[s.k]=s.v;
+    var d=dec(s.step),div=document.createElement('div');
+    div.className='sl';
+    div.innerHTML='<label><span>'+s.l+'</span><span class="val">'+fmt(s.v,d)+' '+s.u+'</span></label><input type="range" min="'+s.min+'" max="'+s.max+'" step="'+s.step+'" value="'+s.v+'" aria-label="'+s.l+'">';
+    var inp=$('input',div),val=$('.val',div);
+    inp.oninput=function(){I.v[s.k]=parseFloat(inp.value);val.textContent=fmt(I.v[s.k],d)+' '+s.u;refresh(I);};
+    box.appendChild(div);
+  });
+
+  /* animatsiya tugmalari */
+  $('.go',sec).onclick=function(){play(I,false);};
+  $('.st',sec).onclick=function(){pause(I);};
+  $('.rs',sec).onclick=function(){pause(I);play(I,true);};
+
+  /* mustaqil masala */
+  $('.ck',sec).onclick=function(){
+    var raw=$('.ans',sec).value.replace(/\s/g,'').replace(',','.'),x=parseFloat(raw),m=$('.msg',sec);
+    if(isNaN(x)){m.className='msg bad';m.textContent='Avval javobni raqam bilan kiriting.';return;}
+    var ok=Math.abs(x-p.ind.ans)<=0.01*Math.abs(p.ind.ans);
+    m.className='msg '+(ok?'ok':'bad');
+    m.textContent=ok?"To'g'ri! ✓":"Noto'g'ri ✗. To'g'ri javob: "+fmt(p.ind.ans,2)+' '+p.ind.u;
+    $('.sol',sec).classList.add('show');
+  };
+  upd();
+  refresh(I);
+}
+
+function mkTest(){
+  var sec=document.createElement('section');
+  mainEl.appendChild(sec);
+  var score=0,done=0;
+  function render(){
+    score=0;done=0;
+    sec.innerHTML='<h2>📝 Test</h2><div class="card"><div id="tstat">Javob berildi: 0/'+Q.length+' · Ball: 0</div></div>'+
+    Q.map(function(q,qi){
+      return '<div class="card" data-q="'+qi+'"><h3>'+(qi+1)+'. '+q.q+'</h3>'+
+      q.o.map(function(o,oi){return '<button class="opt" data-o="'+oi+'">'+'ABCD'[oi]+') '+o+'</button>';}).join('')+
+      '<div class="msg"></div></div>';
+    }).join('')+'<div class="card" id="tres" style="display:none"></div>';
+  }
+  sec.addEventListener('click',function(e){
+    var rt=e.target.closest('#retry');
+    if(rt){render();window.scrollTo(0,0);return;}
+    var b=e.target.closest('.opt');if(!b)return;
+    var card=b.closest('[data-q]');if(!card||card.dataset.done)return;
+    card.dataset.done='1';
+    var q=Q[+card.dataset.q],oi=+b.dataset.o,m=$('.msg',card),opts=card.querySelectorAll('.opt');
+    if(oi===q.a){b.classList.add('ok');m.className='msg ok';m.textContent="To'g'ri! ✓";score++;}
+    else{b.classList.add('bad');opts[q.a].classList.add('ok');m.className='msg bad';m.textContent="Noto'g'ri ✗. To'g'ri javob: "+'ABCD'[q.a];}
+    done++;
+    $('#tstat',sec).textContent='Javob berildi: '+done+'/'+Q.length+' · Ball: '+score;
+    if(done===Q.length){
+      var msg=score===5?'Ajoyib! Mavzuni mukammal o\'zlashtirdingiz.':score===4?'Juda yaxshi!':score===3?'Yaxshi, formulalarni yana bir bor takrorlang.':"Mavzuni qayta ko'rib chiqing va masalalarni yeching.";
+      var r=$('#tres',sec);r.style.display='block';
+      r.innerHTML='<h3>Natija</h3><div class="big">'+score+' / '+Q.length+'</div><p>'+msg+'</p><button class="btn" id="retry">Testni qayta topshirish</button>';
+    }
+  });
+  render();
+}
+
+P.forEach(mk);
+mkTest();
+
+/* tablar */
+var names=P.map(function(p){return p.tab;}).concat(['Test']);
+names.forEach(function(n,i){
+  var b=document.createElement('button');
+  b.textContent=n;b.onclick=function(){show(i);};
+  tabsEl.appendChild(b);tabBtns.push(b);
+});
+function show(i){
+  var secs=mainEl.querySelectorAll('section');
+  secs.forEach(function(s,j){s.classList.toggle('on',j===i);});
+  tabBtns.forEach(function(b,j){b.classList.toggle('on',j===i);});
+  insts.forEach(pause);
+  if(tabBtns[i].scrollIntoView){try{tabBtns[i].scrollIntoView({inline:'center',block:'nearest'});}catch(e){}}
+  if(i<insts.length){
+    var I=insts[i];I.t=1;
+    requestAnimationFrame(function(){draw(I);play(I,true);});
+  }
+  window.scrollTo(0,0);
+}
+window.addEventListener('resize',function(){insts.forEach(draw);});
+
+/* mavzu almashtirgich */
+var root=document.documentElement;
+function setTheme(dark){
+  root.setAttribute('data-theme',dark?'dark':'light');
+  $('#themeBtn').textContent=dark?'☀️':'🌙';
+  insts.forEach(draw);
+}
+$('#themeBtn').onclick=function(){setTheme(root.getAttribute('data-theme')!=='dark');};
+setTheme(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches));
+show(0);
+})();
+</script>
+</body>
+</html>

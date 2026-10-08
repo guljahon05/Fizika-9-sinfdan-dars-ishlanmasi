@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>33-mavzu: Masalalar yechish</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1b2333;--mu:#5b6578;--ac:#2563eb;--ok:#16a34a;--bad:#dc2626;--bd:#d5dbe8;--w:rgba(37,140,255,.55);--hg:#8b94a3}
+:root[data-theme=dark]{--bg:#0f1420;--card:#1a2133;--tx:#e8ecf5;--mu:#9aa6bd;--ac:#6ea0ff;--ok:#34d399;--bad:#f87171;--bd:#33405c;--w:rgba(70,160,255,.6);--hg:#aab3c2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px}
+h1{font-size:18px;margin:0}
+#th{font-size:22px;background:var(--card);border:1px solid var(--bd);border-radius:12px;width:48px;height:48px;cursor:pointer}
+#tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 14px 10px;position:sticky;top:0;background:var(--bg);z-index:5}
+#tabs button{flex:none;min-height:46px;padding:0 16px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:15px;cursor:pointer}
+#tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+main{max-width:760px;margin:0 auto;padding:0 14px 40px}
+section{display:none;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px}
+section.on{display:block}
+h2{font-size:18px;margin:0 0 8px}h3{font-size:16px;margin:18px 0 8px;color:var(--ac)}
+.gf{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.gf{grid-template-columns:1fr}}
+.box{border:1px solid var(--bd);border-radius:12px;padding:10px;background:var(--bg)}
+.box ul{margin:6px 0 0;padding-left:18px}
+.st{border-left:4px solid var(--ac);background:var(--bg);border-radius:8px;padding:8px 10px;margin:6px 0}
+.btn{min-height:48px;padding:0 18px;border:0;border-radius:12px;background:var(--ac);color:#fff;font-size:16px;cursor:pointer;margin:6px 6px 6px 0}
+.btn:disabled{opacity:.5}
+.btn.alt{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.sl{margin:8px 0}.sl label{display:flex;justify-content:space-between;font-size:15px}
+input[type=range]{width:100%;height:36px;accent-color:var(--ac)}
+.res{background:var(--bg);border:2px solid var(--ac);border-radius:12px;padding:10px;font-weight:600;margin:8px 0}
+canvas{width:100%;height:auto;border:1px solid var(--bd);border-radius:12px;background:var(--card);display:block}
+input[type=text]{min-height:48px;width:100%;max-width:220px;font-size:17px;padding:0 12px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.fb{margin-top:6px;font-weight:600}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.q{border:1px solid var(--bd);border-radius:12px;padding:10px;margin:10px 0}
+.o{display:block;width:100%;text-align:left;min-height:48px;margin:6px 0;padding:8px 12px;border-radius:10px;border:2px solid var(--bd);background:var(--bg);color:var(--tx);font-size:16px;cursor:pointer}
+.o.ok{border-color:var(--ok);background:rgba(22,163,74,.2);color:var(--tx)}
+.o.bad{border-color:var(--bad);background:rgba(220,38,38,.2);color:var(--tx)}
+</style>
+</head>
+<body>
+<header><h1>33-mavzu. Masalalar yechish<br><small style="font-weight:400;color:var(--mu)">Hoʻllash va kapillyar hodisalar · 9-sinf</small></h1><button id="th" aria-label="Mavzu">🌙</button></header>
+<div id="tabs"></div>
+<main id="main"></main>
+<script>
+/* ===== Yordamchilar ===== */
+const F=(x,d=2)=>(+x).toFixed(d).replace('.',','); // vergulli format
+const RAD=Math.PI/180, SG=0.072, RW=1000, G=10;
+const $=(s,e=document)=>e.querySelector(s);
+
+/* ===== Chizish funksiyalari ===== */
+// Naycha: tubi (bot), suyuqlik sathi (lvl), menisk ishorasi (sign: +botiq, -qavariq)
+function tube(c,C,x,w,top,bot,lvl,col,sign){
+  const md=Math.min(w/2,7)*sign;
+  c.fillStyle=C.card;c.fillRect(x-w/2,top,w,bot-top);
+  c.fillStyle=col;c.beginPath();c.moveTo(x-w/2,lvl);
+  c.quadraticCurveTo(x,lvl+2*md,x+w/2,lvl);c.lineTo(x+w/2,bot);c.lineTo(x-w/2,bot);c.fill();
+  c.strokeStyle=C.tx;c.lineWidth=2;c.beginPath();
+  c.moveTo(x-w/2,top);c.lineTo(x-w/2,bot);c.moveTo(x+w/2,top);c.lineTo(x+w/2,bot);c.stroke();
+}
+function ruler(c,C,x,base,sc,k0,k1){
+  c.strokeStyle=C.tx;c.fillStyle=C.tx;c.lineWidth=1;c.font='10px sans-serif';c.textAlign='right';
+  c.beginPath();c.moveTo(x,base-k1*sc);c.lineTo(x,base-k0*sc);c.stroke();
+  for(let k=k0;k<=k1;k++){const y=base-k*sc;c.beginPath();c.moveTo(x-6,y);c.lineTo(x,y);c.stroke();c.fillText(k,x-8,y+3);}
+  c.textAlign='left';
+}
+function dash(c,C,x1,x2,y,col){c.save();c.setLineDash([4,4]);c.strokeStyle=col||C.ac;c.lineWidth=1.5;c.beginPath();c.moveTo(x1,y);c.lineTo(x2,y);c.stroke();c.restore();}
+function txt(c,C,s,x,y,col,al,f){c.fillStyle=col||C.tx;c.font=f||'bold 13px sans-serif';c.textAlign=al||'left';c.fillText(s,x,y);c.textAlign='left';}
+
+/* ===== MASALALAR (ma'lumotlar + hisob + animatsiya) ===== */
+const P=[
+{ // 1
+ t:'1-masala. Suvning kapillyar naychada koʻtarilishi',
+ q:'Radiusi r = 0,5 mm boʻlgan shisha kapillyar naycha suvga tushirildi. Suv naychada qanday balandlikka koʻtariladi? (σ = 0,072 N/m, ρ = 1000 kg/m³, g = 10 m/s², θ = 0°)',
+ find:'h = ? (m va sm)',
+ sl:[{k:'r',l:'Radius r',min:.1,max:2,step:.05,val:.5,u:'mm'}],
+ h:v=>2*SG/(RW*G*v.r/1000),
+ g:v=>[`r = ${F(v.r)} mm = ${F(v.r/1000,5)} m`,'σ = 0,072 N/m','ρ = 1000 kg/m³','g = 10 m/s²','θ = 0° (cosθ = 1)'],
+ s(v){const r=v.r/1000,h=this.h(v);return[
+  'Formula: h = 2σcosθ / (ρgr). θ = 0° boʻlgani uchun cosθ = 1.',
+  `r ni SI ga oʻtkazamiz: r = ${F(v.r)} mm = ${F(r,5)} m.`,
+  `Qiymatlarni qoʻyamiz: h = 2·0,072·1 / (1000·10·${F(r,5)}).`,
+  `Surat: 2σ = 0,144 N/m; maxraj ρgr = ${F(1e4*r,3)} N/m².`,
+  `Natija: h = ${F(h,4)} m ≈ ${F(h*100)} sm.`]},
+ res(v){const h=this.h(v);return`h = ${F(h,4)} m = ${F(h*100)} sm`},
+ draw(c,C,p,v){const h=this.h(v)*100,base=190,sc=10,w=10+v.r*20,lvl=base-h*sc*p;
+  c.fillStyle=C.w;c.fillRect(0,base,360,50);
+  tube(c,C,210,w,15,225,lvl,C.w,1);ruler(c,C,110,base,sc,0,14);
+  dash(c,C,110,210-w/2,lvl);txt(c,C,`h = ${F(h*p)} sm`,225+w/2,(lvl+base)/2,C.ac);},
+ own:{t:'Mustaqil masala: r = 0,25 mm boʻlgan naychada suv necha sm koʻtariladi?',a:5.76,u:'sm'}
+},
+{ // 2
+ t:'2-masala. Simobning kapillyar naychada pasayishi',
+ q:'Radiusi r = 1 mm boʻlgan shisha naycha simobga tushirildi. Simob–shisha chegaraviy burchagi θ = 138°, σ = 0,47 N/m, ρ = 13600 kg/m³. Simob sathi qanday oʻzgaradi? (g = 10 m/s²)',
+ find:'h = ? (m va mm), ishorasi nimani bildiradi?',
+ sl:[{k:'th',l:'Burchak θ',min:90,max:180,step:1,val:138,u:'°'},{k:'r',l:'Radius r',min:.3,max:2,step:.1,val:1,u:'mm'}],
+ h:v=>2*.47*Math.cos(v.th*RAD)/(13600*G*v.r/1000),
+ g:v=>[`r = ${F(v.r)} mm = ${F(v.r/1000,5)} m`,'σ = 0,47 N/m','ρ = 13600 kg/m³','g = 10 m/s²',`θ = ${v.th}° (cosθ = ${F(Math.cos(v.th*RAD),3)})`],
+ s(v){const r=v.r/1000,c=Math.cos(v.th*RAD),h=this.h(v);return[
+  'Formula: h = 2σcosθ / (ρgr).',
+  `cos ${v.th}° = ${F(c,3)}${c<0?' (manfiy — simob hoʻllamaydi)':''}.`,
+  `h = 2·0,47·(${F(c,3)}) / (13600·10·${F(r,5)}) = ${F(2*.47*c,4)} / ${F(13600*G*r,3)}.`,
+  `Natija: h = ${F(h,5)} m = ${F(h*1000)} mm.`,
+  h<0?`Manfiy ishora: simob sathi naychada ${F(-h*1000)} mm PASAYADI (menisk qavariq).`:`Musbat ishora: suyuqlik ${F(h*1000)} mm koʻtariladi.`]},
+ res(v){const h=this.h(v);return`h = ${F(h*1000)} mm → ${h<0?'pasayadi':'koʻtariladi'}`},
+ draw(c,C,p,v){const h=this.h(v)*100,base=80,sc=30,w=10+v.r*20,lvl=base-h*sc*p,sg=Math.cos(v.th*RAD)<0?-1:1;
+  c.fillStyle=C.hg;c.fillRect(0,base,360,160);
+  tube(c,C,210,w,10,225,lvl,C.hg,sg);ruler(c,C,110,base,sc,-3,2);
+  dash(c,C,110,210-w/2,base,C.mu||C.tx);dash(c,C,110,210-w/2,lvl);
+  txt(c,C,`h = ${F(h*p)} sm`,225+w/2,Math.min(lvl,200)+4,C.ac);txt(c,C,'boshlangʻich sath',120,base-4,C.tx,'left','10px sans-serif');},
+ own:{t:'Mustaqil masala: r = 0,5 mm (θ = 138°) boʻlsa, simob necha mm pasayadi? (modul)',a:10.27,u:'mm'}
+},
+{ // 3
+ t:'3-masala. Naycha radiusini topish',
+ q:'Kapillyar naychada suv h = 3 sm balandlikka koʻtarildi. σ = 0,072 N/m, ρ = 1000 kg/m³, g = 10 m/s², θ = 0°. Naycha radiusi r qancha?',
+ find:'r = ? (m va mm)',
+ sl:[{k:'h',l:'Balandlik h',min:1,max:6,step:.5,val:3,u:'sm'}],
+ r:v=>2*SG/(RW*G*v.h/100),
+ g:v=>[`h = ${F(v.h)} sm = ${F(v.h/100,3)} m`,'σ = 0,072 N/m','ρ = 1000 kg/m³','g = 10 m/s²','θ = 0° (cosθ = 1)'],
+ s(v){const r=this.r(v);return[
+  'h = 2σcosθ/(ρgr) formuladan r ni ifodalaymiz: r = 2σcosθ / (ρgh).',
+  `h = ${F(v.h)} sm = ${F(v.h/100,3)} m; cosθ = 1.`,
+  `r = 2·0,072 / (1000·10·${F(v.h/100,3)}) = 0,144 / ${F(1e4*v.h/100,1)}.`,
+  `Natija: r = ${F(r,6)} m = ${F(r*1000)} mm.`]},
+ res(v){const r=this.r(v);return`r = ${F(r,5)} m = ${F(r*1000)} mm`},
+ draw(c,C,p,v){const r=this.r(v)*1000,h=v.h,sc=70/h,base=190;
+  c.fillStyle=C.w;c.fillRect(0,base,360,24);
+  c.fillStyle='rgba(37,99,235,.15)';c.fillRect(140,20,80,200);
+  [.5,1,2].forEach((m,i)=>{const x=70+i*110,ri=r*m,hi=1.44/ri,w=6+Math.min(ri,3)*20;
+   tube(c,C,x+(i==1?-0:0),w,30,205,base-hi*sc*p,C.w,1);
+   txt(c,C,`r = ${F(ri)} mm`,x,235,i==1?C.ac:C.tx,'center');
+   txt(c,C,`${F(hi*p,1)} sm`,x,22,C.tx,'center','11px sans-serif');});
+  txt(c,C,'↑ kerakli naycha (h = '+F(h)+' sm)',180,230+6,C.ac,'center','10px sans-serif');},
+ own:{t:'Mustaqil masala: suv 6 sm balandlikka koʻtarilgan. Naycha radiusi necha mm?',a:.24,u:'mm'}
+},
+{ // 4
+ t:'4-masala. Sirt tarangligidan hosil boʻlgan kuch',
+ q:'Sim ramkaning harakatchan tomoni uzunligi l = 5 sm. Sovunli suyuqlik pardasi ikki sirtli, σ = 0,04 N/m. Parda simga qanday F kuch bilan taʼsir qiladi? F = 2σl',
+ find:'F = ? (N va mN)',
+ sl:[{k:'l',l:'Uzunlik l',min:1,max:10,step:.5,val:5,u:'sm'},{k:'s',l:'Sirt taranglik σ',min:.02,max:.08,step:.005,val:.04,u:'N/m'}],
+ f:v=>2*v.s*v.l/100,
+ g:v=>[`l = ${F(v.l)} sm = ${F(v.l/100,3)} m`,`σ = ${F(v.s,3)} N/m`,'Parda ikki sirtli (n = 2)'],
+ s(v){const f=this.f(v);return[
+  'Parda ikki sirtli (old va orqa), shuning uchun F = 2σl.',
+  `l = ${F(v.l)} sm = ${F(v.l/100,3)} m.`,
+  `F = 2·${F(v.s,3)}·${F(v.l/100,3)}.`,
+  `Natija: F = ${F(f,4)} N = ${F(f*1000)} mN.`]},
+ res(v){const f=this.f(v);return`F = ${F(f,4)} N = ${F(f*1000)} mN`},
+ draw(c,C,p,v){const L=v.l*12,cy=110,bx=110+p*120,f=this.f(v);
+  c.fillStyle=C.w;c.fillRect(60,cy-L/2,bx-60,L);
+  c.strokeStyle=C.tx;c.lineWidth=3;c.beginPath();c.moveTo(300,cy-L/2);c.lineTo(60,cy-L/2);c.lineTo(60,cy+L/2);c.lineTo(300,cy+L/2);c.stroke();
+  c.strokeStyle=C.ac;c.lineWidth=6;c.beginPath();c.moveTo(bx,cy-L/2);c.lineTo(bx,cy+L/2);c.stroke();
+  const al=20+f/.016*70;c.strokeStyle=C.bad;c.fillStyle=C.bad;c.lineWidth=4;
+  c.beginPath();c.moveTo(bx,cy);c.lineTo(bx-al,cy);c.stroke();c.beginPath();c.moveTo(bx-al-9,cy);c.lineTo(bx-al,cy-6);c.lineTo(bx-al,cy+6);c.fill();
+  txt(c,C,`F = 2σl = ${F(f*1000)} mN`,180,215,C.bad,'center');txt(c,C,`l = ${F(v.l)} sm`,bx+10,cy-L/2-6,C.ac);},
+ own:{t:'Mustaqil masala: l = 8 sm, σ = 0,05 N/m (ikki sirtli parda). F necha mN?',a:8,u:'mN'}
+},
+{ // 5
+ t:'5-masala. Hoʻllash va hoʻllamaslik',
+ q:'Chegaraviy burchak suv–shisha uchun θ = 30°, simob–shisha uchun θ = 140°. cosθ ni hisoblab, menisk shaklini aniqlang. Slayder bilan burchakni oʻzgartiring.',
+ find:'cosθ = ? Suyuqlik hoʻllaydimi yoki yoʻqmi?',
+ sl:[{k:'a',l:'θ (suv–shisha)',min:5,max:175,step:1,val:30,u:'°'},{k:'b',l:'θ (simob–shisha)',min:5,max:175,step:1,val:140,u:'°'}],
+ g:v=>[`θ₁ = ${v.a}° (suv–shisha)`,`θ₂ = ${v.b}° (simob–shisha)`,'Qoida: θ < 90° — hoʻllaydi; θ > 90° — hoʻllamaydi'],
+ w:t=>t<90?'hoʻllaydi (botiq menisk, h > 0)':t>90?'hoʻllamaydi (qavariq menisk, h < 0)':'chegaraviy holat (menisk tekis)',
+ s(v){const c1=Math.cos(v.a*RAD),c2=Math.cos(v.b*RAD);return[
+  'cosθ ishorasi h ning ishorasini belgilaydi: h = 2σcosθ/(ρgr).',
+  `cos ${v.a}° = ${F(c1,3)} → ${this.w(v.a)}.`,
+  `cos ${v.b}° = ${F(c2,3)} → ${this.w(v.b)}.`,
+  'Xulosa: cosθ > 0 boʻlsa suyuqlik naychada koʻtariladi, cosθ < 0 boʻlsa pasayadi.']},
+ res(v){return`cos ${v.a}° = ${F(Math.cos(v.a*RAD),3)} · cos ${v.b}° = ${F(Math.cos(v.b*RAD),3)}`},
+ draw(c,C,p,v){const y0=160;c.fillStyle=C.bd;c.fillRect(0,y0,360,40);
+  [[90,v.a,C.w,'suv'],[270,v.b,C.hg,'simob']].forEach(([cx,t,col,nm])=>{
+   const th=Math.max(5,90+(t-90)*p),R=55/Math.sin(th*RAD),cy=y0+R*Math.cos(th*RAD),a1=Math.atan2(y0-cy,55);
+   c.fillStyle=col;c.beginPath();c.arc(cx,cy,R,a1,-Math.PI-a1,true);c.closePath();c.fill();
+   c.strokeStyle=C.tx;c.lineWidth=2;c.stroke();
+   txt(c,C,`${nm}: θ = ${F(th,0)}°`,cx,30,C.tx,'center');
+   txt(c,C,`cosθ = ${F(Math.cos(th*RAD),2)}`,cx,50,C.ac,'center');
+   txt(c,C,t<90?'HOʻLLAYDI':t>90?'HOʻLLAMAYDI':'90°',cx,222,t<90?C.ok:C.bad,'center');});},
+ own:{t:'Mustaqil masala: θ = 120° boʻlsa, cosθ nimaga teng?',a:-.5,u:''}
+},
+{ // 6
+ t:'6-masala. Oʻsimlik ildizi va tuproq kapillyarlari',
+ q:'Tuproqdagi kapillyar naycha radiusi r = 0,02 mm = 20 mkm. Suv ildizgacha qancha balandlikka koʻtariladi? (σ = 0,072 N/m, ρ = 1000 kg/m³, g = 10 m/s², θ = 0°)',
+ find:'h = ? (m va sm)',
+ sl:[{k:'r',l:'Kapillyar radiusi r',min:5,max:100,step:1,val:20,u:'mkm'}],
+ h:v=>2*SG/(RW*G*v.r*1e-6),
+ g:v=>[`r = ${F(v.r,0)} mkm = ${F(v.r*1e-6,7)} m`,'σ = 0,072 N/m','ρ = 1000 kg/m³','g = 10 m/s²','θ = 0°'],
+ s(v){const r=v.r*1e-6,h=this.h(v);return[
+  'Formula: h = 2σcosθ/(ρgr), cosθ = 1.',
+  `r = ${F(v.r,0)} mkm = ${F(r,7)} m.`,
+  `h = 0,144 / (1000·10·${F(r,7)}) = 0,144 / ${F(1e4*r,4)}.`,
+  `Natija: h = ${F(h,3)} m = ${F(h*100,1)} sm. Radius qancha kichik boʻlsa, suv shuncha baland chiqadi.`]},
+ res(v){const h=this.h(v);return`h = ${F(h,3)} m = ${F(h*100,1)} sm`},
+ draw(c,C,p,v){const h=this.h(v),hp=Math.min(150,h*150),cw=4+v.r*.12,tb=210,lvl=tb-hp*p;
+  c.fillStyle=C.bg||'#fff';c.fillRect(0,0,360,240);
+  c.fillStyle='#8a6a45';c.fillRect(0,45,360,195);
+  for(let i=0;i<140;i++){c.fillStyle=i%3?'#6e5334':'#a78660';c.fillRect((i*53)%358,50+(i*37)%185,3,3);}
+  c.fillStyle=C.w;c.fillRect(0,tb,360,30);
+  c.fillStyle='#e8d9bb';c.fillRect(180-cw/2,tb-150-5,cw,155);
+  c.fillStyle=C.w;c.fillRect(180-cw/2,lvl,cw,tb-lvl);
+  c.strokeStyle='#2f9e44';c.lineWidth=3;c.beginPath();c.moveTo(180,45);c.lineTo(180,10);c.moveTo(180,25);c.lineTo(205,12);c.moveTo(180,32);c.lineTo(155,18);c.stroke();
+  c.strokeStyle='#c9a36b';c.lineWidth=2;c.beginPath();c.moveTo(180,45);c.lineTo(180,62);c.moveTo(180,52);c.lineTo(165,66);c.moveTo(180,52);c.lineTo(195,66);c.stroke();
+  txt(c,C,`h = ${F(h*p*100,1)} sm${h>1?' (chizmada qirqilgan)':''}`,200,(lvl+tb)/2,'#fff');
+  txt(c,C,'yer osti suvi',10,232,'#fff');}, 
+ own:{t:'Mustaqil masala: r = 0,05 mm boʻlgan tuproq kapillyarida suv necha sm koʻtariladi?',a:28.8,u:'sm'}
+}];
+
+/* ===== TEST ===== */
+const T=[
+{q:'Hoʻllaydigan suyuqlik (θ < 90°) kapillyar naychada qanday holatda boʻladi?',o:['Pasayadi','Koʻtariladi, menisk botiq','Oʻzgarmaydi','Koʻtariladi, menisk qavariq'],a:1},
+{q:'Kapillyar naychadagi suyuqlik koʻtarilish balandligi formulasi qaysi?',o:['h = σ/(ρgr)','h = 2σ/(ρg)','h = 2σcosθ/(ρgr)','h = σcosθ/(2ρgr)'],a:2},
+{q:'Naycha radiusi 2 marta kamaytirilsa, suyuqlik balandligi qanday oʻzgaradi?',o:['2 marta ortadi','2 marta kamayadi','4 marta ortadi','Oʻzgarmaydi'],a:0},
+{q:'Simob–shisha uchun θ = 140°. Simob kapillyar naychada qanday boʻladi?',o:['Hoʻllaydi, koʻtariladi','Hoʻllamaydi, pasayadi','Hoʻllaydi, pasayadi','Hoʻllamaydi, koʻtariladi'],a:1},
+{q:'Ikki sirtli suyuqlik pardasi uzunligi l boʻlgan sim tomoniga taʼsir kuchi qaysi?',o:['F = σ/(2l)','F = σl','F = σ/l','F = 2σl'],a:3}];
+
+/* ===== UI qurish ===== */
+const tabs=$('#tabs'),main=$('#main'),S=[],cvs=[];let cur=0,t0=0;
+function show(i){cur=i;[...tabs.children].forEach((b,j)=>b.classList.toggle('on',j==i));[...main.children].forEach((s,j)=>s.classList.toggle('on',j==i));t0=performance.now();}
+P.forEach((p,i)=>{
+  const b=document.createElement('button');b.textContent=(i+1)+'-masala';b.onclick=()=>show(i);tabs.appendChild(b);
+  const v={};p.sl.forEach(s=>v[s.k]=s.val);S[i]={v,n:0};
+  const sec=document.createElement('section');
+  sec.innerHTML=`<h2>${p.t}</h2><p>${p.q}</p>
+  <div class="gf"><div class="box"><b>Berilgan (SI)</b><ul class="g"></ul></div><div class="box"><b>Topish kerak</b><p>${p.find}</p></div></div>
+  <h3>Bosqichma-bosqich yechim</h3><div class="stp"></div><button class="btn nx">Keyingi qadam ▶</button><button class="btn alt rs">↺ Boshidan</button>
+  <h3>Simulyatsiya</h3><div class="sls"></div><div class="res"></div>
+  <canvas width="720" height="480"></canvas><button class="btn alt rp">▶ Animatsiyani qayta ijro</button>
+  <h3>Mustaqil masala</h3><p>${p.own.t}</p><input type="text" inputmode="decimal" placeholder="Javob ${p.own.u?'('+p.own.u+')':''}"><br><button class="btn ck">Tekshirish</button><div class="fb"></div>`;
+  main.appendChild(sec);
+  const box=$('.sls',sec);
+  p.sl.forEach(s=>{const d=document.createElement('div');d.className='sl';
+    d.innerHTML=`<label><span>${s.l}</span><b></b></label><input type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${s.val}">`;
+    const inp=$('input',d),out=$('b',d);const upd=()=>{v[s.k]=+inp.value;out.textContent=F(inp.value,s.step<1?(s.step<.01?3:2):0)+' '+s.u;render(i);t0=performance.now();};
+    inp.oninput=upd;box.appendChild(d);out.textContent=F(s.val,s.step<1?(s.step<.01?3:2):0)+' '+s.u;});
+  const c=$('canvas',sec);cvs[i]=c;c.getContext('2d').setTransform(2,0,0,2,0,0);
+  $('.nx',sec).onclick=()=>{S[i].n++;render(i)};
+  $('.rs',sec).onclick=()=>{S[i].n=0;render(i)};
+  $('.rp',sec).onclick=()=>{t0=performance.now()};
+  $('.ck',sec).onclick=()=>{const x=parseFloat($('input[type=text]',sec).value.replace(',','.')),a=p.own.a,f=$('.fb',sec);
+    if(isNaN(x)){f.className='fb bad';f.textContent='Raqam kiriting.';return;}
+    const ok=Math.abs(x-a)<=Math.max(.01,Math.abs(a)*.02);
+    f.className='fb '+(ok?'ok':'bad');f.textContent=ok?'✅ Toʻgʻri!':`❌ Notoʻgʻri. Toʻgʻri javob: ${F(a)} ${p.own.u}`;};
+  render(i);
+});
+function render(i){const p=P[i],sec=main.children[i],v=S[i].v,st=p.s(v);
+  $('.g',sec).innerHTML=p.g(v).map(x=>`<li>${x}</li>`).join('');
+  $('.stp',sec).innerHTML=st.slice(0,S[i].n).map((x,k)=>`<div class="st"><b>${k+1}.</b> ${x}</div>`).join('');
+  const nx=$('.nx',sec);nx.disabled=S[i].n>=st.length;nx.textContent=nx.disabled?'Yechim tugadi ✔':'Keyingi qadam ▶';
+  $('.res',sec).textContent='Natija: '+p.res(v);}
+
+/* Test tabi */
+(function(){
+  const b=document.createElement('button');b.textContent='📝 Test';b.onclick=()=>show(P.length);tabs.appendChild(b);
+  const sec=document.createElement('section');main.appendChild(sec);let sc,an;
+  function build(){sc=0;an=0;sec.innerHTML='<h2>Test: hoʻllash va kapillyar hodisalar</h2>';
+    T.forEach((t,qi)=>{const d=document.createElement('div');d.className='q';d.innerHTML=`<b>${qi+1}. ${t.q}</b>`;
+      t.o.forEach((o,oi)=>{const bt=document.createElement('button');bt.className='o';bt.textContent='ABCD'[oi]+') '+o;
+        bt.onclick=()=>{[...d.querySelectorAll('.o')].forEach((x,k)=>{x.disabled=true;if(k==t.a)x.classList.add('ok');});
+          if(oi==t.a)sc++;else bt.classList.add('bad');an++;if(an==T.length)fin();};
+        d.appendChild(bt);});sec.appendChild(d);});
+    const r=document.createElement('div');r.id='tr';sec.appendChild(r);}
+  function fin(){const pc=Math.round(sc/T.length*100);
+    $('#tr',sec).innerHTML=`<div class="res">Natija: ${sc} / ${T.length} ball · ${pc}%<br>${pc>=80?'Ajoyib! 🎉':pc>=60?'Yaxshi, yana mashq qiling.':'Mavzuni takrorlang.'}</div><button class="btn" id="rst">↺ Qayta boshlash</button>`;
+    $('#rst',sec).onclick=()=>{build();window.scrollTo(0,0)};}
+  build();
+})();
+
+/* ===== Animatsiya sikli (requestAnimationFrame) ===== */
+function loop(now){
+  const cs=getComputedStyle(document.documentElement),g=n=>cs.getPropertyValue(n).trim();
+  const C={card:g('--card'),tx:g('--tx'),ac:g('--ac'),w:g('--w'),hg:g('--hg'),bd:g('--bd'),ok:g('--ok'),bad:g('--bad'),mu:g('--mu'),bg:g('--card')};
+  if(cur<P.length){const c=cvs[cur].getContext('2d'),t=Math.min(1,(now-t0)/2500),p=1-Math.pow(1-t,3);
+    c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,360,240);c.fillStyle=C.card;c.fillRect(0,0,360,240);
+    P[cur].draw(c,C,p,S[cur].v);}
+  requestAnimationFrame(loop);}
+
+/* Mavzu almashtirgich */
+$('#th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme=='dark';r.dataset.theme=d?'light':'dark';$('#th').textContent=d?'🌙':'☀️';};
+show(0);requestAnimationFrame(loop);
+</script>
+</body>
+</html>

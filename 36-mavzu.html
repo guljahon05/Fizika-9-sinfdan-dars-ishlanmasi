@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>36-mavzu. Qattiq jismlarning mexanik xossalari</title>
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--fg:#1e2a3a;--mut:#64748b;--ac:#4f7cff;--ac2:#e8eeff;--ok:#2fb67c;--warn:#f2b83d;--bad:#e5534b;--bd:#dbe3ef}
+[data-t=dark]{--bg:#0f1622;--card:#182233;--fg:#e6edf7;--mut:#94a3b8;--ac:#7aa2ff;--ac2:#22304a;--bd:#2a3a55}
+*{box-sizing:border-box}body{margin:0;font:17px/1.55 system-ui,sans-serif;background:var(--bg);color:var(--fg)}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px}
+h1{font-size:18px;margin:0}h2{font-size:20px;margin:0 0 6px}h3{font-size:17px;margin:0 0 8px;color:var(--ac)}
+nav{display:flex;gap:8px;overflow-x:auto;padding:6px 14px 10px;position:sticky;top:0;background:var(--bg);z-index:5}
+button,select,input{font:inherit;color:var(--fg)}
+button{min-height:48px;padding:0 16px;border:0;border-radius:12px;background:var(--ac);color:#fff;font-weight:600;cursor:pointer}
+nav button{background:var(--card);color:var(--fg);border:1px solid var(--bd);white-space:nowrap}
+nav button.on{background:var(--ac);color:#fff}
+#th{background:var(--card);color:var(--fg);border:1px solid var(--bd);font-size:20px}
+main{max-width:760px;margin:0 auto;padding:0 12px 40px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 8px #0001}
+.formula{background:var(--ac2);border-left:5px solid var(--ac);padding:12px;margin:8px 0;font:24px Georgia,serif;text-align:center;border-radius:12px}
+.ex,.out{background:var(--ac2);border-radius:12px;padding:12px;margin-top:10px}
+canvas{width:100%;height:auto;border:1px solid var(--bd);border-radius:12px;display:block}
+label{display:block;margin:12px 0 2px}input[type=range]{width:100%;height:38px}
+select,input[type=text]{width:100%;min-height:48px;padding:0 10px;border-radius:12px;border:1px solid var(--bd);background:var(--card)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row button{flex:1;min-width:110px}.row input{flex:2;min-width:120px}
+.res{margin-top:8px;font-weight:600}.q{border-top:1px dashed var(--bd);padding-top:10px;margin-top:10px}
+details{margin-top:8px}summary{cursor:pointer;color:var(--ac);font-weight:600}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;background:var(--card);color:var(--fg);border:2px solid var(--bd)}
+.opt.ok{border-color:var(--ok);background:#2fb67c33}.opt.no{border-color:var(--bad);background:#e5534b33}
+li{margin:3px 0}
+</style></head><body>
+<header><h1>📘 36-mavzu. Qattiq jismlarning mexanik xossalari</h1><button id="th" title="Mavzu">🌙</button></header>
+<nav id="nav"></nav><main id="M"></main>
+<script>
+const $=s=>document.querySelector(s),M=$('#M'),css=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+const n=(x,d=2)=>(+x.toFixed(d)).toString().replace('.',',');
+const sci=x=>{const e=Math.floor(Math.log10(Math.abs(x))),m=x/10**e;return n(m)+'·10<sup>'+e+'</sup>'};
+const clr=c=>{c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,360,200)};
+const T=(c,s,x,y,col,sz,al)=>{c.fillStyle=col||css('--fg');c.font=(sz||12)+'px system-ui,sans-serif';c.textAlign=al||'left';c.fillText(s,x,y)};
+const colF=r=>r<.7?css('--ok'):r<1?css('--warn'):css('--bad');
+function arrow(c,x1,y1,x2,y2,col){c.strokeStyle=c.fillStyle=col;c.lineWidth=2.5;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();const a=Math.atan2(y2-y1,x2-x1);c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-9*Math.cos(a-.4),y2-9*Math.sin(a-.4));c.lineTo(x2-9*Math.cos(a+.4),y2-9*Math.sin(a+.4));c.fill()}
+function zig(c,x,y,len,k,w){c.strokeStyle=css('--ac');c.lineWidth=2.5;c.beginPath();c.moveTo(x,y);const d=len/(k+1);c.lineTo(x,y+d/2);for(let i=0;i<k;i++)c.lineTo(x+(i%2?-w:w),y+d/2+d*(i+.5));c.lineTo(x,y+len-d/2);c.lineTo(x,y+len);c.stroke()}
+
+const DN=["Cho'zilish","Siqilish","Egilish","Burilish","Siljish"];
+const DD=["kuch sterjenni uchlaridan tashqariga tortadi, sterjen uzayadi.","kuch uchlaridan ichkariga siqadi, sterjen qisqaradi va yo'g'onlashadi.","bir uchi mahkamlangan sterjen kuch ta'sirida egiladi.","kuch momenti sterjenni o'qi atrofida buraydi.","qatlamlar bir-biriga nisbatan parallel suriladi."];
+function shape(c,k,f){const fg=css('--fg'),ac=css('--ac'),bad=css('--bad');c.fillStyle=ac;c.lineWidth=2;
+if(k==0){const L=150+70*f,h=30-8*f,x=180-L/2;c.fillRect(x,100-h/2,L,h);arrow(c,x,100,x-32,100,bad);arrow(c,x+L,100,x+L+32,100,bad)}
+if(k==1){const L=170-60*f,h=30+14*f,x=180-L/2;c.fillRect(x,100-h/2,L,h);arrow(c,x-32,100,x,100,bad);arrow(c,x+L+32,100,x+L,100,bad)}
+if(k==2){c.fillStyle=fg;c.fillRect(56,60,10,80);c.strokeStyle=ac;c.lineWidth=26;c.beginPath();c.moveTo(66,100);c.quadraticCurveTo(170,100,270,100+60*f);c.stroke();arrow(c,270,40+60*f,270,82+60*f,bad)}
+if(k==3){c.fillStyle=fg;c.fillRect(56,70,10,60);c.fillStyle=ac;c.fillRect(66,80,224,40);c.strokeStyle='#fff';c.lineWidth=2;for(let i=0;i<=10;i++){const x=66+i*22.4,tw=26*f*i/10;c.beginPath();c.moveTo(x+tw,80);c.lineTo(x-tw,120);c.stroke()}c.strokeStyle=bad;c.lineWidth=3;c.beginPath();c.arc(290,100,30,-1.2,1.2);c.stroke();T(c,'M',326,104,bad,14)}
+if(k==4){const s=50*f;c.fillStyle=fg;c.fillRect(90,140,190,8);c.fillStyle=ac;c.beginPath();c.moveTo(100,140);c.lineTo(260,140);c.lineTo(260+s,100);c.lineTo(100+s,100);c.fill();arrow(c,110+s,88,165+s,88,bad)}}
+
+const MT=[["Po'lat",2e11,4e8],["Mis",1.1e11,2.2e8],["Alyuminiy",7e10,1e8],["Rezina",5e7,2e7]];
+const CP=[[0,0],[.2,.6],[.28,.68],[.45,.7],[.8,1],[.92,.82]];
+function d5(c,q,sn,tail,nm){clr(c);const e=40*Math.min(q,1),L=80;c.fillStyle=css('--fg');c.fillRect(20,10,80,6);c.strokeStyle=css('--ac');c.lineWidth=3;c.beginPath();c.moveTo(60,16);
+ if(!sn){c.lineTo(60,16+L+e);c.stroke();c.fillStyle=css('--bad');c.fillRect(42,16+L+e,36,26)}
+ else{c.lineTo(60,16+L+e*.6);c.stroke();c.fillStyle=css('--bad');c.fillRect(42,16+L+e+tail,36,26);T(c,'💥',52,60,null,18)}
+ T(c,nm,20,196,null,12);const X=p=>165+p[0]*170,Y=p=>170-p[1]*130;
+ c.strokeStyle=css('--mut');c.lineWidth=1.5;c.beginPath();c.moveTo(150,170);c.lineTo(150,20);c.moveTo(150,170);c.lineTo(345,170);c.stroke();T(c,'σ',140,26,null,13,'right');T(c,'ε',338,186,null,13);
+ c.strokeStyle=css('--ac');c.lineWidth=2.5;c.beginPath();CP.forEach((p,i)=>i?c.lineTo(X(p),Y(p)):c.moveTo(X(p),Y(p)));c.stroke();
+ 'ABCDE'.split('').forEach((l,i)=>T(c,l,X(CP[i+1])-4,Y(CP[i+1])-8,css('--mut'),12));
+ let m;if(sn)m=CP[5];else{const s=q*4,i=Math.min(3,Math.floor(s)),f=s-i;m=[CP[i][0]+(CP[i+1][0]-CP[i][0])*f,CP[i][1]+(CP[i+1][1]-CP[i][1])*f]}
+ c.fillStyle=css('--bad');c.beginPath();c.arc(X(m),Y(m),6,0,7);c.fill()}
+
+const PL=[
+{t:"Deformatsiya tushunchasi va turlari",th:"Tashqi kuch ta'sirida jism shakli yoki o'lchamining o'zgarishi <b>deformatsiya</b> deyiladi. Deformatsiya turlari: cho'zilish, siqilish, egilish, burilish (buralish) va siljish.",
+fm:["Deformatsiya = shakl yoki o'lchamning o'zgarishi"],tm:["F — tashqi kuch (N, nyuton)","Cho'zilish — kuch jismni uzaytiradi","Siqilish — kuch jismni qisqartiradi","Egilish — sterjen egiladi","Burilish — sterjen o'qi atrofida buraladi","Siljish — qatlamlar bir-biriga nisbatan suriladi"],
+life:"Arqonni tortsangiz — cho'zilish; bino ustuni — siqilish; ko'prik to'sini — egilish; murvatni burash — burilish; qaychi bilan qirqish — siljish.",
+ex:["Kran trosiga yuk osildi.","Deformatsiya turi","Kuch trosni uzunligi bo'ylab tortadi, tros uzayadi → cho'zilish."],
+ctl:[{id:'k',l:'Deformatsiya turi',o:DN},{id:'f',l:'Kuch',min:0,max:100,s:1,v:60,u:'%'}],
+calc:v=>`<b>${DN[v.k]}</b>: ${DD[v.k]}<br>Kuch ${v.f}% da deformatsiya shuncha ko'rinadi.`,
+sd:(c,v)=>{clr(c);shape(c,v.k,v.f/100);T(c,DN[v.k],180,24,null,15,'center')},
+dur:11,ad:(c,t)=>{const k=Math.min(4,Math.floor(t/2.2)),f=Math.sin(Math.PI*(t%2.2)/2.2);clr(c);shape(c,k,f);T(c,(k+1)+". "+DN[k],180,24,null,15,'center')},
+qs:[{t:"Mavzuda sanalgan deformatsiya turlari soni nechta?",a:5,u:'ta',s:"Cho'zilish, siqilish, egilish, burilish, siljish → 5 ta."}]},
+
+{t:"Elastik va plastik deformatsiya",th:"Kuch olingach jism avvalgi shaklini tiklasa — <b>elastik</b> deformatsiya (prujina, rezina). Shakl tiklanmasa — <b>plastik</b> (qoldiq) deformatsiya (plastilin, qo'rg'oshin, qizdirilgan sim). Ular orasidagi chegara <b>elastiklik chegarasi</b> deyiladi.",
+fm:["F ≤ F<sub>chegara</sub> → elastik","F &gt; F<sub>chegara</sub> → plastik"],tm:["Elastik: deformatsiya yo'qoladi","Plastik: qoldiq deformatsiya qoladi","Elastiklik chegarasi — elastik deformatsiyaning eng katta qiymati"],
+life:"Prujinani siqib qo'yib yuborsangiz, qaytadi. Plastilin to'pi yassi bo'lib qoladi. Sim ko'p egilsa, to'g'rilanmaydi.",
+ex:["Elastiklik chegarasi 60 N. 40 N va 80 N kuch qo'yildi.","Qaysi holda qoldiq deformatsiya qoladi?","40 N &lt; 60 N → elastik, qoldiq yo'q. 80 N &gt; 60 N → plastik, qoldiq qoladi."],
+ctl:[{id:'f',l:'Kuch F',min:0,max:100,s:5,v:40,u:'N'}],
+calc:v=>{const d=v.f/10,r=v.f>60?(v.f-60)/10*.8:0;return `Kuch ostida deformatsiya: <b>${n(d)} sm</b><br>Kuch olingach qoldiq: <b>${n(r)} sm</b><br>${v.f<=60?"✅ Elastik deformatsiya (chegaradan oshmadi)":"⚠️ Elastiklik chegarasi (60 N) oshdi — plastik deformatsiya"}`},
+sd:(c,v)=>{clr(c);const d=v.f/10,r=v.f>60?(v.f-60)/10*.8:0;c.fillStyle=css('--fg');c.fillRect(30,170,300,3);
+ for(let s=0;s<2;s++){const x=100+160*s,h=Math.max(14,60-(s?r:d)*3.5);c.fillStyle=(s&&r>0)?css('--warn'):css('--ac');c.fillRect(x-35,170-h,70,h);
+ if(!s){c.fillStyle=css('--fg');c.fillRect(x-45,170-h-8,90,8);if(v.f>0)arrow(c,x,170-h-55,x,170-h-12,css('--bad'))}
+ T(c,s?"Kuch olingach":"Kuch ostida",x,192,null,12,'center')}T(c,"qoldiq: "+n(r)+" sm",260,40,null,13,'center')},
+dur:8,ad:(c,t)=>{clr(c);const a=t<3?t/3:t<4?1:t<6?1-(t-4)/2:0,cb=t<3?a:Math.max(.35,a);c.fillStyle=css('--fg');c.fillRect(30,170,300,3);
+ const L=100-60*a;zig(c,100,170-L,L,8,16);const H=60-30*cb;c.fillStyle=css('--warn');c.beginPath();c.ellipse(260,170-H/2,40+(60-H)*.6,H/2,0,0,7);c.fill();
+ c.fillStyle=css('--fg');if(a>.01){c.fillRect(55,170-L-8,90,8);c.fillRect(215,170-(60-30*a)-8,90,8)}
+ T(c,"Prujina (elastik)",100,192,null,12,'center');T(c,"Plastilin (plastik)",260,192,null,12,'center')},
+qs:[{t:"Elastiklik chegarasi 60 N bo'lgan jismga 40 N kuch qo'yildi. Kuch olingach qoldiq deformatsiya necha sm?",a:0,u:'sm',s:"40 N &lt; 60 N → deformatsiya elastik, kuch olingach jism tiklanadi: qoldiq = 0 sm."}]},
+
+{t:"Elastiklik kuchi. Guk qonuni",th:"Deformatsiya paytida jismda <b>elastiklik kuchi</b> paydo bo'ladi. U deformatsiyaga proporsional va unga qarama-qarshi yo'nalgan (Guk qonuni).",
+fm:["F<sub>el</sub> = k·Δl","F<sub>el</sub> = −k·x"],tm:["F<sub>el</sub> — elastiklik kuchi (N)","k — bikrlik (N/m)","Δl — uzayish (m)","x — muvozanatdan siljish (m)","Minus — kuch deformatsiyaga qarama-qarshi","k jism materiali, uzunligi va ko'ndalang kesimiga bog'liq"],
+life:"Prujinali tarozi va avtomobil ressori Guk qonuniga asoslangan: yuk og'ir bo'lsa, prujina ko'proq cho'ziladi.",
+ex:["k = 200 N/m, Δl = 0,05 m","F = ?","F = k·Δl = 200 · 0,05 = 10 N"],
+ctl:[{id:'m',l:'Yuk massasi m',min:.1,max:2,s:.1,v:1,u:'kg'},{id:'k',l:'Bikrlik k',min:50,max:500,s:10,v:200,u:'N/m'}],
+calc:v=>{const F=v.m*10,dl=F/v.k;return `F = mg = <b>${n(F)} N</b> (g = 10 m/s²)<br>Δl = mg/k = <b>${n(dl,3)} m</b> (${n(dl*100,1)} sm)<br>Tekshiruv: k·Δl = ${n(v.k*dl)} N`},
+sd:(c,v)=>{clr(c);const F=v.m*10,dl=F/v.k,L=50+dl*200;c.fillStyle=css('--fg');c.fillRect(40,16,100,8);zig(c,90,24,L,8,14);c.fillStyle=css('--ac');c.fillRect(70,24+L,40,26);T(c,v.m+" kg",90,42+L,'#fff',11,'center');
+ const X=x=>200+x/.5*130,Y=y=>170-y/25*140;c.strokeStyle=css('--mut');c.lineWidth=1.5;c.beginPath();c.moveTo(200,20);c.lineTo(200,170);c.lineTo(335,170);c.stroke();
+ c.strokeStyle=css('--ac');c.lineWidth=2.5;c.beginPath();c.moveTo(X(0),Y(0));const xe=Math.min(.5,25/v.k);c.lineTo(X(xe),Y(xe*v.k));c.stroke();
+ c.fillStyle=css('--bad');c.beginPath();c.arc(X(dl),Y(Math.min(F,25)),5,0,7);c.fill();T(c,"F, N",204,18);T(c,"Δl, m",300,186)},
+dur:8,ad:(c,t)=>{clr(c);const e=60*(1-Math.exp(-.5*t)*Math.cos(7*t)),L=50+e;c.fillStyle=css('--fg');c.fillRect(120,16,100,8);zig(c,170,24,L,8,14);c.fillStyle=css('--ac');c.fillRect(150,24+L,40,26);T(c,"m",170,42+L,'#fff',12,'center');
+ c.setLineDash([4,3]);c.strokeStyle=css('--mut');c.lineWidth=1;c.beginPath();c.moveTo(110,134);c.lineTo(230,134);c.stroke();c.setLineDash([]);T(c,"muvozanat: Δl = mg/k",236,138,null,12)},
+qs:[{t:"Prujina k = 150 N/m, Δl = 0,06 m. Elastiklik kuchi F necha N?",a:9,u:'N',s:"F = k·Δl = 150 · 0,06 = 9 N"}]},
+
+{t:"Mexanik kuchlanish va nisbiy deformatsiya",th:"<b>Mexanik kuchlanish</b> — ko'ndalang kesim yuzi birligiga to'g'ri keladigan kuch. <b>Nisbiy deformatsiya</b> — uzayishning boshlang'ich uzunlikka nisbati.",
+fm:["σ = F / S","ε = Δl / l<sub>0</sub>"],tm:["σ — mexanik kuchlanish (Pa)","F — kuch (N)","S — ko'ndalang kesim yuzi (m²); 1 mm² = 10⁻⁶ m²","Δl — uzayish (m)","l₀ — boshlang'ich uzunlik (m)","ε — o'lchamsiz yoki % da","Simulyatsiyada po'lat (E = 2·10¹¹ Pa) olingan"],
+life:"Ingichka sim yo'g'on simga qaraganda tez uziladi: bir xil kuchda ingichka simda kuchlanish katta.",
+ex:["F = 2000 N, S = 1 mm² = 10⁻⁶ m²","σ = ?","σ = F/S = 2000/10⁻⁶ = 2·10⁹ Pa"],
+ctl:[{id:'F',l:'Kuch F',min:100,max:3000,s:100,v:1000,u:'N'},{id:'S',l:'Kesim yuzi S',min:1,max:10,s:.5,v:2,u:'mm²'},{id:'l',l:'Uzunlik l₀',min:1,max:5,s:.5,v:2,u:'m'}],
+calc:v=>{const s=v.F/(v.S*1e-6),e=s/2e11;return `σ = F/S = <b>${sci(s)} Pa</b> (${n(s/1e6,0)} MPa)<br>ε = σ/E = <b>${n(e*100,3)} %</b><br>Δl = ε·l₀ = <b>${n(e*v.l*1000,2)} mm</b>`},
+sd:(c,v)=>{clr(c);const s=v.F/(v.S*1e-6),e=s/2e11,ext=e*2500,L=v.l*22;c.fillStyle=css('--fg');c.fillRect(100,10,160,6);c.strokeStyle=css('--ac');c.lineWidth=Math.sqrt(v.S)*1.4;c.beginPath();c.moveTo(180,16);c.lineTo(180,16+L+ext);c.stroke();
+ c.setLineDash([4,3]);c.lineWidth=1;c.strokeStyle=css('--mut');c.beginPath();c.moveTo(150,16+L);c.lineTo(210,16+L);c.stroke();c.setLineDash([]);
+ c.fillStyle=css('--bad');c.fillRect(160,16+L+ext,40,26);T(c,v.F+" N",180,34+L+ext,'#fff',11,'center');T(c,"σ = "+n(s/1e6,0)+" MPa",230,60,null,13);T(c,"ε = "+n(e*100,3)+" %",230,80,null,13)},
+dur:6,ad:(c,t)=>{clr(c);const a=Math.min(1,t/3);[[110,1,60,"S = 1 mm²","ε = 0,5 %"],[250,4,15,"S = 4 mm²","ε = 0,125 %"]].forEach(([x,S,m,l1,l2])=>{const ext=m*a;c.fillStyle=css('--fg');c.fillRect(x-40,10,80,6);c.strokeStyle=css('--ac');c.lineWidth=2*Math.sqrt(S)+1;c.beginPath();c.moveTo(x,16);c.lineTo(x,96+ext);c.stroke();c.fillStyle=css('--bad');c.fillRect(x-20,96+ext,40,26);T(c,"F",x,114+ext,'#fff',12,'center');T(c,l1,x+14,50,null,12);T(c,l2,x+14,66,null,12)});T(c,"Bir xil kuch — ingichka sim ko'proq cho'ziladi",180,190,null,12,'center')},
+qs:[{t:"F = 600 N, S = 3 mm². Kuchlanish σ necha MPa? (1 mm² = 10⁻⁶ m²)",a:200,u:'MPa',s:"σ = F/S = 600/(3·10⁻⁶) = 2·10⁸ Pa = 200 MPa"}]},
+
+{t:"Yung moduli va kuchlanish–deformatsiya diagrammasi",th:"Kichik deformatsiyada kuchlanish nisbiy deformatsiyaga proporsional: σ = E·ε. <b>E — Yung moduli</b> materialning bikrligini bildiradi. Diagrammada: A — proporsionallik chegarasi, B — elastiklik chegarasi, C — oquvchanlik, D — mustahkamlik chegarasi, E — uzilish nuqtasi.",
+fm:["σ = E·ε","Δl = F·l<sub>0</sub> / (E·S)"],tm:["E — Yung moduli (Pa)","Po'lat ≈ 2·10¹¹ Pa; mis ≈ 1,1·10¹¹ Pa","Alyuminiy ≈ 7·10¹⁰ Pa; rezina ≈ 10⁷–10⁸ Pa","A, B, C, D, E — diagrammadagi xarakterli nuqtalar"],
+life:"Po'lat sim rezina shnurga qaraganda juda kam cho'ziladi — po'latning Yung moduli ancha katta.",
+ex:["Po'lat sim: F = 200 N, S = 1 mm², l₀ = 1 m, E = 2·10¹¹ Pa","Δl = ?","Δl = F·l₀/(E·S) = 200·1/(2·10¹¹·10⁻⁶) = 10⁻³ m = 1 mm"],
+ctl:[{id:'m',l:'Material',o:MT.map(x=>x[0])},{id:'F',l:'Kuch F',min:10,max:10000,s:10,v:1000,u:'N'},{id:'S',l:'Kesim yuzi S',min:1,max:20,s:1,v:5,u:'mm²'},{id:'l',l:'Uzunlik l₀',min:.5,max:5,s:.5,v:2,u:'m'}],
+calc:v=>{const m=MT[v.m],s=v.F/(v.S*1e-6),q=s/m[2],dl=v.F*v.l/(m[1]*v.S*1e-6),st=q>=1?"💥 σ ≥ σ<sub>m</sub> ("+n(m[2]/1e6,0)+" MPa): sim uziladi!":q<.45?"🟢 Guk qonuni o'rinli (elastik soha)":q<.75?"🟡 Oquvchanlik / plastik soha":"🟠 Mustahkamlik chegarasiga yaqin";
+ return `Δl = F·l₀/(E·S) = <b>${q>=1?"—":n(dl*1000,2)+" mm"}</b><br>σ = ${n(s/1e6,1)} MPa, ε = ${n(s/m[1]*100,3)} %<br>${st}`},
+sd:(c,v)=>{const m=MT[v.m],q=v.F/(v.S*1e-6)/m[2];d5(c,q,q>=1,20,m[0])},
+dur:7,ad:(c,t)=>{const q=t/5;d5(c,Math.min(q,1),q>=1,Math.min(30,Math.max(0,t-5)*30),"Po'lat sim")},
+qs:[{t:"Po'lat sim: F = 1000 N, S = 1 mm², l₀ = 2 m, E = 2·10¹¹ Pa. Δl necha mm?",a:10,u:'mm',s:"Δl = F·l₀/(E·S) = 1000·2/(2·10¹¹·10⁻⁶) = 0,01 m = 10 mm"}]},
+
+{t:"Qattiq jismlarning mexanik xossalari va qo'llanilishi",th:"Asosiy xossalar: <b>mustahkamlik, qattiqlik, elastiklik, plastiklik, mo'rtlik</b> (shisha, cho'yan — kichik deformatsiyada sinadi), <b>qovushqoqlik</b>. Ko'prik, bino, kabel, avtomobil ressori, tormoz va amortizatorlar shu xossalarga qarab tanlanadi. <b>Xavfsizlik zaxirasi:</b> ruxsat etilgan kuchlanish mustahkamlik chegarasidan kichik bo'lishi kerak.",
+fm:["σ<sub>ruxsat</sub> = σ<sub>m</sub> / n","σ ≤ σ<sub>ruxsat</sub> &lt; σ<sub>m</sub>"],tm:["σ<sub>m</sub> — mustahkamlik chegarasi (Pa)","n — xavfsizlik zaxirasi koeffitsiyenti (n &gt; 1)","Simulyatsiyada po'lat kabel: σ<sub>m</sub> = 400 MPa, n = 2,5 → σ<sub>ruxsat</sub> = 160 MPa; g = 10 m/s²"],
+life:"Ko'prik kabellari va kran troslari ruxsat etilgan kuchlanishdan ancha kichik yuk bilan ishlatiladi — shunda ular xavfsiz.",
+ex:["σ<sub>m</sub> = 400 MPa, n = 2,5","σ<sub>ruxsat</sub> = ?","σ<sub>ruxsat</sub> = 400/2,5 = 160 MPa"],
+ctl:[{id:'m',l:'Yuk massasi m',min:0,max:60,s:1,v:20,u:'t'},{id:'S',l:'Kabel kesimi S',min:20,max:100,s:5,v:50,u:'sm²'}],
+calc:v=>{const s=v.m*1e4/(v.S*1e-4),r=s/160e6;return `σ = mg/S = <b>${n(s/1e6,1)} MPa</b>; σ<sub>ruxsat</sub> = 160 MPa<br>σ/σ<sub>ruxsat</sub> = <b>${n(r*100,0)} %</b>; zaxira n = ${s?n(400e6/s):"—"}<br>${r<.7?"🟢 Xavfsiz":r<1?"🟡 Ruxsat etilgan chegaraga yaqin":"🔴 Xavf! σ &gt; σ<sub>ruxsat</sub>"}`},
+sd:(c,v)=>{clr(c);const s=v.m*1e4/(v.S*1e-4),r=s/160e6,col=colF(r);c.fillStyle=css('--fg');c.fillRect(86,35,8,100);c.fillRect(266,35,8,100);c.fillRect(10,130,340,6);
+ c.strokeStyle=col;c.lineWidth=3;c.beginPath();c.moveTo(90,35);c.quadraticCurveTo(180,125,270,35);c.stroke();c.lineWidth=1.5;
+ for(let x=110;x<=250;x+=20){const u=(x-90)/180,y=(1-u)*(1-u)*35+2*u*(1-u)*125+u*u*35;c.beginPath();c.moveTo(x,y);c.lineTo(x,130);c.stroke()}
+ c.fillStyle=css('--ac');c.fillRect(150,112,60,18);T(c,v.m+" t",180,125,'#fff',11,'center');
+ c.fillStyle=css('--ok');c.fillRect(20,160,112,14);c.fillStyle=css('--warn');c.fillRect(132,160,48,14);c.fillStyle=css('--bad');c.fillRect(180,160,160,14);
+ c.fillStyle=css('--fg');c.fillRect(20+160*Math.min(r,2)-2,154,4,26);T(c,"100 %",180,152,null,10,'center');T(c,"σ/σ ruxsat = "+n(r*100,0)+" %",180,194,col,13,'center')},
+dur:8,ad:(c,t)=>{clr(c);const p=t/8,lf=p<.5?p*2:2-2*p,r=.3+.9*lf,ly=150-95*lf,ex=8*lf,col=colF(r);c.fillStyle=css('--fg');c.fillRect(20,184,320,6);c.fillRect(70,30,8,154);c.fillRect(70,30,200,7);
+ c.strokeStyle=col;c.lineWidth=3;c.beginPath();c.moveTo(240,37);c.lineTo(240,ly+ex);c.stroke();c.fillStyle=css('--ac');c.fillRect(222,ly+ex,36,26);T(c,"yuk",240,ly+ex+17,'#fff',11,'center');
+ T(c,"Tros cho'zilmoqda: σ/σ ruxsat = "+n(r*100,0)+" %",180,20,col,12,'center')},
+qs:[
+{t:"<b>1-masala (Guk qonuni).</b><br><b>Berilgan:</b> k = 400 N/m, Δl = 3 cm.<br><b>Topish kerak:</b> F = ? (N)",a:12,u:'N',s:"Δl = 3 sm = 0,03 m<br>F = k·Δl = 400 · 0,03 = 12 N"},
+{t:"<b>2-masala (kuchlanish).</b><br><b>Berilgan:</b> F = 5000 N, S = 2·10⁻⁴ m².<br><b>Topish kerak:</b> σ = ? (MPa)",a:25,u:'MPa',s:"σ = F/S = 5000/(2·10⁻⁴) = 2,5·10⁷ Pa = 25 MPa"},
+{t:"<b>3-masala (nisbiy deformatsiya).</b><br><b>Berilgan:</b> l₀ = 2 m, Δl = 1 mm.<br><b>Topish kerak:</b> ε = ? (%)",a:.05,u:'%',s:"Δl = 1 mm = 10⁻³ m<br>ε = Δl/l₀ = 10⁻³/2 = 5·10⁻⁴ = 0,05 %"},
+{t:"<b>4-masala (Yung moduli).</b><br><b>Berilgan:</b> E = 2·10¹¹ Pa, F = 10 kN, S = 1 cm², l₀ = 2 m.<br><b>Topish kerak:</b> Δl = ? (mm)",a:1,u:'mm',s:"F = 10⁴ N, S = 10⁻⁴ m²<br>Δl = F·l₀/(E·S) = 10⁴·2/(2·10¹¹·10⁻⁴) = 2·10⁴/(2·10⁷) = 10⁻³ m = 1 mm"}]}
+];
+
+const TS=[
+{q:"Kuch olingach shakli tiklanmaydigan deformatsiya qanday nomlanadi?",o:["Elastik","Plastik","Bikr","Siljish"],a:1,e:"Qoldiq deformatsiya qoladigan holat plastik deformatsiya deyiladi (plastilin, qo'rg'oshin)."},
+{q:"k = 300 N/m, Δl = 0,02 m bo'lsa, elastiklik kuchi qancha?",o:["6 N","15 N","0,06 N","60 N"],a:0,e:"F = k·Δl = 300 · 0,02 = 6 N."},
+{q:"F = 100 N, S = 10⁻⁴ m² bo'lsa, mexanik kuchlanish σ nimaga teng?",o:["10⁻² Pa","10⁴ Pa","10⁶ Pa","10⁸ Pa"],a:2,e:"σ = F/S = 100/10⁻⁴ = 10⁶ Pa."},
+{q:"Quyidagi materiallardan qaysi birining Yung moduli eng katta?",o:["Rezina","Alyuminiy","Mis","Po'lat"],a:3,e:"Po'latning E ≈ 2·10¹¹ Pa — eng katta."},
+{q:"Xavfsizlik zaxirasi sharti qaysi?",o:["σ ruxsat > σ mustahkamlik","σ ruxsat < σ mustahkamlik","σ ruxsat = 0","σ ruxsat = E"],a:1,e:"Ruxsat etilgan kuchlanish mustahkamlik chegarasidan kichik bo'lishi kerak."}];
+
+let cur=0,P,raf,playing=false,at=0,last=0,sctx,actx,ans=[];
+const NV=[...Array(6).keys()].map(i=>(i+1)+"-reja").concat("📝 Test");
+$('#nav').innerHTML=NV.map((x,i)=>`<button onclick="show(${i})">${x}</button>`).join('');
+function show(i){cancelAnimationFrame(raf);playing=false;cur=i;[...$('#nav').children].forEach((b,j)=>b.className=j==i?'on':'');i<6?plan(i):test();scrollTo(0,0)}
+function plan(i){P=PL[i];at=0;
+ const ct=P.ctl.map(c=>c.o?`<label>${c.l}<select id="c_${c.id}">${c.o.map((x,j)=>`<option value="${j}">${x}</option>`).join('')}</select></label>`:`<label>${c.l}: <b id="b_${c.id}"></b> ${c.u}<input type="range" id="c_${c.id}" min="${c.min}" max="${c.max}" step="${c.s}" value="${c.v}"></label>`).join('');
+ const qs=P.qs.map((q,j)=>`<div class="q"><p>${q.t}</p><div class="row"><input type="text" id="a${j}" inputmode="decimal" placeholder="Javob (${q.u})"><button onclick="chk(${j})">Tekshirish</button></div><div class="res" id="r${j}"></div><details><summary>Yechimni ko'rish</summary><p>${q.s}</p></details></div>`).join('');
+ M.innerHTML=`<div class="card"><h2>${cur+1}-reja. ${P.t}</h2><h3>1. Nazariya</h3><p>${P.th}</p></div>
+<div class="card"><h3>2. Asosiy formula va tushunchalar</h3>${P.fm.map(x=>`<div class="formula">${x}</div>`).join('')}<ul>${P.tm.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+<div class="card"><h3>3. Hayotiy misol</h3><p>${P.life}</p><div class="ex"><b>Berilgan:</b> ${P.ex[0]}<br><b>Topish kerak:</b> ${P.ex[1]}<br><b>Yechish:</b> ${P.ex[2]}</div></div>
+<div class="card"><h3>4. Interaktiv simulyatsiya</h3><canvas id="sc" width="720" height="400"></canvas>${ct}<div class="out" id="out"></div></div>
+<div class="card"><h3>5. Animatsiya</h3><canvas id="ac" width="720" height="400"></canvas><div class="row"><button id="pl">▶ Boshlash</button><button id="ps">⏸ To'xtatish</button><button id="rs">↻ Qayta boshlash</button></div></div>
+<div class="card"><h3>6. Mustaqil masala${P.qs.length>1?"lar (4 ta)":""}</h3>${qs}</div>`;
+ sctx=$('#sc').getContext('2d');actx=$('#ac').getContext('2d');
+ M.querySelectorAll('[id^=c_]').forEach(e=>e.oninput=upd);upd();P.ad(actx,0);
+ $('#pl').onclick=()=>{if(!playing){playing=true;last=performance.now();raf=requestAnimationFrame(loop)}};
+ $('#ps').onclick=()=>{playing=false;cancelAnimationFrame(raf)};
+ $('#rs').onclick=()=>{at=0;P.ad(actx,0);$('#pl').onclick()}}
+function upd(){const v={};P.ctl.forEach(c=>{v[c.id]=+$('#c_'+c.id).value;if(!c.o)$('#b_'+c.id).textContent=n(v[c.id])});$('#out').innerHTML=P.calc(v);P.sd(sctx,v)}
+function loop(ts){if(!playing)return;at=(at+(ts-last)/1000)%P.dur;last=ts;P.ad(actx,at);raf=requestAnimationFrame(loop)}
+function chk(j){const q=P.qs[j],v=parseFloat($('#a'+j).value.replace(',','.')),r=$('#r'+j);
+ if(isNaN(v)){r.textContent="Javobni raqam bilan kiriting.";return}
+ const ok=Math.abs(v-q.a)<=Math.max(Math.abs(q.a)*.01,.001);r.style.color=ok?css('--ok'):css('--bad');r.textContent=ok?"✅ To'g'ri!":"❌ Noto'g'ri. Qayta urinib ko'ring yoki yechimni ko'ring."}
+function test(){ans=[];M.innerHTML=`<div class="card"><h2>📝 Test (5 ta savol)</h2></div>`+TS.map((t,i)=>`<div class="card" id="t${i}"><p><b>${i+1}. ${t.q}</b></p>${t.o.map((o,j)=>`<button class="opt" onclick="pick(${i},${j})">${"ABCD"[j]}) ${o}</button>`).join('')}<div class="res" id="e${i}"></div></div>`).join('')+`<div id="fin"></div>`}
+function pick(i,j){if(ans[i]!=null)return;ans[i]=j;const t=TS[i],b=$('#t'+i).querySelectorAll('.opt');b[t.a].classList.add('ok');if(j!=t.a)b[j].classList.add('no');
+ $('#e'+i).innerHTML=(j==t.a?"✅ To'g'ri! ":"❌ Noto'g'ri. ")+t.e;
+ if(ans.filter(x=>x!=null).length==TS.length){const s=ans.filter((x,k)=>x==TS[k].a).length;$('#fin').innerHTML=`<div class="card"><h2>Natija: ${s} / 5</h2><p>${s==5?"🎉 Ajoyib!":s>=3?"👍 Yaxshi!":"📚 Mavzuni yana takrorlang."}</p><button onclick="test()" style="width:100%">↻ Qayta topshirish</button></div>`}}
+function redraw(){if(cur<6){upd();P.ad(actx,at)}}
+$('#th').onclick=()=>{const d=document.documentElement;d.dataset.t=d.dataset.t=='dark'?'':'dark';$('#th').textContent=d.dataset.t=='dark'?'☀️':'🌙';redraw()};
+show(0);
+</script></body></html>

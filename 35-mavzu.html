@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>35-mavzu. Kristall va amorf jismlar</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--tx:#223;--ac:#5b8def;--ac2:#e8f0ff;--ok:#2fb36d;--no:#e5484d;--bd:#d7e0ee;--cv:#fbfdff}
+body.d{--bg:#151a26;--card:#1f2637;--tx:#e8ecf5;--ac:#6f9cff;--ac2:#2a3550;--bd:#36415c;--cv:#111623}
+*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;gap:8px;max-width:760px;margin:auto}
+h1{font-size:17px;margin:0}
+button,select{font:inherit;border:0;border-radius:14px;padding:12px 16px;background:var(--ac);color:#fff;min-height:48px;cursor:pointer}
+button.g{background:var(--ac2);color:var(--tx)}button:disabled{opacity:.4}
+nav{display:flex;gap:8px;overflow-x:auto;padding:0 14px 10px;max-width:760px;margin:auto}
+nav button{white-space:nowrap;background:var(--ac2);color:var(--tx)}nav button.on{background:var(--ac);color:#fff}
+main{padding:0 14px 90px;max-width:760px;margin:auto}
+.card{background:var(--card);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0001}
+h2{font-size:19px;margin:0 0 8px}h3{font-size:16px;margin:0 0 8px;color:var(--ac)}p{margin:0 0 8px}
+.box{border:2px solid var(--ac);background:var(--ac2);border-radius:16px;padding:12px}.box ul{margin:0;padding-left:20px}
+canvas{width:100%;height:auto;background:var(--cv);border-radius:14px;border:1px solid var(--bd);display:block;margin-top:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+input[type=range]{flex:1;min-width:150px;height:36px;accent-color:var(--ac)}
+select{background:var(--ac2);color:var(--tx);border:1px solid var(--bd);max-width:100%}
+.out{font-weight:600;padding:8px 12px;background:var(--ac2);border-radius:12px;width:100%}
+.ok{color:var(--ok);font-weight:600}.no{color:var(--no);font-weight:600}
+footer{position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;padding:10px 14px;background:var(--card);border-top:1px solid var(--bd)}footer button{flex:1}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;background:var(--ac2);color:var(--tx)}
+.opt.ok{background:var(--ok);color:#fff}.opt.no{background:var(--no);color:#fff}
+.pq{margin:10px 0;padding-bottom:8px;border-bottom:1px dashed var(--bd)}
+</style></head><body>
+<header><h1>35-mavzu. Kristall va amorf jismlar</h1><button class="g" id="th" onclick="document.body.classList.toggle('d')">🌓 Mavzu</button></header>
+<nav id="nav"></nav><main id="m"></main>
+<footer><button class="g" id="pv" onclick="go(cur-1)">◀ Oldingi</button><button id="nx" onclick="go(cur+1)">Keyingi ▶</button></footer>
+<script>
+const $=(s)=>document.querySelector(s),R=(a,b)=>a+Math.random()*(b-a),W=320,H=200;
+let seed=11;const sr=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const B='#5b8def',O='#f08a4b',G='#2fb36d',D='#6b7a90';
+const FG=()=>document.body.classList.contains('d')?'#e8ecf5':'#223';
+function grid(nx,ny,d,ox,oy){const p=[];for(let j=0;j<ny;j++)for(let i=0;i<nx;i++)p.push({x:ox+i*d,y:oy+j*d,c:(i+j)%2,ph:R(0,6.28)});return p}
+function amor(n,mn,w=W,ox=0){seed=5;const p=[];let k=0;while(p.length<n&&k++<4000){const x=15+sr()*(w-30),y=15+sr()*(H-30);if(p.every(q=>Math.hypot(q.x-x-ox,q.y-y)>mn))p.push({x:x+ox,y,c:0,ph:R(0,6.28)})}return p}
+function draw(x,P,bd,amp,t,cols,keep){
+ if(!keep)x.clearRect(0,0,W,H);
+ const q=P.map(p=>[p.x+amp*Math.sin(t*4+p.ph),p.y+amp*Math.cos(t*3.3+p.ph)]);
+ if(bd){x.strokeStyle='rgba(130,140,160,.6)';x.lineWidth=2;x.beginPath();
+  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const d=Math.hypot(P[i].x-P[j].x,P[i].y-P[j].y);if(d>bd[0]&&d<bd[1]){x.moveTo(q[i][0],q[i][1]);x.lineTo(q[j][0],q[j][1])}}x.stroke()}
+ q.forEach((s,i)=>{x.fillStyle=cols[P[i].c];x.beginPath();x.arc(s[0],s[1],P[i].r||6,0,6.3);x.fill()})}
+function txt(x,s,px,py,sz=14,al='left'){x.fillStyle=FG();x.font='600 '+sz+'px system-ui';x.textAlign=al;x.fillText(s,px,py)}
+function sel(id,arr,fn){return `<select id="${id}" onchange="${fn}(+this.value)">${arr.map((a,i)=>`<option value="${i}">${a}</option>`).join('')}</select>`}
+function sld(id,min,max,v,fn,lab){return `<div class="row"><span>${lab}</span><input type="range" id="${id}" min="${min}" max="${max}" value="${v}" oninput="${fn}(+this.value)"></div>`}
+
+/* ---------- 1-reja ---------- */
+const SUB=[['Osh tuzi',1],['Shisha',0],['Olmos',1],['Smola',0],['Muz',1],['Polietilen',0]];let S1=0;
+const C1=grid(8,5,38,26,22),A1=amor(34,30);
+function s1(v){S1=v;const k=SUB[v][1];$('#o1').innerHTML=`<b>${SUB[v][0]}</b> — <span class="${k?'ok':'no'}">${k?'KRISTALL jism':'AMORF jism'}</span>. ${k?'Zarrachalari tartibli joylashgan, aniq erish temperaturasiga ega.':'Zarrachalari tartibsiz, aniq erish temperaturasi yo‘q.'}`}
+/* ---------- 2-reja ---------- */
+const LD=[
+{n:'Oddiy kubik',p:grid(7,5,40,40,20),b:[30,50],c:[B,B],i:'Har bir tugunda bitta zarracha, panjara kub shaklida.'},
+{n:'NaCl (osh tuzi)',p:grid(7,5,40,40,20).map(q=>({...q,r:q.c?8:5})),b:[30,50],c:[B,G],i:'Na⁺ va Cl⁻ ionlari navbatma-navbat joylashgan.'},
+{n:'Olmos (uglerod)',p:grid(10,7,30,25,10),b:[38,47],c:[D,D],i:'Har bir C atomi 4 ta qo‘shnisi bilan mustahkam bog‘langan — juda qattiq.'},
+{n:'Grafit (uglerod)',p:[...Array(4).keys()].flatMap(j=>[...Array(10).keys()].map(i=>({x:30+i*28+(j%2)*14,y:25+j*50,c:0,ph:R(0,6.28)}))),b:[20,36],c:[D,D],i:'Qatlamlar ichida mustahkam, qatlamlar orasida kuchsiz bog‘ — yumshoq, yozadi.'}];
+let L2=0,A2=3;
+function s2(v){L2=v;u2()}function t2(v){A2=v;u2()}
+function u2(){$('#o2').textContent=LD[L2].n+': '+LD[L2].i+' Tebranish amplitudasi: '+A2}
+/* ---------- 3-reja ---------- */
+let D3=50;const GL=grid(4,5,36,26,16),OF=GL.map(()=>({x:R(-1,1),y:R(-1,1)}));
+function t3(v){D3=v;$('#o3').textContent='Tartibsizlik darajasi: '+v+'% '+(v<15?'(kristall)':v>70?'(amorf)':'(oraliq)')}
+/* ---------- 4-reja ---------- */
+let A4=0;
+function P4(a){return 50+40*Math.cos(2*a*Math.PI/180)}
+function t4(v){A4=v;$('#o4').innerHTML=`θ=${v}°: kristall — <b>${P4(v).toFixed(0)}</b> birlik; amorf — <b>50</b> birlik (doimiy)`}
+/* ---------- 5-reja ---------- */
+const S5=[['Muz',1,-20,0,15,10],['Qo‘rg‘oshin',1,20,327,380,60],['Shisha',0,20,0,900,160],['Mum',0,20,0,90,14]];let I5=0,cv5=[],ix5=0,on5=0;
+function curve(i){const [,k,T0,Tm,Te,r]=S5[i],c=[],dt=1/60;let T=T0,q=0;
+ while(T<Te&&c.length<6000){let ph=0;
+  if(k){if(T<Tm)T=Math.min(Tm,T+r*dt);else if(q<3){q+=dt;ph=1}else T+=r*dt;if(q>0&&q<3)ph=1;if(q>=3)ph=2}
+  else{const f=(T-T0)/(Te-T0);T+=r*dt*(1.4-0.8*f);ph=3}
+  c.push([T,ph])}return c}
+function s5(v){I5=v;cv5=curve(v);ix5=0;on5=0;u5()}
+function u5(){const k=S5[I5][1],c=cv5[Math.min(ix5,cv5.length-1)]||[0,0];const st=['qattiq','ERISH — temperatura o‘zgarmaydi (plato)','suyuq','asta-sekin YUMSHAMOQDA'][c[1]];$('#o5').innerHTML=`${S5[I5][0]} (${k?'kristall':'amorf'}): T = <b>${Math.round(c[0])}°C</b>, holat: ${st}`}
+/* ---------- 6-reja ---------- */
+let SA=60,CR=2;const NU=[...Array(20)].map(()=>({x:R(0,W),y:R(0,H)})),DT=[];for(let j=0;j<20;j++)for(let i=0;i<32;i++)DT.push({x:5+i*10,y:5+j*10,r:R(-2,2),s:R(-2,2)});
+function t6(a,b){if(a!==null)SA=a;if(b!==null)CR=b;const N=nuc();$('#o6').innerHTML=SA<15?'To‘yinish past: kristall deyarli o‘smaydi.':CR>=9?'Juda tez sovish: <b>amorf</b> jism (kristallga ulgurmaydi).':`Sovish ${CR<=3?'sekin':'tez'}: <b>${N<=3?'yirik':N<=9?'o‘rta':'mayda'} kristallar</b> (kristallanish markazlari: ${N}).`}
+function nuc(){return Math.min(20,Math.floor(1+0.2*CR*CR*(0.5+SA/100)))}
+
+/* ---------- ma'lumotlar ---------- */
+const T=[
+{n:'Turlari',t:'Qattiq jismlar turlari',
+th:'<p>Qattiq jismlar ikki turga bo‘linadi: <b>kristall</b> va <b>amorf</b>. Kristall jismlarda zarrachalar (atom, ion, molekula) qat’iy tartibda joylashadi. Amorf jismlarda esa bunday tartib yo‘q.</p><p><b>Umumiy:</b> shaklini va hajmini saqlaydi, zarrachalari tebranadi. <b>Farqli:</b> kristallar aniq temperaturada eriydi, amorflar asta yumshaydi.</p>',
+bx:['Kristall: tuz, kvars, olmos, metallar, muz','Amorf: shisha, smola, plastmassa, mum','Kristallda zarrachalar tartibli, amorfda tartibsiz'],
+ex:'Osh tuzining donachalari muntazam kubchalar shaklida, singan shisha parchasi esa tartibsiz — chunki ichki tuzilish har xil.',
+sim:`<div class="row">${sel('x1',SUB.map(a=>a[0]),'s1')}</div><div class="out" id="o1"></div>`,
+live(x,t){const k=SUB[S1][1];draw(x,k?C1:A1,k?[28,46]:[0,42],2.5,t,k?[B,B]:[O,O])},
+an:{init:()=>0,step(x,s,t){const k=SUB[S1][1];draw(x,k?C1:A1,k?[28,46]:[0,42],5,t,k?[B,B]:[O,O]);txt(x,SUB[S1][0]+': '+(k?'uzoq tartib bor ✔':'faqat yaqin tartib'),10,20)}},
+ini(){s1(0)},
+pr:[{q:'Qaysi qatorda faqat kristall jismlar berilgan?',o:['Tuz, olmos, muz','Shisha, mum, smola','Tuz, shisha, olmos'],a:0}]},
+
+{n:'Kristall',t:'Kristall jismlarning tuzilishi',
+th:'<p>Kristallarda zarrachalar <b>kristall panjara</b> tugunlarida joylashadi va <b>uzoq tartib</b> mavjud: tartib butun hajm bo‘ylab takrorlanadi. Zarrachalar tugunlar atrofida tebranadi; temperatura oshsa, tebranish kuchayadi.</p><p><b>Monokristall</b> — bitta yaxlit kristall (olmos, kvars). <b>Polikristall</b> — ko‘p mayda kristallchalar yig‘indisi (metallar).</p>',
+bx:['Uzoq tartib — panjara bo‘ylab takrorlanish','Zarrachalar tugunlarda tebranadi','Olmos va grafit — bir xil C atomi, panjarasi har xil'],
+ex:'Olmos eng qattiq, grafit esa qalam o‘zagi: ikkalasi ham uglerod, farqi faqat kristall panjarasida.',
+sim:`<div class="row">${sel('x2',LD.map(a=>a.n),'s2')}</div>${sld('r2',0,8,3,'t2','Temperatura:')}<div class="out" id="o2"></div>`,
+live(x,t){const l=LD[L2];draw(x,l.p,l.b,A2*0.7,t,l.c)},
+an:{init:()=>0,step(x,s,t){draw(x,LD[1].p,LD[1].b,2.5+1.5*Math.sin(t),t,LD[1].c);txt(x,'Tartibli panjara: tugunlarda tebranish',10,20)}},
+ini(){u2()},
+pr:[{q:'Olmos va grafit bir xil atomdan tuzilgan, lekin xossalari farq qiladi. Sababi?',o:['Atomlari turlicha','Kristall panjarasi turlicha','Temperaturasi turlicha'],a:1}]},
+
+{n:'Amorf',t:'Amorf jismlarning tuzilishi',
+th:'<p>Amorf jismlarda faqat <b>yaqin tartib</b> bor: har bir zarracha atrofida qo‘shnilar taxminan tartibli, lekin uzoqda tartib yo‘qoladi. Amorf jism — <b>o‘ta sovutilgan suyuqlik</b>: suyuqlik sovib, zarrachalar tartibsiz holatda qotib qoladi.</p>',
+bx:['Yaqin tartib bor, uzoq tartib yo‘q','Amorf jism — o‘ta sovutilgan suyuqlik','Misollar: shisha, smola, mum, asfalt'],
+ex:'Asfalt issiq kunda yumshab, oqib ketishi mumkin — u suyuqlikka o‘xshash tuzilishga ega.',
+sim:`<div class="row"><span>Chapda — kristall, o‘ngda — amorf</span></div>${sld('r3',0,100,50,'t3','Tartibsizlik:')}<div class="out" id="o3"></div>`,
+live(x,t){const d=D3/100*17,Rr=GL.map((p,i)=>({...p,x:p.x+160+OF[i].x*d,y:p.y+OF[i].y*d}));draw(x,GL,[30,42],2,t,[B,B]);draw(x,Rr,[0,44],2,t,[O,O],1);x.strokeStyle='#999';x.beginPath();x.moveTo(160,0);x.lineTo(160,H);x.stroke();txt(x,'Kristall',80,192,13,'center');txt(x,'Amorf',240,192,13,'center')},
+an:{init:()=>[...Array(40)].map(()=>({x:R(10,310),y:R(10,190),a:R(0,6.28)})),step(x,s,t){const T=Math.max(0,1-t/8);x.clearRect(0,0,W,H);s.forEach(p=>{if(T>.1){p.a+=R(-.5,.5);p.x+=Math.cos(p.a)*3*T;p.y+=Math.sin(p.a)*3*T;if(p.x<8||p.x>312)p.a=Math.PI-p.a;if(p.y<8||p.y>192)p.a=-p.a;p.x=Math.min(312,Math.max(8,p.x));p.y=Math.min(192,Math.max(8,p.y))}x.fillStyle=`hsl(${20+200*(1-T)},80%,60%)`;x.beginPath();x.arc(p.x,p.y,6,0,6.3);x.fill()});txt(x,T>.6?'Suyuqlik':T>.1?'O‘ta sovutilgan suyuqlik':'Amorf jism — qotib qoldi',10,20);txt(x,'T ≈ '+Math.round(20+T*80)+'°C',310,20,14,'right')}},
+ini(){t3(50)},
+pr:[{q:'Amorf jismda qanday tartib mavjud?',o:['Faqat yaqin tartib','Uzoq tartib','Hech qanday tartib yo‘q'],a:0}]},
+
+{n:'Anizotropiya',t:'Anizotropiya va izotropiya',
+th:'<p>Kristallar <b>anizotrop</b>: mustahkamlik, issiqlik o‘tkazuvchanlik, optik xossalari <b>yo‘nalishga bog‘liq</b>. Masalan, slyuda qatlamlarga oson ajraladi, ko‘ndalang yo‘nalishda esa qiyin. Amorf jismlar <b>izotrop</b>: xossalari barcha yo‘nalishda bir xil.</p>',
+bx:['Anizotropiya — xossa yo‘nalishga bog‘liq (kristall)','Izotropiya — xossa yo‘nalishga bog‘liq emas (amorf)','Sababi: panjarada turli yo‘nalishda zarrachalar zichligi turlicha'],
+ex:'Slyuda varag‘ini qatlam bo‘ylab qirqish oson, shisha esa har tomonga bir xil sinadi.',
+sim:`${sld('r4',0,180,0,'t4','Burchak θ:')}<div class="out" id="o4"></div>`,
+live(x,t){x.clearRect(0,0,W,H);x.strokeStyle='#999';x.lineWidth=1;x.beginPath();x.moveTo(30,10);x.lineTo(30,180);x.lineTo(310,180);x.stroke();
+ const X=a=>30+a/180*280,Y=v=>180-v*1.7;
+ x.lineWidth=3;x.strokeStyle=B;x.beginPath();for(let a=0;a<=180;a+=3){a?x.lineTo(X(a),Y(P4(a))):x.moveTo(X(a),Y(P4(a)))}x.stroke();
+ x.strokeStyle=O;x.beginPath();x.moveTo(X(0),Y(50));x.lineTo(X(180),Y(50));x.stroke();
+ x.strokeStyle=G;x.lineWidth=2;x.beginPath();x.moveTo(X(A4),10);x.lineTo(X(A4),180);x.stroke();
+ txt(x,'0°',30,195,11,'center');txt(x,'90°',170,195,11,'center');txt(x,'180°',310,195,11,'right');txt(x,'Kristall',40,22,12);txt(x,'Amorf',100,22,12)},
+an:{init(){const n=32;return [new Float32Array(n*n),new Float32Array(n*n)]},step(x,s,t){const n=32,K=[[.24,.04],[.14,.14]];x.clearRect(0,0,W,H);
+ s.forEach((u,g)=>{for(let it=0;it<3;it++){u[16*n+16]=1;const c=u.slice();for(let j=0;j<n;j++)for(let i=0;i<n;i++){const k=j*n+i,v=c[k],l=i?c[k-1]:0,r=i<n-1?c[k+1]:0,uu=j?c[k-n]:0,dd=j<n-1?c[k+n]:0;u[k]=v+K[g][0]*(l+r-2*v)+K[g][1]*(uu+dd-2*v)}}
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){const v=Math.min(1,u[j*n+i]);x.fillStyle=`rgb(${40+215*v|0},${60+60*(1-v)|0},${200-170*v|0})`;x.fillRect(g*160+i*5,20+j*5,5,5)}});
+ txt(x,'Kristall: notekis',80,14,12,'center');txt(x,'Amorf: tekis',240,14,12,'center')}},
+ini(){t4(0)},
+pr:[{q:'Slyuda plastinkalarga oson ajraladi, ko‘ndalang yo‘nalishda qiyin. Bu xossa nima deyiladi?',o:['Izotropiya','Anizotropiya','Diffuziya'],a:1}]},
+
+{n:'Erish',t:'Erish va qotish: erish temperaturasi',
+th:'<p>Kristall jismlar <b>aniq erish temperaturasiga</b> ega: muz 0°C, qo‘rg‘oshin 327°C, temir 1538°C. Erish vaqtida temperatura o‘zgarmaydi — grafikda gorizontal <b>plato</b>, chunki energiya panjarani buzishga sarflanadi. Amorf jismlarda aniq erish temperaturasi yo‘q: ular asta-sekin yumshab, oquvchan bo‘ladi.</p>',
+bx:['Kristall: aniq t_erish, grafikda plato','Amorf: silliq egri chiziq, asta yumshash','Erish davomida kristall temperaturasi o‘zgarmaydi'],
+ex:'Muz 0°C da erib bo‘lguncha stakandagi suv sovuq qoladi; shisha esa qizdirilganda avval egiluvchan bo‘ladi, so‘ng oqadi.',
+sim:`<div class="row">${sel('x5',S5.map(a=>a[0]),'s5')}<button onclick="on5=1;if(ix5>=cv5.length-1)ix5=0">🔥 Qizdirish</button><button class="g" onclick="s5(I5)">↺ Qayta</button></div><div class="out" id="o5"></div>`,
+live(x,t){if(on5){ix5+=2;if(ix5>=cv5.length-1){ix5=cv5.length-1;on5=0}u5()}
+ x.clearRect(0,0,W,H);x.strokeStyle='#999';x.lineWidth=1;x.beginPath();x.moveTo(40,10);x.lineTo(40,175);x.lineTo(310,175);x.stroke();
+ const [,k,T0,,Te]=S5[I5],tm=cv5.length,X=i=>40+i/tm*268,Y=v=>175-(v-T0)/(Te-T0)*160;
+ x.strokeStyle=k?B:O;x.lineWidth=3;x.beginPath();for(let i=0;i<=ix5&&i<tm;i+=2){i?x.lineTo(X(i),Y(cv5[i][0])):x.moveTo(X(i),Y(cv5[i][0]))}x.stroke();
+ txt(x,'t (vaqt)',310,192,11,'right');txt(x,'T°C',4,14,11);txt(x,Math.round(Te)+'',36,18,10,'right');txt(x,Math.round(T0)+'',36,175,10,'right')},
+an:{init(){return{L:grid(4,4,34,30,45).map(p=>({bx:p.x,by:p.y,ox:0,oy:0,c:0,ph:0})),A:amor(16,32,150,170).map(p=>({bx:p.x,by:p.y,ox:0,oy:0,c:0,ph:0}))}},
+ step(x,s,t){const pr=Math.min(t/10,1),dC=pr<.5?.12*pr/.5:1,dA=pr;
+  const mv=(a,d)=>a.map(p=>{p.ox=p.ox*.92+R(-.5,.5)*d*9;p.oy=p.oy*.92+R(-.5,.5)*d*9;return{x:p.bx+p.ox,y:p.by+p.oy,c:0,ph:0}});
+  draw(x,mv(s.L,dC),[0,40],0,t,[B,B]);draw(x,mv(s.A,dA),[0,44],0,t,[O,O],1);
+  txt(x,'Kristall',80,16,13,'center');txt(x,'Amorf',245,16,13,'center');txt(x,pr<.5?'Panjara saqlanadi':'Panjara BUZILDI',80,192,12,'center');txt(x,pr<1?'Asta-sekin yumshaydi':'Oquvchan',245,192,12,'center');
+  x.fillStyle=B;x.fillRect(0,196,pr*W,4)}},
+ini(){s5(0)},
+pr:[{q:'Qizdirish grafigida harorat 0°C da 3 daqiqa o‘zgarmay turdi. Bu jism...',o:['amorf, yumshayapti','kristall, erimoqda','gaz, kondensatsiyalanmoqda'],a:1}]},
+
+{n:'Qo‘llanilishi',t:'Qo‘llanilishi, kristallanish va masalalar',
+th:'<p><b>Kristallar:</b> olmos (kesish, burg‘ulash), kvars (soat generatori), silitsiy (yarimo‘tkazgich, mikrochip), lazer kristallari, optik oynalar. <b>Amorf jismlar:</b> shisha, plastmassa, polimerlar. <b>Sun’iy kristallar</b> to‘yingan eritmani sekin sovitib o‘stiriladi: sekin sovishda yirik, tez sovishda mayda kristallar yoki amorf jism hosil bo‘ladi.</p>',
+bx:['Kvars — soat, silitsiy — chiplar, olmos — kesuvchi asbob','Sekin sovish → yirik kristall','Juda tez sovish → amorf holat'],
+ex:'Uyda osh tuzi yoki shakarning to‘yingan eritmasidan ip ustida kristall o‘stirish mumkin — qancha sekin sovisa, shuncha yirik bo‘ladi.',
+sim:`${sld('r6a',0,100,60,'t6a','To‘yinganlik:')}${sld('r6b',1,10,2,'t6b','Sovish tezligi:')}<div class="out" id="o6"></div>`,
+live(x,t){const N=CR>=9?0:nuc(),f=SA/100,th=1.6*Math.sqrt(W*H/Math.max(N,1))*(0.25+0.75*f);x.clearRect(0,0,W,H);
+ DT.forEach(d=>{let bi=-1,bd=1e9;for(let i=0;i<N;i++){const e=Math.hypot(NU[i].x-d.x,NU[i].y-d.y);if(e<bd){bd=e;bi=i}}
+  if(!N){x.fillStyle=O;x.beginPath();x.arc(d.x+d.r*2,d.y+d.s*2,4,0,6.3);x.fill()}
+  else if(bd<th){x.fillStyle=`hsl(${bi*57},60%,58%)`;x.beginPath();x.arc(d.x,d.y,4,0,6.3);x.fill()}
+  else{x.fillStyle='rgba(150,170,200,.45)';x.beginPath();x.arc(d.x+Math.sin(t*3+d.r)*2,d.y+Math.cos(t*3+d.s)*2,2,0,6.3);x.fill()}})},
+an:{init(){return{r:6,p:[...Array(40)].map(()=>({x:R(10,310),y:R(10,190)}))}},step(x,s,t){x.clearRect(0,0,W,H);
+ s.p.forEach(p=>{p.x+=R(-1.5,1.5)+(160-p.x)*.006;p.y+=R(-1.5,1.5)+(100-p.y)*.006;if(Math.hypot(p.x-160,p.y-100)<s.r+8&&s.r<92){s.r+=1.2;p.x=R(10,310);p.y=Math.random()<.5?8:192}
+  x.fillStyle='rgba(150,170,200,.8)';x.beginPath();x.arc(p.x,p.y,3,0,6.3);x.fill()});
+ x.fillStyle=B;for(let j=-8;j<=8;j++)for(let i=-10;i<=10;i++){const X=i*14,Y=j*11;if(Math.hypot(X,Y)<s.r){x.beginPath();x.arc(160+X,100+Y,4,0,6.3);x.fill()}}
+ txt(x,s.r>=92?'Kristall o‘sdi ✔':'Kristall o‘syapti...',10,20)}},
+ini(){t6(60,2)},
+pr:[
+{q:'1) Jadval: A — 327°C da aniq eriydi; B — 80–120°C oralig‘ida yumshaydi; C — 1538°C da eriydi. Qaysi biri amorf?',o:['A','B','C'],a:1},
+{q:'2) Grafikda T tekis ko‘tarilib, 327°C da gorizontal chiziq, so‘ng yana ko‘tarildi. Bu qaysi modda?',o:['Qo‘rg‘oshin (kristall)','Shisha','Mum'],a:0},
+{q:'3) Taqqoslang: eritmani sekin va tez sovitganda qanday kristallar hosil bo‘ladi?',o:['Sekin — yirik, tez — mayda yoki amorf','Sekin — mayda, tez — yirik','Farqi yo‘q'],a:0},
+{q:'4) Nima uchun tuz kristali tekis yoqlar bo‘ylab ajraladi, shisha esa tartibsiz sinadi?',o:['Tuz anizotrop, shisha izotrop','Shisha og‘irroq','Tuz qattiqroq'],a:0}]}
+];
+const TEST=[
+['Quyidagilardan qaysi biri amorf jism?',['Olmos','Shisha','Osh tuzi','Muz'],1],
+['Kristall jismlarda zarrachalar qanday joylashgan?',['Tartibsiz','Faqat yaqin tartib','Uzoq tartib bilan panjara tugunlarida','Erkin harakatlanadi'],2],
+['Anizotropiya nima?',['Xossa yo‘nalishga bog‘liq emas','Xossa yo‘nalishga bog‘liq','Erish temperaturasi','Zichlik'],1],
+['Qizdirish grafigida plato (gorizontal qism) nimani bildiradi?',['Amorf yumshashi','Kristall erishi','Sovishni','Gaz hosil bo‘lishini'],1],
+['Katta kristall o‘stirish uchun eritmani qanday sovitish kerak?',['Juda tez','Sekin','Muzlatkichga qo‘yib','Aralashtirib tez'],1]];
+let ans=0,sc=0;
+function tst(){ans=0;sc=0;return `<section id="p6" hidden><div class="card"><h2>Test (5 ta savol)</h2>${TEST.map((q,i)=>`<div class="pq" id="q${i}"><p><b>${i+1}. ${q[0]}</b></p>${q[1].map((o,j)=>`<button class="opt" onclick="pick(${i},${j},this)">${'ABCD'[j]}) ${o}</button>`).join('')}</div>`).join('')}<div class="out" id="res">Natija: javob bering</div><div class="row"><button onclick="rst()">↺ Qayta boshlash</button></div></div></section>`}
+function pick(i,j,b){const q=$('#q'+i);if(q.dataset.d)return;q.dataset.d=1;const bs=q.querySelectorAll('.opt'),c=TEST[i][2];bs[c].classList.add('ok');if(j!==c)b.classList.add('no');else sc++;ans++;$('#res').textContent=ans<5?`Javob berildi: ${ans}/5`:`Natija: ${sc}/5 ${sc==5?'— ajoyib! 🎉':sc>=3?'— yaxshi!':'— yana mashq qiling'}`}
+function rst(){const p=$('#p6');p.outerHTML=tst();$('#p6').hidden=false}
+function chk(b,a){const s=b.previousElementSibling,r=b.nextElementSibling,ok=+s.value===a;r.className=ok?'ok':'no';r.textContent=ok?' ✔ To‘g‘ri!':' ✘ Noto‘g‘ri, qayta o‘ylab ko‘ring'}
+function t6a(v){t6(v,null)}function t6b(v){t6(null,v)}
+const pr=(p)=>`<div class="pq"><p>${p.q}</p><div class="row"><select><option value="-1">— javobni tanlang —</option>${p.o.map((o,i)=>`<option value="${i}">${o}</option>`).join('')}</select><button onclick="chk(this,${p.a})">Tekshirish</button><span></span></div></div>`;
+const AN={};
+function anim(i,o){const c=$('#a'+i),x=c.getContext('2d');let s=o.init(),run=0,t=0;const f=()=>{if(!run)return;t+=1/60;o.step(x,s,t);requestAnimationFrame(f)};
+ AN[i]={go(){if(!run){run=1;f()}},stop(){run=0},reset(){run=0;t=0;s=o.init();o.step(x,s,0)}};AN[i].reset()}
+const sec=(o,i)=>`<section id="p${i}" hidden><div class="card"><h2>${i+1}-reja. ${o.t}</h2><h3>1. Nazariya</h3>${o.th}</div><div class="card"><h3>2. Asosiy tushunchalar</h3><div class="box"><ul>${o.bx.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div class="card"><h3>3. Hayotiy misol</h3><p>${o.ex}</p></div><div class="card"><h3>4. Simulyatsiya</h3>${o.sim}<canvas id="s${i}" width="320" height="200"></canvas></div><div class="card"><h3>5. Animatsiya</h3><canvas id="a${i}" width="320" height="200"></canvas><div class="row"><button onclick="AN[${i}].go()">▶ Boshlash</button><button class="g" onclick="AN[${i}].stop()">⏸ To‘xtatish</button><button class="g" onclick="AN[${i}].reset()">↺ Qayta</button></div></div><div class="card"><h3>6. Mustaqil masala</h3>${o.pr.map(pr).join('')}</div></section>`;
+$('#m').innerHTML=T.map(sec).join('')+tst();
+$('#nav').innerHTML=T.map((o,i)=>`<button onclick="go(${i})">${i+1}. ${o.n}</button>`).join('')+'<button onclick="go(6)">✔ Test</button>';
+let cur=0;
+function go(i){if(i<0||i>6)return;cur=i;Object.values(AN).forEach(a=>a.stop());for(let k=0;k<7;k++){$('#p'+k).hidden=k!==i;$('#nav').children[k].classList.toggle('on',k===i)}
+ $('#pv').disabled=i==0;$('#nx').disabled=i==6;$('#nav').children[i].scrollIntoView({inline:'center',block:'nearest'});scrollTo(0,0)}
+T.forEach((o,i)=>{anim(i,o.an);o.ini()});
+const CX=T.map((o,i)=>$('#s'+i).getContext('2d'));
+(function L(){const t=performance.now()/1000;if(cur<6)T[cur].live(CX[cur],t);requestAnimationFrame(L)})();
+go(0);
+</script></body></html>

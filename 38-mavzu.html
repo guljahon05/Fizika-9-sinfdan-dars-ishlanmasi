@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Qattiq jismlarning erishi va qotishi</title>
+<style>
+:root{--bg:#eef6fc;--cd:#fff;--tx:#1d3550;--mu:#5b7a96;--ice:#4fa3e0;--hot:#ff8a3d;--cv:#f4faff;--fm:#fff4e8;--bd:#d6e6f2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root:not([data-th="l"]){}
+@media(prefers-color-scheme:dark){:root:not([data-th="l"]){--bg:#0f1b2a;--cd:#172a3f;--tx:#e6f1fb;--mu:#9bb5cc;--cv:#10202f;--fm:#2b2218;--bd:#26405a}}
+:root[data-th="d"]{--bg:#0f1b2a;--cd:#172a3f;--tx:#e6f1fb;--mu:#9bb5cc;--cv:#10202f;--fm:#2b2218;--bd:#26405a}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px;background:linear-gradient(135deg,#4fa3e0,#7cc4f5);color:#fff}
+header h1{font-size:18px;margin:0;line-height:1.3}
+#th{border:0;background:rgba(255,255,255,.25);color:#fff;font-size:22px;border-radius:12px;padding:6px 12px;cursor:pointer}
+nav{display:flex;gap:8px;overflow-x:auto;padding:10px;background:var(--cd);position:sticky;top:0;z-index:5;border-bottom:1px solid var(--bd)}
+nav button{flex:0 0 auto;border:2px solid var(--bd);background:var(--bg);color:var(--tx);padding:10px 14px;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--ice);border-color:var(--ice);color:#fff}
+nav button:last-child.on{background:var(--hot);border-color:var(--hot)}
+main{max-width:760px;margin:0 auto;padding:12px}
+.plan{display:none}.plan.on{display:block}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 4px 14px rgba(60,120,180,.08)}
+h2{margin:0 0 8px;font-size:21px;color:var(--ice)}
+h3{margin:12px 0 8px;font-size:17px;color:var(--hot)}
+p{margin:6px 0}
+.fm{background:var(--fm);border-left:5px solid var(--hot);border-radius:10px;padding:12px 14px;font-size:18px;font-weight:600;margin:8px 0}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px}
+td,th{border-bottom:1px solid var(--bd);padding:6px 8px;text-align:left}
+th{background:var(--cv);color:var(--ice)}
+canvas{width:100%;height:auto;background:var(--cv);border-radius:14px;border:1px solid var(--bd);display:block;margin:8px 0}
+.ctl{margin:10px 0}
+.ctl label{display:block;font-weight:600;margin-bottom:4px}
+input[type=range]{width:100%;height:32px;accent-color:var(--hot)}
+select,input[type=text]{width:100%;font-size:17px;padding:10px;border-radius:12px;border:2px solid var(--bd);background:var(--bg);color:var(--tx)}
+.out{background:var(--cv);border-radius:12px;padding:10px 12px;margin-top:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.row input{flex:1 1 140px;width:auto}
+.b{background:var(--hot);color:#fff;border:0;border-radius:14px;padding:13px 18px;font-size:16px;font-weight:700;cursor:pointer;flex:1 1 auto}
+.b.g{background:var(--ice)}
+.b:disabled{opacity:.5}
+.pr{border:1px dashed var(--bd);border-radius:14px;padding:12px;margin:10px 0}
+.res{margin-top:6px;font-weight:700}
+.res.ok{color:#1b9e55}.res.no{color:#d6452f}
+.stp{background:var(--cv);border-radius:10px;padding:6px 10px;margin:6px 0}
+.opt{display:block;width:100%;text-align:left;border:2px solid var(--bd);background:var(--bg);color:var(--tx);padding:12px;border-radius:12px;margin:6px 0;font-size:16px;cursor:pointer}
+.opt.ok{background:#d8f5e3;border-color:#1b9e55;color:#0d5c31}
+.opt.no{background:#fde0db;border-color:#d6452f;color:#8a2616}
+.sc{text-align:center}.sc h3{font-size:26px}
+</style></head><body>
+<header><h1>🧊 Qattiq jismlarning erishi va qotishi <small style="display:block;font-weight:400;font-size:13px">9-sinf fizika · 38-mavzu</small></h1><button id="th" title="Mavzu">🌙</button></header>
+<nav id="nav"></nav><main id="main"></main>
+<script>
+const K={tx:'#1d3550'};
+const $=s=>document.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const lerp=(a,b,t)=>a+(b-a)*t,cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+const H=(i,j,s)=>Math.abs(Math.sin(i*127.1+j*311.7+s*74.7)*43758.5453)%1;
+const SUB={muz:{n:`Muz`,t:0,l:3.4},qorgoshin:{n:`Qo'rg'oshin`,t:327,l:.25},mis:{n:`Mis`,t:1085,l:2.1},temir:{n:`Temir`,t:1539,l:2.7},alyuminiy:{n:`Alyuminiy`,t:660,l:3.9},simob:{n:`Simob`,t:-39,l:0}};
+const rr=(c,x,y,w,h,r,f)=>{c.beginPath();c.roundRect(x,y,w,h,r);c.fillStyle=f;c.fill()};
+const tx=(c,s,x,y,sz=14,col=K.tx,al='left')=>{c.font=`600 ${sz}px sans-serif`;c.fillStyle=col;c.textAlign=al;c.fillText(s,x,y)};
+function mol(c,x,y,w,h,k,amp,t,cols=9,rows=4,r=9){const sp=Math.min(46,(w-2*r-10)/(cols-1),(h-50)/(rows-1)),x0=x+(w-sp*(cols-1))/2,y0=y+(h-sp*(rows-1))/2+8,P=[];
+c.save();c.beginPath();c.rect(x,y,w,h);c.clip();
+for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const a=H(i,j,1)*6.28,b=H(i,j,2);
+P.push([x0+i*sp+k*(H(i,j,3)-.5)*sp*1.2+Math.sin(t*(3+b*3)+a)*amp+k*Math.sin(t*(1+b)+a)*sp*.35,
+y0+j*sp+k*(H(i,j,4)-.5)*sp*.9+Math.cos(t*(3+b*3)+a*2)*amp+k*Math.cos(t*(1+b)+a)*sp*.25])}
+if(k<.6){c.strokeStyle='rgba(120,160,200,.55)';c.lineWidth=2;c.beginPath();for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const p=P[j*cols+i];if(i<cols-1){c.moveTo(p[0],p[1]);c.lineTo(...P[j*cols+i+1])}if(j<rows-1){c.moveTo(p[0],p[1]);c.lineTo(...P[(j+1)*cols+i])}}c.stroke()}
+const q=Math.min(k,1);P.forEach(p=>{c.beginPath();c.arc(p[0],p[1],r,0,6.28);c.fillStyle=`rgb(${lerp(79,255,q)|0},${lerp(163,138,q)|0},${lerp(224,61,q)|0})`;c.fill()});c.restore()}
+function thermo(c,x,y,h,f,col){f=cl(f,0,1);rr(c,x-7,y,14,h,7,'rgba(150,170,190,.35)');rr(c,x-4,y+h*(1-f),8,h*f+6,4,col);c.beginPath();c.arc(x,y+h+8,13,0,6.28);c.fillStyle=col;c.fill()}
+function blk(c,x,y,w,h,k){rr(c,x,y,w,h,8,`rgb(${lerp(150,255,k)|0},${lerp(205,138,k)|0},${lerp(245,61,k)|0})`)}
+function beaker(c,x,y,w,h){c.strokeStyle=K.tx;c.lineWidth=3;c.beginPath();c.moveTo(x,y);c.lineTo(x,y+h);c.lineTo(x+w,y+h);c.lineTo(x+w,y);c.stroke()}
+function flame(c,x,y,s,t){c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(x+s*.6,y-s*.5,x,y-s*(1+.15*Math.sin(t*12)));c.quadraticCurveTo(x-s*.6,y-s*.5,x,y);c.fillStyle='#ff8a3d';c.fill()}
+function cp(seg,u){const r=[[0,seg[0][1]]];let x=0;for(const s of seg){const d=Math.min(s[0],u-x);if(d<=0)break;x+=d;r.push([x,s[1]+(s[2]-s[1])*d/s[0]])}return r}
+function graph(c,x,y,w,h,pts,xm,y0,y1){const X=v=>x+v/xm*w,Y=v=>y+h-(v-y0)/(y1-y0)*h;
+c.strokeStyle=K.tx;c.lineWidth=1.5;c.beginPath();c.moveTo(x,y);c.lineTo(x,y+h);c.lineTo(x+w,y+h);c.stroke();
+c.setLineDash([4,4]);c.strokeStyle='rgba(150,170,190,.8)';c.beginPath();c.moveTo(x,Y(0));c.lineTo(x+w,Y(0));c.stroke();c.setLineDash([]);
+tx(c,'0°C',x-4,Y(0)+4,11,K.tx,'right');tx(c,'t, °C',x+6,y+10,12);tx(c,'τ',x+w,y+h+16,13,K.tx,'right');
+c.strokeStyle='#ff8a3d';c.lineWidth=3;c.beginPath();pts.forEach((p,i)=>i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.stroke();
+const l=pts[pts.length-1];c.beginPath();c.arc(X(l[0]),Y(l[1]),6,0,6.28);c.fillStyle='#4fa3e0';c.fill()}
+function mold(c,x,y,w,h,fl,f,T){rr(c,x,y,w,h,12,'#6b7785');const ch=h-28,cx=x+14,cy=y+14;rr(c,cx,cy,w-28,ch,6,'#2a3441');const lh=ch*fl,q=cl((T-327)/273,0,1);
+if(lh>1)rr(c,cx,cy+ch-lh,w-28,lh,4,`rgb(255,${lerp(110,190,q)|0},${lerp(50,90,q)|0})`);if(lh*f>1)rr(c,cx,cy+ch-lh*f,w-28,lh*f,4,'#aab4bf')}
+function cast(T0,tt){const t1=(T0-327)/5;if(tt<t1)return{T:T0-5*tt,f:0};if(tt<t1+30)return{T:327,f:(tt-t1)/30};return{T:Math.max(20,327-5*(tt-t1-30)),f:1}}
+const S3=[[.15,-20,0],[.25,0,0],[.3,0,100],[.2,100,100],[.1,100,120]];
+const kJ=q=>(q/1000).toFixed(1)+' kJ';
+const tbl=(a,b,r)=>`<table><tr><th>Modda</th><th>${a}</th></tr>${r.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join('')}</table>`;
+
+const P=[
+{title:`Erish va qotish tushunchasi`,
+th:`<p><b>Erish</b> — moddaning qattiq holatdan suyuq holatga o'tishi. <b>Qotish (kristallanish)</b> — suyuq holatdan qattiq holatga o'tish.</p><p>Kristall jismda molekulalar panjara tugunlarida joylashib, o'z o'rnida tebranadi. Qizdirilganda tebranish kuchayadi va ma'lum temperaturada kristall panjara buziladi: molekulalar erkin ko'chib yuradi — modda suyuqlikka aylanadi.</p>`,
+fm:`Erish: qattiq → suyuq (energiya yutiladi)<br>Qotish: suyuq → qattiq (energiya ajraladi)`,
+ex:`Quyoshda muz eriydi, pechda qo'rg'oshin eriydi, qo'lingizda shokolad eriydi, shamning mumi olovda eriydi. Sovigach ular yana qotadi.`,
+sim:{c:[{id:'T',l:'Muzning temperaturasi',min:-30,max:60,v:-20,u:'°C'}],
+r:V=>`Muz, T = <b>${V.T}°C</b> → <b>${V.T<0?'Qattiq (kristall panjara saqlanadi)':V.T==0?'Erish jarayoni (0°C)':'Suyuq (panjara buzilgan)'}</b>`,
+d:(c,w,h,V,t)=>{const k=V.T<0?0:V.T==0?.5:1;mol(c,0,0,w,h,k,V.T<0?1+(V.T+30)/30*4:2.5,t);tx(c,V.T<0?'Qattiq':V.T==0?'Erish':'Suyuq',14,24,16,k?'#ff8a3d':'#4fa3e0')}},
+an:(c,w,h,p,t)=>{const s=p*p*(3-2*p);mol(c,0,0,w,h,s,lerp(1.5,5,p),t);tx(c,p<.3?'1) Qizdirilmoqda: tebranish kuchaymoqda':p<.7?'2) Kristall panjara buzilmoqda':`3) Suyuqlik hosil bo'ldi`,14,24,15)},
+pr:[{q:`Muz 0°C da erishni boshladi. Uning qotish temperaturasi necha °C?`,a:0,u:'°C',h:`Qotish temperaturasi erish temperaturasiga teng.`}]},
+
+{title:`Erish temperaturasi`,
+th:`<p><b>Erish temperaturasi (t<sub>er</sub>)</b> — modda erishi boshlanadigan temperatura. Qotish temperaturasi unga teng. Erish davomida temperatura <b>o'zgarmaydi</b>: berilgan energiya panjarani buzishga sarflanadi.</p><p><b>Kristall</b> jismlar (muz, metallar) aniq t<sub>er</sub> ga ega. <b>Amorf</b> jismlar (shisha, smola) asta-sekin yumshaydi, ularning aniq t<sub>er</sub> si yo'q.</p>`,
+fm:`t<sub>qotish</sub> = t<sub>er</sub> &nbsp;|&nbsp; erish vaqtida t = const`,
+tb:tbl('t<sub>er</sub>, °C',0,[['Muz',0],[`Qo'rg'oshin`,327],['Mis',1085],['Temir',1539],['Alyuminiy',660],['Simob','−39']]),
+ex:`Simob −39°C da qotadi, shuning uchun juda sovuq joylarda simobli termometr ishlamaydi. Muz 0°C da eriydi, shu sababli bahorda havo 0°C dan isiganda qor eriy boshlaydi.`,
+sim:{c:[{id:'s',l:'Modda',o:['muz','qorgoshin','mis','temir','alyuminiy','simob']},{id:'T',l:'Temperatura',min:-60,max:1600,v:20,u:'°C'}],
+r:V=>{const s=SUB[V.s];return `${s.n}: t<sub>er</sub> = <b>${s.t}°C</b>. T = ${V.T}°C → <b>${V.T<s.t?'Qattiq':V.T==s.t?`Erish/qotish jarayoni (T o'zgarmaydi)`:'Suyuq'}</b>`},
+d:(c,w,h,V,t)=>{const s=SUB[V.s],T=V.T,k=T<s.t?0:T==s.t?.5:1;thermo(c,70,20,170,(T+60)/1660,k?'#ff8a3d':'#4fa3e0');const y=20+170*(1-(s.t+60)/1660);c.strokeStyle='#e0568a';c.lineWidth=2;c.setLineDash([5,4]);c.beginPath();c.moveTo(40,y);c.lineTo(110,y);c.stroke();c.setLineDash([]);tx(c,'t_er='+s.t+'°C',118,y+4,13,'#e0568a');blk(c,330,60,220,120,k);tx(c,s.n+(k==0?' (qattiq)':k==1?' (suyuq)':' (erimoqda)'),440,208,15,K.tx,'center')}},
+an:(c,w,h,p,t)=>{let T,m;if(p<.25){T=-20+80*p;m=0}else if(p<.65){T=0;m=(p-.25)/.4}else{T=(p-.65)/.35*20;m=1}
+thermo(c,60,20,170,(T+30)/80,T>0?'#ff8a3d':'#4fa3e0');tx(c,'T = '+T.toFixed(1)+'°C',90,60,16,m>0&&m<1?'#e0568a':K.tx);
+tx(c,p<.25?'Muz qizdirilmoqda':p<.65?`Muz eriyapti: T = 0°C o'zgarmaydi`:'Suv qizdirilmoqda',400,32,14,K.tx,'center');
+beaker(c,300,50,200,140);const wh=80*m*.9,hi=70*(1-m);if(wh>1)rr(c,302,190-wh,196,wh,0,'rgba(79,163,224,.55)');if(hi>1)rr(c,340,190-wh-hi,120,hi,8,'#bfe3ff');if(p<.999)flame(c,400,234,26,t)},
+pr:[{q:`Temir va alyuminiyning erish temperaturalari farqi necha °C? (t(temir) = 1539°C, t(alyuminiy) = 660°C)`,a:879,u:'°C',h:`1539 − 660`}]},
+
+{title:`Erish va qotish grafigi (t–τ)`,
+th:`<p>Qattiq jismni qizdirsak, t–τ grafik 3 bosqichdan iborat: 1) qattiq jism qizdiriladi (chiziq ko'tariladi); 2) erish — <b>gorizontal chiziq</b> (t = t<sub>er</sub>); 3) suyuqlik qizdiriladi.</p><p>Sovitishda teskari: suyuqlik soviydi → qotish (gorizontal chiziq) → qattiq jism soviydi.</p>`,
+fm:`Gorizontal qism: t = t<sub>er</sub> = const<br>Qizdirish vaqti: τ = Q / P`,
+ex:`Stakandagi muz bo'lagi: avval 0°C gacha isiydi, keyin erib bo'lguncha suv-muz aralashmasi 0°C da turadi, hammasi erigach suv isiy boshlaydi.`,
+sim:{c:[{id:'P',l:'Qizdirish quvvati',min:100,max:1000,v:400,step:50,u:'W'}],
+r:V=>{const a=21000/V.P,b=170000/V.P,d=42000/V.P;return `0,5 kg muz (−20°C → 20°C). Muzni qizdirish: ${a.toFixed(0)} s; <b>erish: ${b.toFixed(0)} s</b>; suvni qizdirish: ${d.toFixed(0)} s. Jami: ${(a+b+d).toFixed(0)} s`},
+d:(c,w,h,V,t)=>{const a=21000/V.P,b=170000/V.P,d=42000/V.P;graph(c,50,20,w-80,h-60,cp([[a,-20,0],[b,0,0],[d,0,20]],((t/7)%1)*(a+b+d)),2400,-30,30)}},
+an:(c,w,h,p,t)=>{let u=p,i=0;while(i<4&&u>S3[i][0]){u-=S3[i][0];i++}const f=cl(u/S3[i][0],0,1);
+const k=[0,f,1,1+.6*f,1.6][i],am=[2,2+f,3,3+2*f,5][i];
+mol(c,8,30,w*.4,h-60,k,am,t,4,4,8);tx(c,[`Muz qizdiriladi`,'Muz eriydi','Suv qizdiriladi',`Suv qaynaydi`,`Bug' qizdiriladi`][i],10,22,14,'#ff8a3d');
+graph(c,w*.48,20,w*.48,h-60,cp(S3,p),1,-30,130)},
+pr:[{q:`Quvvati 500 W bo'lgan isitgich 0°C dagi 1 kg muzni necha sekundda eritadi? (λ = 3,4·10⁵ J/kg)`,a:680,u:'s',h:`τ = λm / P = 3,4·10⁵ / 500`}]},
+
+{title:`Solishtirma erish issiqligi (λ)`,
+th:`<p><b>Solishtirma erish issiqligi (λ)</b> — 1 kg kristall moddani erish temperaturasida to'liq eritish uchun kerak bo'lgan issiqlik miqdori. Qotishda xuddi shuncha issiqlik ajraladi.</p><p>Erish vaqtida energiya molekulalar orasidagi bog'lanishni uzishga sarflanadi, shuning uchun molekulalarning kinetik energiyasi (temperatura) o'zgarmaydi.</p>`,
+fm:`λ = Q / m &nbsp;&nbsp; [λ] = J/kg`,
+tb:tbl('λ, J/kg',0,[['Muz','3,4·10⁵'],['Alyuminiy','3,9·10⁵'],['Mis','2,1·10⁵'],[`Qo'rg'oshin`,'0,25·10⁵'],['Temir','2,7·10⁵']]),
+ex:`Muzning λ si katta (3,4·10⁵ J/kg), shuning uchun qor va muz sekin eriydi — bahorda suv birdaniga bosib kelmaydi.`,
+sim:{c:[{id:'s',l:'Modda',o:['muz','alyuminiy','mis','qorgoshin','temir']},{id:'m',l:'Massa',min:.1,max:10,v:1,step:.1,u:'kg'}],
+r:V=>{const s=SUB[V.s];return `Q = λ·m = ${s.l}·10⁵ · ${V.m} = <b>${kJ(s.l*1e5*V.m)}</b>`},
+d:(c,w,h,V)=>{const s=SUB[V.s],Q=s.l*1e5*V.m;tx(c,s.n+', m = '+V.m+' kg',40,22,14);blk(c,40,32,30+V.m*12,30+V.m*8,0);tx(c,'Kerakli energiya Q',40,150,14);rr(c,40,160,w-80,28,14,'rgba(150,170,190,.3)');rr(c,40,160,Math.max(8,(w-80)*Q/3.9e6),28,14,'#ff8a3d');tx(c,kJ(Q),40,214,16,'#ff8a3d')}},
+an:(c,w,h,p,t)=>{thermo(c,50,20,150,.35,'#4fa3e0');tx(c,'T = 0°C',74,60,15);tx(c,`kinetik energiya o'zgarmaydi`,74,80,12);
+const wh=70*p,hi=90*(1-p)+3;rr(c,150,170-wh,110,wh,6,'rgba(79,163,224,.6)');rr(c,150,170-wh-hi,110,hi,8,'#bfe3ff');tx(c,'2 kg muz',205,24,14,K.tx,'center');if(p<.999)flame(c,205,232,24,t);
+rr(c,320,30,30,140,8,'rgba(150,170,190,.3)');rr(c,320,170-140*p,30,140*p,8,'#ff8a3d');tx(c,'Energiya shkalasi',365,48,13);tx(c,'Q = '+(680*p).toFixed(0)+' kJ',365,100,20,'#ff8a3d');tx(c,'Maks: λm = 680 kJ',365,125,13)},
+pr:[{q:`0,5 kg misni erish temperaturasida eritish uchun qancha issiqlik kerak? λ = 2,1·10⁵ J/kg. Javobni kJ da yozing.`,a:105,u:'kJ',h:`Q = λm = 2,1·10⁵ · 0,5 = 1,05·10⁵ J`}]},
+
+{title:`Q = λ·m formulasi va masalalar`,
+th:`<p>Erishda issiqlik <b>yutiladi</b>, qotishda <b>ajraladi</b>. Agar jism avval erish temperaturasigacha qizdirilsa, umumiy issiqlik qizdirish va erish issiqliklarining yig'indisiga teng.</p>`,
+fm:`Erishda: Q = λ·m<br>Qotishda: Q = −λ·m<br>To'liq jarayon: Q = cm(t<sub>er</sub> − t₁) + λm`,
+ex:`2 kg muzni 0°C da eritish uchun: Q = 3,4·10⁵ · 2 = 6,8·10⁵ J.`,
+sim:{c:[{id:'m',l:'Massa m',min:.5,max:10,v:2,step:.5,u:'kg'},{id:'L',l:'λ (×10⁵ J/kg)',min:.2,max:4,v:3.4,step:.1}],
+r:V=>`Q = λ·m = ${V.L}·10⁵ · ${V.m} = <b>${(V.L*V.m).toFixed(2)}·10⁵ J</b> = ${(V.L*V.m*100).toFixed(0)} kJ`,
+d:(c,w,h,V)=>{const ms=[1,2,3,4,5,V.m],mx=Math.max(...ms)*V.L,bw=(w-80)/6;ms.forEach((m,i)=>{const q=m*V.L,bh=(h-70)*q/mx,x=50+i*bw;rr(c,x+8,h-30-bh,bw-16,bh,6,i==5?'#ff8a3d':'#4fa3e0');tx(c,(i==5?'joriy ':'')+m+' kg',x+bw/2,h-10,12,K.tx,'center');tx(c,q.toFixed(1),x+bw/2,h-34-bh,12,K.tx,'center')});tx(c,'Q, ×10⁵ J',10,18,13)}},
+an:(c,w,h,p,t)=>{const E=p*445;let T,m=0;if(E<21)T=-10+E/2.1;else if(E<361){T=0;m=(E-21)/340}else{T=(E-361)/84*20;m=1}
+thermo(c,45,20,150,(T+20)/50,m>=1&&T>0?'#ff8a3d':'#4fa3e0');tx(c,'T = '+T.toFixed(1)+'°C',70,30,15);
+const wh=60*m,hi=70*(1-m);rr(c,110,190-wh,110,wh,6,'rgba(79,163,224,.6)');if(hi>1)rr(c,115,190-wh-hi,100,hi,8,'#bfe3ff');if(p<.999)flame(c,165,236,24,t);
+tx(c,'1 kg muz: −10°C → +20°C suv',260,28,14);let x=260,acc=0;const bw=w-290;
+[[21,'#7fc4f0'],[340,'#4fa3e0'],[84,'#ff8a3d']].forEach(s=>{const sw=bw*s[0]/445;rr(c,x,44,sw,28,4,'rgba(150,170,190,.3)');const f=cl((E-acc)/s[0],0,1);if(f>0)rr(c,x,44,Math.max(3,sw*f),28,4,s[1]);acc+=s[0];x+=sw});
+tx(c,'Q₁ = cmΔt (muz) = 21 kJ',260,110,14,'#5aa8e0');tx(c,'Q₂ = λm (erish) = 340 kJ',260,136,14,'#4fa3e0');tx(c,'Q₃ = cmΔt (suv) = 84 kJ',260,162,14,'#ff8a3d');tx(c,'Jami: '+E.toFixed(0)+' / 445 kJ',260,205,17)},
+pr:[{q:`5 kg alyuminiyni erish temperaturasida (660°C) eritish uchun qancha issiqlik kerak? λ = 3,9·10⁵ J/kg. Javobni MJ da yozing.`,a:1.95,u:'MJ',h:`Q = λm`,st:[`Berilgan: m = 5 kg, λ = 3,9·10⁵ J/kg. Topish kerak: Q`,`Formula: Q = λ·m`,`Hisob: Q = 3,9·10⁵ · 5 = 19,5·10⁵ J`,`Javob: Q = 1,95·10⁶ J = 1,95 MJ`]},
+{q:`0,5 kg suyuq qo'rg'oshin 327°C da qotdi. Qancha issiqlik ajraladi? λ = 0,25·10⁵ J/kg. Javobni kJ da yozing (musbat son).`,a:12.5,u:'kJ',h:`|Q| = λm`,st:[`Berilgan: m = 0,5 kg, λ = 0,25·10⁵ J/kg`,`Qotishda Q = −λ·m (issiqlik ajraladi)`,`Hisob: |Q| = 0,25·10⁵ · 0,5 = 12 500 J`,`Javob: 12,5 kJ ajraladi`]},
+{q:`−10°C li 2 kg muzni 0°C li suvga aylantirish uchun qancha issiqlik kerak? c = 2100 J/(kg·°C), λ = 3,4·10⁵ J/kg. Javobni kJ da yozing.`,a:722,u:'kJ',h:`Q = cm(0−(−10)) + λm`,st:[`1-bosqich: muzni 0°C gacha qizdirish: Q₁ = 2100 · 2 · 10 = 42 000 J`,`2-bosqich: 0°C da eritish: Q₂ = 3,4·10⁵ · 2 = 680 000 J`,`Umumiy: Q = Q₁ + Q₂ = 722 000 J`,`Javob: Q = 722 kJ`]}]},
+
+{title:`Tabiat va texnikada qo'llanilishi`,
+th:`<ul><li><b>Metallarni quyish va payvandlash:</b> metall eritilib qolipga quyiladi, qotganda kerakli shaklni oladi.</li><li><b>Bahorda</b> qor va muz erishi issiqlik yutadi — havo birdan isimaydi. <b>Qishda</b> suv qotganda issiqlik ajraladi — iqlim yumshaydi.</li><li><b>Tuz</b> muzning erish temperaturasini pasaytiradi — yo'ldagi muz tuz bilan eritiladi.</li><li><b>Suv qotganda kengayadi</b> (muz zichligi suvnikidan kichik): muzlagan quvur yorilishi mumkin.</li><li>Shokolad va mum past temperaturada eriydi.</li></ul>`,
+fm:`Q = λ·m &nbsp;|&nbsp; τ = Q / P &nbsp;|&nbsp; ρ = m / V`,
+ex:`Sovuq kechasi bog'ni suv bilan sepishadi: suv muzlaganda issiqlik ajratib, kurtaklarni sovuqdan asraydi.`,
+sim:{c:[{id:'T0',l:'Quyish temperaturasi (qo\'rg\'oshin)',min:350,max:600,v:450,step:10,u:'°C'},{id:'tt',l:'Vaqt',min:0,max:110,v:0,step:1,u:'s'}],
+r:V=>{const r=cast(V.T0,V.tt);return `T = <b>${r.T.toFixed(0)}°C</b> → <b>${r.T>327?'Suyuq':r.f<1?`Qotmoqda (T = 327°C o'zgarmaydi)`:'Qattiq'}</b>`},
+d:(c,w,h,V)=>{const r=cast(V.T0,V.tt);mold(c,60,30,220,170,1,r.f,r.T);thermo(c,380,20,170,r.T/650,r.T>327?'#ff8a3d':'#4fa3e0');tx(c,'T = '+r.T.toFixed(0)+'°C',410,50,16);tx(c,r.T>327?'Suyuq metall':r.f<1?'Qotmoqda':'Qotdi',410,80,16,r.T>327?'#ff8a3d':'#4fa3e0');tx(c,'t_er = 327°C',410,110,13)}},
+an:(c,w,h,p,t)=>{let fl=1,T=450,f=0;if(p<.4){fl=p/.4}else if(p<.6)T=lerp(450,327,(p-.4)/.2);else if(p<.85){T=327;f=(p-.6)/.25}else{T=lerp(327,20,(p-.85)/.15);f=1}
+mold(c,250,100,200,130,fl,f,T);rr(c,285,40,80,30,8,'#777');if(fl<1||p<.4)rr(c,289,40,72,10,3,'#ff8a3d');c.strokeStyle='#777';c.lineWidth=6;c.beginPath();c.moveTo(365,50);c.lineTo(420,20);c.stroke();
+if(p<.4){c.strokeStyle='#ff8a3d';c.lineWidth=7;c.beginPath();c.moveTo(300,70);c.lineTo(300,114+102*(1-fl));c.stroke()}
+thermo(c,60,50,140,T/500,T>327?'#ff8a3d':'#4fa3e0');tx(c,'T = '+T.toFixed(0)+'°C',90,60,15);tx(c,p<.4?'Eritilgan metall quyilmoqda':p<.6?'Metall soviyapti':p<.85?`Qotmoqda (T = 327°C)`:'Quyma tayyor',90,90,13)},
+pr:[{q:`4 kg suv qotganda qancha issiqlik ajraladi? λ = 3,4·10⁵ J/kg. Javobni MJ da yozing.`,a:1.36,u:'MJ',h:`Q = λm = 3,4·10⁵ · 4`},
+{q:`3 kg misni (erish temperaturasida) eritish uchun qancha issiqlik kerak? λ = 2,1·10⁵ J/kg. Javobni kJ da yozing.`,a:630,u:'kJ',h:`Q = λm`},
+{q:`Quvvati 2 kW bo'lgan pech 1539°C dagi 10 kg temirni necha sekundda eritadi? λ = 2,7·10⁵ J/kg. (τ = Q/P)`,a:1350,u:'s',h:`Q = 2,7·10⁶ J; τ = Q / 2000`},
+{q:`Muzning zichligi 900 kg/m³, suvniki 1000 kg/m³. 1 m³ suv muzga aylansa, hajmi necha m³ bo'ladi?`,a:1.11,u:'m³',h:`m = 1000 kg; V = m/ρ(muz) = 1000/900`}]}
+];
+
+const QZ=[
+{q:`Qattiq jismning suyuqlikka aylanishi nima deyiladi?`,o:[`Bug'lanish`,'Erish','Qotish','Kondensatsiya'],a:1},
+{q:`Kristall jism erish jarayonida uning temperaturasi qanday o'zgaradi?`,o:['Ortadi','Kamayadi',`O'zgarmaydi`,'Avval ortib, keyin kamayadi'],a:2},
+{q:`Muzning solishtirma erish issiqligi qancha?`,o:['2,1·10⁵ J/kg','3,9·10⁵ J/kg','3,4·10⁵ J/kg','0,25·10⁵ J/kg'],a:2},
+{q:`2 kg muzni 0°C da eritish uchun qancha issiqlik kerak? (λ = 3,4·10⁵ J/kg)`,o:['3,4·10⁵ J','1,7·10⁵ J','6,8·10⁶ J','6,8·10⁵ J'],a:3},
+{q:`Quyidagilardan qaysi jism aniq erish temperaturasiga ega emas?`,o:['Shisha (amorf jism)','Muz','Mis',`Qo'rg'oshin`],a:0}];
+
+const PL=[];let cur=0;
+function setK(){K.tx=getComputedStyle(document.documentElement).getPropertyValue('--tx').trim()}
+function prob(pr,i,n){const d=el('div','pr',`<p><b>${n>1?(i+1)+'-masala. ':''}</b>${pr.q}</p><div class="row"><input type="text" inputmode="decimal" placeholder="Javob (${pr.u})"><button class="b">Tekshirish</button></div><div class="res"></div>`);
+const inp=d.querySelector('input'),res=d.querySelector('.res');
+d.querySelector('.b').onclick=()=>{const v=parseFloat(inp.value.replace(',','.'));if(isNaN(v)){res.className='res';res.textContent='Javobni raqam bilan kiriting';return}
+const ok=Math.abs(v-pr.a)<=Math.max(.01,Math.abs(pr.a)*.01);res.className='res '+(ok?'ok':'no');res.textContent=ok?`✅ To'g'ri!`:`❌ Noto'g'ri. Ko'rsatma: ${pr.h}`};
+if(pr.st){let j=0;const sb=el('button','b g','Keyingi qadam ➜'),box=el('div');sb.style.marginTop='8px';sb.onclick=()=>{box.append(el('div','stp',`<b>${j+1}.</b> ${pr.st[j]}`));if(++j>=pr.st.length)sb.disabled=true};d.append(sb,box)}return d}
+function build(p,i){const s=el('section','plan'),live=[];
+s.append(el('div','card',`<h2>${i+1}-reja. ${p.title}</h2><h3>1. Nazariya</h3>${p.th}`),
+el('div','card',`<h3>2. Asosiy formula va tushunchalar</h3><div class="fm">${p.fm}</div>${p.tb||''}`),
+el('div','card',`<h3>3. Hayotiy misol</h3><p>${p.ex}</p>`));
+const sc=el('div','card','<h3>4. Interaktiv simulyatsiya</h3>'),V={};
+p.sim.c.forEach(c=>{const d=el('div','ctl');
+if(c.o){V[c.id]=c.o[0];d.innerHTML=`<label>${c.l}</label><select>${c.o.map(k=>`<option value="${k}">${SUB[k].n}</option>`).join('')}</select>`;d.lastChild.onchange=e=>{V[c.id]=e.target.value;upd()}}
+else{V[c.id]=c.v;d.innerHTML=`<label>${c.l}: <b>${c.v}</b> ${c.u||''}</label><input type="range" min="${c.min}" max="${c.max}" step="${c.step||1}" value="${c.v}">`;d.lastChild.oninput=e=>{V[c.id]=+e.target.value;d.firstChild.innerHTML=`${c.l}: <b>${V[c.id]}</b> ${c.u||''}`;upd()}}
+sc.append(d)});
+const mk=()=>{const e=el('canvas');e.width=1280;e.height=480;return{e,c:e.getContext('2d')}};
+const a=mk(),out=el('div','out'),upd=()=>{out.innerHTML=p.sim.r(V)};upd();sc.append(a.e,out);
+live.push(t=>{const c=a.c;c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,640,240);p.sim.d(c,640,240,V,t)});
+const ac=el('div','card',`<h3>5. Canvas animatsiya</h3><div class="row"><button class="b">▶ Boshlash</button><button class="b g">⏸ To'xtatish</button><button class="b g">↺ Qayta boshlash</button></div>`);
+const A={p:0,run:false},m=mk(),bt=ac.querySelectorAll('button');ac.append(m.e);
+bt[0].onclick=()=>{if(A.p>=1)A.p=0;A.run=true};bt[1].onclick=()=>{A.run=false};bt[2].onclick=()=>{A.p=0;A.run=false};
+live.push((t,dt)=>{if(A.run){A.p+=dt/9;if(A.p>=1){A.p=1;A.run=false}}const c=m.c;c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,640,240);p.an(c,640,240,A.p,t)});
+const pc=el('div','card',`<h3>6. Mustaqil ${p.pr.length>1?'masalalar':'masala'}</h3>`);p.pr.forEach((q,j)=>pc.append(prob(q,j,p.pr.length)));
+s.append(sc,ac,pc);return{s,live}}
+function fillTest(s){s.innerHTML='';let n=0,ok=0;const wrap=el('div','card','<h2>Test</h2><p>Variantni tanlang — natija darhol ko\'rinadi.</p>'),res=el('div','card sc');res.hidden=true;
+QZ.forEach((q,qi)=>{const d=el('div','pr',`<p><b>${qi+1}.</b> ${q.q}</p>`);
+const bs=q.o.map((o,oi)=>{const b=el('button','opt',`<b>${'ABCD'[oi]}.</b> ${o}`);
+b.onclick=()=>{if(d.dataset.done)return;d.dataset.done=1;n++;if(oi==q.a){ok++;b.classList.add('ok')}else{b.classList.add('no');bs[q.a].classList.add('ok')}
+if(n==QZ.length){res.hidden=false;res.innerHTML=`<h3>Natija: ${ok} / ${QZ.length}</h3><p>${ok==5?'Ajoyib! 🎉':ok>=3?'Yaxshi, yana takrorlang 👍':`Darslikni qayta o'qib chiqing 📖`}</p><button class="b">↺ Qayta boshlash</button>`;res.querySelector('button').onclick=()=>{fillTest(s);scrollTo(0,0)};res.scrollIntoView({behavior:'smooth'})}};
+d.append(b);return b});wrap.append(d)});s.append(wrap,res)}
+function show(i){cur=i;PL.forEach((x,j)=>x.s.classList.toggle('on',j==i));[...$('#nav').children].forEach((b,j)=>b.classList.toggle('on',j==i));scrollTo(0,0)}
+const names=['1. Tushuncha','2. t_er','3. Grafik','4. λ','5. Q=λm',`6. Qo'llanish`,'Test'];
+P.forEach((p,i)=>PL.push(build(p,i)));
+const ts=el('section','plan');fillTest(ts);PL.push({s:ts,live:[]});
+PL.forEach((x,i)=>{$('#main').append(x.s);const b=el('button','',names[i]);b.onclick=()=>show(i);$('#nav').append(b)});
+$('#th').onclick=()=>{const d=document.documentElement,dark=getComputedStyle(d).getPropertyValue('--bg').trim()=='#0f1b2a';d.dataset.th=dark?'l':'d';$('#th').textContent=dark?'🌙':'☀️';setK()};
+setK();show(0);
+let last=0;(function loop(ms){const t=ms/1000,dt=Math.min(.1,t-last);last=t;PL[cur].live.forEach(f=>f(t,dt));requestAnimationFrame(loop)})(0);
+</script></body></html>
