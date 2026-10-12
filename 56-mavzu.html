@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>56-mavzu. Masalalar yechish (Ko'z va ko'rish)</title>
+<style>
+:root{--bg:#f6f9ff;--card:#fff;--ink:#1d2433;--blue:#1c5dd6;--red:#e8590c;--pink:#ec6fa3;--green:#2f9e44}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,Segoe UI,Arial,sans-serif;padding:12px}
+.wrap{max-width:980px;margin:0 auto}
+h1{font-size:1.5rem;text-align:center;margin:8px 0 14px;color:var(--blue)}
+h2{font-size:1.2rem;margin:18px 0 8px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tabs button{flex:1 1 90px;padding:10px;font-size:1rem;border:2px solid var(--blue);background:#fff;color:var(--blue);border-radius:10px;cursor:pointer;font-weight:600}
+.tabs button.on{background:var(--blue);color:#fff}
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+table{border-collapse:collapse;width:100%}
+td,th{border:1px solid #cfd8ea;padding:6px 10px;text-align:left}
+th{background:#eaf1ff}
+td.find{background:#fff4e6}
+svg{width:100%;height:auto;background:#fcfdff;border:1px solid #dbe4f5;border-radius:10px;display:block}
+.sl{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.sl label{min-width:190px;font-weight:600}
+.sl input{flex:1 1 180px;height:28px}
+.sl b{min-width:90px;color:var(--blue)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.btns button,.ex button{padding:10px 14px;font-size:1rem;border:0;border-radius:10px;background:var(--blue);color:#fff;cursor:pointer}
+.btns button.alt{background:#6c7a96}
+.btns button:disabled{opacity:.4}
+.st{padding:8px 10px;border-left:5px solid #cfd8ea;margin:6px 0;background:#f4f7fd;border-radius:6px;animation:fi .5s}
+.st.cur{border-color:var(--red);background:#fff4e6}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.ans{border:3px solid var(--green);background:#ebfbee;border-radius:12px;padding:12px;font-size:1.1rem}
+.ans .big{font-size:1.3rem;font-weight:700;color:var(--green)}
+.hl{animation:pl .7s infinite alternate}
+.hl ellipse,.hl polyline,.hl line,.hl path,.hl circle{stroke-width:5}
+@keyframes pl{to{opacity:.45}}
+.ex{border-top:1px dashed #b8c4de;padding:8px 0}
+.hid{display:none;color:var(--green);font-weight:600;margin-top:6px}
+svg text{font-family:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>56-mavzu. Masalalar yechish (Ko'z va ko'rish)</h1>
+<div class="tabs" id="tabs"></div>
+
+<div class="card"><h2 style="margin-top:0">1. Masala sharti</h2><div id="text"></div></div>
+<div class="card"><h2 style="margin-top:0">2. Berilgan va topish kerak</h2>
+<table><thead><tr><th>Belgi</th><th>Qiymat</th><th>Izoh / birlik</th></tr></thead><tbody id="given"></tbody></table></div>
+<div class="card"><h2 style="margin-top:0">3. Chizma / simulyatsiya</h2>
+<svg id="svg" viewBox="0 0 600 260"></svg>
+<div id="sliders"></div></div>
+<div class="card"><h2 style="margin-top:0">4. Yechilishi (animatsiya)</h2>
+<div class="btns">
+<button id="bPrev" class="alt">◀ Oldingi qadam</button>
+<button id="bNext">Keyingi qadam ▶</button>
+<button id="bAuto">▶▶ Avtomatik ijro</button>
+<button id="bReset" class="alt">↺ Qaytadan</button></div>
+<div id="steps"></div></div>
+<div class="card"><h2 style="margin-top:0">5. Javob</h2><div class="ans" id="ans"></div></div>
+
+<div class="card"><h2 style="margin-top:0">Mustaqil mashq</h2><div id="exs"></div></div>
+
+<div class="card"><h2 style="margin-top:0">Qisqa jadval</h2>
+<div style="overflow-x:auto"><table>
+<tr><th>Kamchilik</th><th>Sababi</th><th>Ko'zoynak turi</th><th>Optik kuch ishorasi</th></tr>
+<tr><td>Miopiya (yaqindan ko'rmaslik)</td><td>Tasvir to'r pardadan <b>oldinda</b> hosil bo'ladi (ko'z uzun yoki gavhar juda kuchli)</td><td>Sochuvchi (botiq) linza</td><td>D &lt; 0 (−)</td></tr>
+<tr><td>Gipermetropiya (uzoqdan ko'rmaslik)</td><td>Tasvir to'r pardadan <b>keyinda</b> hosil bo'ladi (ko'z qisqa yoki gavhar kuchsiz)</td><td>Yig'uvchi (qavariq) linza</td><td>D &gt; 0 (+)</td></tr>
+</table></div></div>
+</div>
+
+<script>
+/* ===== Yordamchi funksiyalar ===== */
+// Vergulli o'nli son (kerakli xonagacha)
+const f=(x,k=1)=>(+x).toFixed(k).replace('.',',').replace('-','−');
+const n=x=>String(+(+x).toFixed(2)).replace('.',',').replace('-','−');
+const yAt=(x0,y0,x1,y1,x)=>y0+(y1-y0)*(x-x0)/(x1-x0);
+const pl=(pts,c='#e8590c',dash='',w=2.5)=>`<polyline points="${pts.join(' ')}" fill="none" stroke="${c}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''}/>`;
+const G=(hl,k,inner)=>`<g class="${hl.includes(k)?'hl':''}">${inner}</g>`;
+const T=(x,y,s,sz=15,c='#333',a='middle')=>`<text x="${x}" y="${y}" font-size="${sz}" fill="${c}" text-anchor="${a}">${s}</text>`;
+
+/* Ko'z kesimi: shox parda, gavhar, to'r parda */
+function eyeBody(lr,hl){
+  return G(hl,'eye',`<ellipse cx="380" cy="130" rx="120" ry="80" fill="#fff" stroke="#555" stroke-width="2"/>
+  <path d="M262 100 Q236 130 262 160" fill="#dff0ff" stroke="#6aa9d8" stroke-width="3"/>
+  <path d="M462 72 A120 80 0 0 1 462 188" fill="none" stroke="#ec6fa3" stroke-width="6"/>`)+
+  G(hl,'lens',`<ellipse cx="330" cy="130" rx="${lr}" ry="32" fill="#cfe3ff" stroke="#1c5dd6" stroke-width="2.5"/>`);
+}
+const concave=`<path d="M238 88 Q252 130 238 172 L262 172 Q248 130 262 88 Z" fill="#cfe3ff" stroke="#1c5dd6" stroke-width="2.5"/>`;
+const convex=`<path d="M250 88 Q270 130 250 172 Q230 130 250 88 Z" fill="#cfe3ff" stroke="#1c5dd6" stroke-width="2.5"/>`;
+const dot=(x,y)=>`<circle cx="${x}" cy="${y}" r="6" fill="#ffd43b" stroke="#e8590c" stroke-width="2"/>`;
+
+/* ===== MASALALAR ===== */
+const P=[
+/* ---------- 1-masala ---------- */
+{
+ name:'1-masala',
+ sl:[{id:'F',label:'Fokus masofasi F (mm)',min:14,max:20,step:0.5,v:17,u:'mm'}],
+ vb:'0 0 600 260',
+ c:v=>{const F=v.F/1000;return{F,D:1/F}},
+ text:v=>`Odam ko'zining gavhari (xrustalik) va shox pardasidan iborat optik tizimning fokus masofasi F = ${n(v.F)} mm. Ko'zning optik kuchini toping.`,
+ given:(v,c)=>[['F',`${n(v.F)} mm = ${f(c.F,3)} m`,'fokus masofasi'],['D','?','optik kuch (dptr) — topish kerak']],
+ draw:(v,c,hl)=>{
+  const fx=330+v.F*10;
+  let s=eyeBody(9,hl);
+  s+=G(hl,'rays',[100,130,160].map(y=>pl([20,y,330,y,fx,130])).join(''));
+  s+=G(hl,'focus',dot(fx,130));
+  s+=T(225,75,'Shox parda',14,'#333','end')+T(330,225,'Gavhar',14)+T(400,248,'Shishasimon tana',14)+T(520,60,"To'r parda",14,'#c2255c');
+  s+=T(20,35,`F = ${n(v.F)} mm`,20,'#1c5dd6','start')+T(20,62,`D = ${f(c.D,1)} dptr`,20,'#e8590c','start');
+  return s;},
+ steps:(v,c)=>[
+  {t:`Berilgan: F = ${n(v.F)} mm. Topish kerak: D.`,hl:['eye']},
+  {t:`Birlikni o'giramiz: F = ${n(v.F)} mm = ${f(c.F,3)} m (1 mm = 0,001 m).`,hl:['lens']},
+  {t:`Formula: <b>D = 1/F</b>`,hl:['lens']},
+  {t:`Qiymatni qo'yamiz: D = 1 / ${f(c.F,3)}`,hl:['rays']},
+  {t:`Hisoblaymiz: D ≈ <b>${f(c.D,1)} dptr</b>`,hl:['focus']}],
+ ans:(v,c)=>`<div class="big">D ≈ ${f(c.D,1)} dptr</div>Xulosa: fokus masofasi qancha kichik bo'lsa, optik kuch shuncha katta. Ko'z tizimining kuchi taxminan ${f(c.D,0)} dioptriya.`
+},
+/* ---------- 2-masala ---------- */
+{
+ name:'2-masala',
+ sl:[{id:'d',label:'Kitobgacha masofa d (sm)',min:10,max:100,step:5,v:25,u:'sm'}],
+ vb:'0 0 600 260',
+ c:v=>{const d=v.d/100,fm=0.017,D=1/d+1/fm;return{d,fm,id:1/d,iff:1/fm,D,F:1/D}},
+ text:v=>`Ko'zdan ${n(v.d)} sm masofada turgan kitobning aniq tasviri to'r pardada hosil bo'ladi. Ko'z gavharidan to'r pardagacha masofa f = 1,7 sm. Ko'z optik tizimining fokus masofasi va optik kuchini toping.`,
+ given:(v,c)=>[['d',`${n(v.d)} sm = ${f(c.d,2)} m`,'buyumgacha masofa'],['f','1,7 sm = 0,017 m',"gavhardan to'r pardagacha"],['F va D','?','topish kerak']],
+ draw:(v,c,hl)=>{
+  const lr=Math.min(24,Math.max(8,8+(c.D-58)));
+  let s=eyeBody(lr,hl);
+  s+=G(hl,'obj',`<line x1="50" y1="130" x2="50" y2="90" stroke="#2b8a3e" stroke-width="4"/><polygon points="44,98 50,86 56,98" fill="#2b8a3e"/>`)+T(50,150,'Kitob',14,'#2b8a3e');
+  s+=G(hl,'rays',pl([50,90,330,90,500,155])+pl([50,90,500,155]));
+  s+=G(hl,'img',`<line x1="500" y1="130" x2="500" y2="155" stroke="#c2255c" stroke-width="4"/><polygon points="494,147 500,159 506,147" fill="#c2255c"/>`);
+  s+=pl([50,215,330,215],'#555','4 3',1.5)+T(190,208,`d = ${n(v.d)} sm`,15)+pl([330,232,500,232],'#555','4 3',1.5)+T(415,250,'f = 1,7 sm',15);
+  s+=T(20,25,`D = ${f(c.D,1)} dptr`,18,'#e8590c','start')+T(20,48,`F = ${f(c.F*100,2)} sm`,18,'#1c5dd6','start');
+  return s;},
+ steps:(v,c)=>[
+  {t:`Berilgan: d = ${n(v.d)} sm, f = 1,7 sm. Topish kerak: F va D.`,hl:['obj','img']},
+  {t:`Birliklar: d = ${f(c.d,2)} m, f = 0,017 m.`,hl:['obj']},
+  {t:`Yupqa linza formulasi: <b>1/F = 1/d + 1/f</b>`,hl:['lens']},
+  {t:`Qo'yamiz: 1/F = 1/${f(c.d,2)} + 1/0,017`,hl:['rays']},
+  {t:`Hisoblaymiz: 1/F = ${f(c.id,1)} + ${f(c.iff,1)} = <b>${f(c.D,1)} dptr</b>`,hl:['rays']},
+  {t:`D = 1/F = ${f(c.D,1)} dptr, F = 1/D ≈ ${f(c.F,4)} m ≈ <b>${f(c.F*100,1)} sm</b>`,hl:['lens','img']}],
+ ans:(v,c)=>`<div class="big">D ≈ ${f(c.D,1)} dptr, F ≈ ${f(c.F*100,1)} sm</div>Xulosa: buyum yaqinlashganda (d kamayganda) gavhar qavariqlashadi, D ortadi — shu tufayli tasvir doim to'r pardada qoladi (akkomodatsiya).`
+},
+/* ---------- 3-masala ---------- */
+{
+ name:'3-masala',
+ sl:[{id:'L',label:'Uzoq ko\'rish nuqtasi (sm)',min:20,max:100,step:5,v:50,u:'sm'}],
+ vb:'0 0 600 200',
+ c:v=>{const L=v.L/100;return{L,F:-L,D:-1/L}},
+ text:v=>`Yaqindan ko'rmaydigan odam ko'zining uzoq ko'rish nuqtasi (aniq ko'ra oladigan eng uzoq masofa) ${n(v.L)} sm. U uzoqdagi narsalarni aniq ko'rishi uchun qanday optik kuchga ega ko'zoynak taqishi kerak?`,
+ given:(v,c)=>[['uzoq nuqta',`${n(v.L)} sm = ${f(c.L,2)} m`,"aniq ko'rishning eng uzoq masofasi"],['d','∞','buyum cheksiz uzoqda'],['F va D','?','topish kerak']],
+ draw:(v,c,hl)=>{
+  const fxNo=500-16*(100/v.L), xF=250-4*v.L;
+  const panel=(gl)=>{
+    let s=eyeBody(9,hl);
+    [110,150].forEach(y=>{
+      if(!gl){ s+=G(hl,'rays',pl([20,y,330,y,fxNo,130,500,yAt(330,y,fxNo,130,500)])); }
+      else{
+        const yl=y===110?130-20*(330-xF)/(250-xF):260-(130-20*(330-xF)/(250-xF));
+        const xs=Math.max(20,xF);
+        s+=G(hl,'rays',pl([20,y,250,y,330,yl,500,130])+pl([xs,yAt(250,y,330,yl,xs),250,y],'#e8590c','6 4',2));
+      }});
+    if(!gl) s+=G(hl,'focus',dot(fxNo,130)); else s+=G(hl,'focus',dot(500,130))+G(hl,'glasses',concave);
+    return s;};
+  return `<g transform="translate(0,30) scale(.5)">${panel(false)}</g><g transform="translate(300,30) scale(.5)">${panel(true)}</g>
+  ${T(150,20,"Ko'zoynaksiz",16)+T(450,20,"Ko'zoynak bilan",16)}
+  ${T(150,185,"Fokus to'r pardadan OLDINDA — tasvir xira",13,'#c2255c')}
+  ${T(450,185,`Sochuvchi linza: D = ${f(c.D,1)} dptr — fokus to'r pardada`,13,'#2b8a3e')}`;},
+ steps:(v,c)=>[
+  {t:`Berilgan: uzoq nuqta = ${n(v.L)} sm = ${f(c.L,2)} m. Topish kerak: F va D.`,hl:['eye']},
+  {t:`Uzoqdagi buyum: d = ∞, shuning uchun 1/d = 0.`,hl:['rays']},
+  {t:`Ko'zoynak tasvirni uzoq nuqtada (mavhum) hosil qilishi kerak: f = −${f(c.L,2)} m.`,hl:['glasses']},
+  {t:`Formula: <b>1/F = 1/d + 1/f = 0 + 1/f</b>`,hl:['glasses']},
+  {t:`Qo'yamiz: 1/F = 1/(−${f(c.L,2)}) = ${f(c.D,1)} dptr`,hl:['rays']},
+  {t:`F = ${f(c.F,2)} m, D = <b>${f(c.D,1)} dptr</b> (sochuvchi linza).`,hl:['glasses','focus']}],
+ ans:(v,c)=>`<div class="big">D = ${f(c.D,1)} dptr (sochuvchi linza)</div>F = ${f(c.F,2)} m. Xulosa: miopiyada tasvir to'r pardadan oldinda hosil bo'ladi; sochuvchi (manfiy) linza fokusni to'r pardaga suradi.`
+},
+/* ---------- 4-masala ---------- */
+{
+ name:'4-masala',
+ sl:[{id:'N',label:"Yaqin ko'rish nuqtasi (sm)",min:25,max:100,step:5,v:50,u:'sm'}],
+ vb:'0 0 600 200',
+ c:v=>{const d=0.25,fm=-v.N/100,id=1/d,iF=1/fm,D=id+iF;return{d,fm,id,iF,D,F:D===0?Infinity:1/D}},
+ text:v=>`Uzoqdan ko'rmaydigan odam ko'zining yaqin ko'rish nuqtasi ${n(v.N)} sm (normal ko'z uchun 25 sm). U kitobni 25 sm masofadan o'qishi uchun qanday optik kuchga ega ko'zoynak taqishi kerak?`,
+ given:(v,c)=>[['d','25 sm = 0,25 m','kitobgacha masofa'],['f',`−${n(v.N)} sm = ${f(c.fm,2)} m`,'mavhum tasvir (yaqin nuqtada)'],['F va D','?','topish kerak']],
+ draw:(v,c,hl)=>{
+  const k=4-100/v.N, fxNo=500+12*k, Dg=Math.max(0,c.D);
+  const panel=(gl)=>{
+    let s=eyeBody(9,hl);
+    [110,150].forEach(y=>{
+      if(!gl) s+=G(hl,'rays',pl([20,y,330,y,fxNo,130]));
+      else{ const yl=y===110?110+5*Dg:150-5*Dg; s+=G(hl,'rays',pl([20,y,250,y,330,yl,500,130])); }});
+    if(!gl) s+=G(hl,'focus',dot(fxNo,130)); else s+=G(hl,'focus',dot(500,130))+G(hl,'glasses',convex);
+    return s;};
+  return `<g transform="translate(0,30) scale(.5)">${panel(false)}</g><g transform="translate(300,30) scale(.5)">${panel(true)}</g>
+  ${T(150,20,"Ko'zoynaksiz",16)+T(450,20,"Ko'zoynak bilan",16)}
+  ${T(150,185,"Fokus to'r pardadan KEYIN — tasvir xira",13,'#c2255c')}
+  ${T(450,185,`Yig'uvchi linza: D = +${f(c.D,1)} dptr — fokus to'r pardada`,13,'#2b8a3e')}`;},
+ steps:(v,c)=>[
+  {t:`Berilgan: d = 0,25 m, f = −${f(-c.fm,2)} m (mavhum tasvir). Topish kerak: F va D.`,hl:['eye']},
+  {t:`Ko'zoynak 25 sm dagi kitobning mavhum tasvirini yaqin nuqtada (${n(v.N)} sm) hosil qiladi, shuning uchun f manfiy.`,hl:['glasses']},
+  {t:`Formula: <b>1/F = 1/d + 1/f</b>`,hl:['glasses']},
+  {t:`Qo'yamiz: 1/F = 1/0,25 + 1/(−${f(-c.fm,2)})`,hl:['rays']},
+  {t:`Hisoblaymiz: 1/F = ${f(c.id,1)} − ${f(-c.iF,1)} = <b>${f(c.D,1)} dptr</b>`,hl:['rays']},
+  {t:c.D===0?`D = 0: ko'zoynak kerak emas (normal ko'z).`:`D = +${f(c.D,1)} dptr, F = 1/D = ${f(c.F,2)} m (yig'uvchi linza).`,hl:['glasses','focus']}],
+ ans:(v,c)=>`<div class="big">D = ${c.D>0?'+':''}${f(c.D,1)} dptr (yig'uvchi linza)</div>${c.D===0?"Yaqin nuqta 25 sm bo'lsa, ko'zoynak kerak emas.":`F = ${f(c.F,2)} m. `}Xulosa: gipermetropiyada tasvir to'r pardadan keyin hosil bo'ladi; yig'uvchi (musbat) linza nurlarni oldindan to'playdi.`
+},
+/* ---------- 5-masala ---------- */
+{
+ name:'5-masala',
+ sl:[{id:'D',label:'Optik kuch D (dptr)',min:1,max:4,step:0.1,v:2.5,u:'dptr'},{id:'d',label:'Kitobgacha masofa d (sm)',min:10,max:40,step:1,v:25,u:'sm'}],
+ vb:'0 0 600 300',
+ c:v=>{const F=100/v.D,iF=1/F,id=1/v.d,ifv=iF-id,inf=Math.abs(ifv)<1e-9,fv=inf?Infinity:1/ifv;return{F,iF,id,ifv,inf,f:fv,m:inf?Infinity:Math.abs(fv)/v.d}},
+ text:v=>`Odam optik kuchi +${n(v.D)} dptr bo'lgan ko'zoynak taqib, kitobni ko'zdan ${n(v.d)} sm masofada o'qiydi. Uning ko'zining yaqin ko'rish nuqtasi qayerda joylashgan?`,
+ given:(v,c)=>[['D',`+${n(v.D)} dptr`,"ko'zoynakning optik kuchi"],['F',`1/${n(v.D)} = ${f(c.F/100,2)} m = ${f(c.F,1)} sm`,'fokus masofasi'],['d',`${n(v.d)} sm`,'kitobgacha masofa'],['f','?',"yaqin ko'rish nuqtasi — topish kerak"]],
+ draw:(v,c,hl)=>{
+  const s3=3,lx=400,y0=150,h=45,xo=lx-s3*v.d,yo=y0-h;
+  let s=pl([10,y0,590,y0],'#999','',1.5);
+  s+=G(hl,'lens',`<ellipse cx="${lx}" cy="${y0}" rx="8" ry="75" fill="#cfe3ff" stroke="#1c5dd6" stroke-width="2.5"/>`);
+  [-1,1].forEach(q=>{const x=lx+q*s3*c.F; if(x>5&&x<595) s+=`<circle cx="${x}" cy="${y0}" r="4" fill="#1c5dd6"/>`+T(x,y0+20,'F',14,'#1c5dd6');});
+  s+=G(hl,'obj',`<line x1="${xo}" y1="${y0}" x2="${xo}" y2="${yo}" stroke="#2b8a3e" stroke-width="4"/><polygon points="${xo-6},${yo+9} ${xo},${yo-3} ${xo+6},${yo+9}" fill="#2b8a3e"/>`)+T(xo,y0+20,'Kitob',14,'#2b8a3e');
+  if(!c.inf){
+    const xi=lx+s3*c.f, yi=y0-h*(-c.f/v.d);
+    const sl1=(yi-yo)/(xi-lx), sl2=h/(lx-xo);
+    let r=pl([xo,yo,lx,yo,600,yo+sl1*200])+pl([xo,yo,lx,y0,600,y0+sl2*200]);
+    if(c.f<0) r+=pl([lx,yo,xi,yi],'#e8590c','6 4',2)+pl([lx,y0,xi,yi],'#e8590c','6 4',2);
+    s+=G(hl,'rays',r);
+    if(xi>0&&xi<600&&Math.abs(yi-y0)<148) s+=G(hl,'img',`<line x1="${xi}" y1="${y0}" x2="${xi}" y2="${yi}" stroke="#c2255c" stroke-width="3" stroke-dasharray="${c.f<0?'6 4':''}"/><circle cx="${xi}" cy="${yi}" r="5" fill="#c2255c"/>`)+T(xi,y0+38,'Tasvir',14,'#c2255c');
+  }
+  const cap=c.inf?"d = F: tasvir cheksizlikda":(c.f<0?`Mavhum, to'g'ri, kattalashgan tasvir: f = ${f(c.f,1)} sm`:`d > F: tasvir haqiqiy, f = ${f(c.f,1)} sm`);
+  s+=T(300,285,cap,15,'#c2255c');
+  s+=T(15,25,`F = ${f(c.F,1)} sm`,17,'#1c5dd6','start');
+  return s;},
+ steps:(v,c)=>[
+  {t:`Berilgan: D = +${n(v.D)} dptr, d = ${n(v.d)} sm. Topish kerak: f.`,hl:['lens','obj']},
+  {t:`Fokus masofasi: F = 1/D = 1/${n(v.D)} = ${f(c.F/100,2)} m = <b>${f(c.F,1)} sm</b>.`,hl:['lens']},
+  {t:`Formula: <b>1/f = 1/F − 1/d</b> (masofalar santimetrda).`,hl:['lens']},
+  {t:`Qo'yamiz: 1/f = 1/${f(c.F,1)} − 1/${n(v.d)}`,hl:['rays']},
+  {t:`Hisoblaymiz: 1/f = ${f(c.iF,4)} − ${f(c.id,4)} = ${f(c.ifv,4)} sm⁻¹`,hl:['rays']},
+  c.inf?{t:`1/f = 0, ya'ni f = ∞: tasvir cheksizlikda (d = F).`,hl:['img']}
+   :{t:`f = 1/(${f(c.ifv,4)}) ≈ <b>${f(c.f,1)} sm</b>. ${c.f<0?`Minus ishora — tasvir mavhum, yaqin ko'rish nuqtasi ≈ ${f(Math.abs(c.f),0)} sm. Kattalashtirish Г = |f|/d ≈ ${f(c.m,1)}.`:`Musbat — tasvir haqiqiy (d > F bo'lgani uchun).`}`,hl:['img','rays']}],
+ ans:(v,c)=>c.inf?`<div class="big">f = ∞</div>d = F bo'lganda tasvir cheksizlikda hosil bo'ladi.`:(c.f<0?`<div class="big">f ≈ ${f(c.f,1)} sm → yaqin nuqta ≈ ${f(Math.abs(c.f),0)} sm</div>Mavhum tasvir ko'zdan taxminan ${f(Math.abs(c.f),1)} sm masofada hosil bo'ladi. Xulosa: buyum fokus ichida (d &lt; F) bo'lsa, linza mavhum, to'g'ri, kattalashgan tasvir beradi.`:`<div class="big">f ≈ ${f(c.f,1)} sm (haqiqiy tasvir)</div>Bu holda d &gt; F, shuning uchun tasvir haqiqiy. Mavhum tasvir uchun d &lt; F tanlang.`)
+}];
+
+/* ===== Mustaqil mashq ===== */
+const EX=[
+ ["Boshqa odam ko'zining optik tizimi uchun F = 16 mm. Uning optik kuchini toping.","D = 1/0,016 = 62,5 dptr"],
+ ["Ko'zdan 40 sm masofadagi buyumning aniq tasviri f = 1,7 sm da hosil bo'ladi. D va F ni toping.","1/F = 1/0,4 + 1/0,017 = 2,5 + 58,8 = 61,3 dptr; F ≈ 1,63 sm"],
+ ["Miopiya bilan og'rigan odamning uzoq ko'rish nuqtasi 25 sm. Qanday ko'zoynak kerak?","D = −1/0,25 = −4 dptr (sochuvchi linza)"],
+ ["Yaqin ko'rish nuqtasi 80 sm bo'lgan odam kitobni 25 sm dan o'qishi uchun qanday ko'zoynak kerak?","1/F = 1/0,25 − 1/0,8 = 4 − 1,25 = +2,75 dptr (yig'uvchi linza)"],
+ ["Optik kuchi +3 dptr bo'lgan ko'zoynak bilan odam kitobni 20 sm dan o'qiydi. Yaqin nuqta qayerda?","F = 33,3 sm; 1/f = 1/33,3 − 1/20 = −0,02 sm⁻¹; f = −50 sm → yaqin nuqta 50 sm"]];
+document.getElementById('exs').innerHTML=EX.map((e,i)=>`<div class="ex"><b>${i+1}-masalaga o'xshash:</b> ${e[0]}<br><button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">Javobni ko'rsat</button><div class="hid">${e[1]}</div></div>`).join('');
+
+/* ===== Holat va chizish ===== */
+let cur=0,timer=null;
+const vals=P.map(p=>Object.fromEntries(p.sl.map(s=>[s.id,s.v])));
+const idx=P.map(()=>-1);
+const $=id=>document.getElementById(id);
+
+function stopAuto(){clearInterval(timer);timer=null;$('bAuto').textContent='▶▶ Avtomatik ijro'}
+
+function buildTabs(){
+  $('tabs').innerHTML=P.map((p,i)=>`<button class="${i===cur?'on':''}" data-i="${i}">${p.name}</button>`).join('');
+  $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{stopAuto();cur=+b.dataset.i;buildTabs();buildSliders();render()});
+}
+function buildSliders(){
+  const p=P[cur];
+  $('sliders').innerHTML=p.sl.map(s=>`<div class="sl"><label>${s.label}</label><input type="range" id="s_${s.id}" min="${s.min}" max="${s.max}" step="${s.step}" value="${vals[cur][s.id]}"><b id="o_${s.id}">${n(vals[cur][s.id])} ${s.u}</b></div>`).join('');
+  p.sl.forEach(s=>$('s_'+s.id).oninput=e=>{vals[cur][s.id]=+e.target.value;$('o_'+s.id).textContent=n(e.target.value)+' '+s.u;render()});
+}
+function render(){
+  const p=P[cur],v=vals[cur],c=p.c(v),st=p.steps(v,c);
+  if(idx[cur]>=st.length) idx[cur]=st.length-1;
+  const i=idx[cur],hl=i>=0?st[i].hl:[];
+  $('text').innerHTML=p.text(v);
+  $('given').innerHTML=p.given(v,c).map(r=>`<tr><td><b>${r[0]}</b></td><td ${r[1]==='?'?'class="find"':''}>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+  $('svg').setAttribute('viewBox',p.vb);
+  $('svg').innerHTML=p.draw(v,c,hl);
+  $('steps').innerHTML=i<0?'<i>«Keyingi qadam» tugmasini bosing.</i>':st.slice(0,i+1).map((s,k)=>`<div class="st ${k===i?'cur':''}"><b>${k+1}-qadam.</b> ${s.t}</div>`).join('');
+  $('ans').innerHTML=p.ans(v,c);
+  $('bPrev').disabled=i<0;$('bNext').disabled=i>=st.length-1;
+}
+const nSteps=()=>P[cur].steps(vals[cur],P[cur].c(vals[cur])).length;
+$('bNext').onclick=()=>{if(idx[cur]<nSteps()-1)idx[cur]++;render()};
+$('bPrev').onclick=()=>{stopAuto();if(idx[cur]>-1)idx[cur]--;render()};
+$('bReset').onclick=()=>{stopAuto();idx[cur]=-1;render()};
+$('bAuto').onclick=()=>{
+  if(timer){stopAuto();return}
+  if(idx[cur]>=nSteps()-1)idx[cur]=-1;
+  $('bAuto').textContent='⏸ To\'xtatish';
+  timer=setInterval(()=>{ if(idx[cur]<nSteps()-1){idx[cur]++;render()} else stopAuto(); },1800);
+  idx[cur]=Math.max(idx[cur],0);render();
+};
+
+buildTabs();buildSliders();render();
+</script>
+</body>
+</html>

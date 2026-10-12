@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Linzalar — 9-sinf fizika, 50-mavzu</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--tx:#1d2733;--mut:#5d6b7c;--bd:#d9e1ea;--ac:#1f9fe0;--ok:#2e9e4f;--bad:#e53935;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161d;--card:#18212b;--tx:#e8edf3;--mut:#9aa8b8;--bd:#2a3644;--ac:#5ac8ff;--ok:#3ddc84;--bad:#ff6b6b}}
+:root[data-theme="dark"]{--bg:#10161d;--card:#18212b;--tx:#e8edf3;--mut:#9aa8b8;--bd:#2a3644;--ac:#5ac8ff;--ok:#3ddc84;--bad:#ff6b6b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.top{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;border-bottom:1px solid var(--bd)}
+header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
+h1{font-size:18px;margin:0}
+#th{font-size:18px;width:38px;height:34px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:0 12px 8px;white-space:nowrap;-webkit-overflow-scrolling:touch}
+nav button{flex:0 0 auto}
+button{font:inherit;font-size:14px;padding:7px 12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;cursor:pointer}
+button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+button:disabled{opacity:.5}
+main{max-width:760px;margin:0 auto;padding:12px}
+h2{font-size:17px;margin:4px 0 8px}
+p{margin:6px 0}
+.p[hidden]{display:none}
+canvas{width:100%;display:block;background:var(--card);border:1px solid var(--bd);border-radius:12px;touch-action:pan-y}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.out{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin:8px 0;font-size:14.5px}
+input[type=range]{width:100%;accent-color:var(--ac)}
+label{font-size:14.5px;display:block;margin-top:6px}
+ol{padding-left:20px}
+li{margin:4px 0;color:var(--mut)}
+li.cur{color:var(--tx);font-weight:600}
+.q{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;margin:10px 0}
+.o{display:block;width:100%;text-align:left;margin:6px 0}
+.o.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.o.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+#tr{font-weight:700;font-size:17px}
+</style>
+</head>
+<body>
+<div class="top">
+  <header><h1>Linzalar · 50-mavzu</h1><button id="th" title="Mavzu">◐</button></header>
+  <nav id="tabs"></nav>
+</div>
+<main id="main"></main>
+
+<script>
+/* ---------- Yordamchi funksiyalar ---------- */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const fmt=n=>(+n.toFixed(2)).toString().replace('.',',');
+const dark=()=>{const t=document.documentElement.dataset.theme;return t?t==='dark':matchMedia('(prefers-color-scheme:dark)').matches};
+// Ranglar (och/to'q mavzuga qarab)
+const col=()=>dark()?{ray:'#ffd23f',lens:'rgba(90,200,255,.28)',lensS:'#5ac8ff',grey:'#9aa0aa',obj:'#ff5252',img:'#3ddc84',tx:'#e8edf3'}
+ :{ray:'#f0b000',lens:'rgba(60,180,240,.25)',lensS:'#1f9fe0',grey:'#80868f',obj:'#e53935',img:'#2e9e4f',tx:'#1d2733'};
+
+/* ---------- Canvas chizish primitivlari ---------- */
+function line(c,a,b,color,w,dash){c.beginPath();c.setLineDash(dash||[]);c.strokeStyle=color;c.lineWidth=w||1.5;c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke();c.setLineDash([])}
+// Siniq chiziqni p (0..1) qismigacha chizish (animatsiya uchun)
+function poly(c,pts,p,color,w,dash){
+  let L=0,seg=[];
+  for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(l);L+=l}
+  let rem=L*p;c.beginPath();c.setLineDash(dash||[]);c.strokeStyle=color;c.lineWidth=w||1.8;c.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length&&rem>0;i++){const l=seg[i-1],f=Math.min(1,rem/l);
+    c.lineTo(pts[i-1][0]+(pts[i][0]-pts[i-1][0])*f,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*f);rem-=l}
+  c.stroke();c.setLineDash([])}
+// Vertikal strelka (buyum / tasvir)
+function arrow(c,x,y0,y1,color,dash){
+  c.strokeStyle=c.fillStyle=color;c.lineWidth=2.5;c.setLineDash(dash?[5,4]:[]);
+  c.beginPath();c.moveTo(x,y0);c.lineTo(x,y1);c.stroke();c.setLineDash([]);
+  if(Math.abs(y1-y0)<3)return;
+  const d=y1<y0?1:-1;c.beginPath();c.moveTo(x,y1);c.lineTo(x-4.5,y1+d*9);c.lineTo(x+4.5,y1+d*9);c.closePath();c.fill()}
+// Linza shakli: s>0 yig'uvchi (qavariq), s<0 sochuvchi (botiq)
+function lensShape(c,cx,cy,L,s,w){
+  const C=col();c.beginPath();
+  if(s>0){c.moveTo(cx,cy-L);c.quadraticCurveTo(cx+2*w,cy,cx,cy+L);c.quadraticCurveTo(cx-2*w,cy,cx,cy-L)}
+  else{c.moveTo(cx-w,cy-L);c.lineTo(cx+w,cy-L);c.quadraticCurveTo(cx-.4*w,cy,cx+w,cy+L);c.lineTo(cx-w,cy+L);c.quadraticCurveTo(cx+.4*w,cy,cx-w,cy-L)}
+  c.closePath();c.fillStyle=C.lens;c.fill();c.strokeStyle=C.lensS;c.lineWidth=1.5;c.stroke()}
+const lens=(c,g,s)=>lensShape(c,g.X(0),g.Y(0),g.H*.42,s,Math.max(5,g.W*.022));
+// Bosh optik o'q va O nuqta
+function axis(c,g){const C=col(),cy=g.Y(0);line(c,[0,cy],[g.W,cy],C.grey,1,[3,4]);
+  c.fillStyle=C.tx;c.textAlign='center';c.fillText('O',g.X(0)+7,cy+14)}
+// F va 2F belgilari
+function marks(c,g,F){const C=col(),cy=g.Y(0),a=Math.abs(F);
+  [-2,-1,1,2].forEach(v=>{const x=g.X(a*v);c.fillStyle=C.grey;c.beginPath();c.arc(x,cy,2.6,0,7);c.fill();
+    c.fillStyle=C.tx;c.textAlign='center';c.fillText((Math.abs(v)==2?'2F':'F')+(v<0?"'":''),x,cy+14)})}
+
+/* ---------- Sahnalar ---------- */
+// 1-reja: parallel dasta (chap — yig'uvchi, o'ng — sochuvchi)
+function draw1(c,g,p){
+  const C=col(),W=g.W,H=g.H,cy=H/2,fp=W*.17,w=Math.max(5,W*.022);
+  [[W/4,1,'Yig\'uvchi linza'],[3*W/4,-1,'Sochuvchi linza']].forEach(([ox,s,name])=>{
+    line(c,[ox-W*.24,cy],[ox+W*.24,cy],C.grey,1,[3,4]);
+    lensShape(c,ox,cy,H*.4,s,w);
+    c.fillStyle=C.tx;c.textAlign='center';c.fillText(name,ox,16);
+    const fx=ox+s*fp;c.fillStyle=C.grey;c.beginPath();c.arc(fx,cy,2.6,0,7);c.fill();c.fillStyle=C.tx;c.fillText('F',fx,cy+14);
+    [-.24,-.16,-.08,.08,.16,.24].forEach(v=>{
+      const y=v*H,e=s>0?W*.23:W*.2,ye=s>0?y*(1-e/fp):y*(1+e/fp);
+      poly(c,[[ox-W*.23,cy+y],[ox,cy+y],[ox+e,cy+ye]],p,C.ray,1.7);
+      if(s<0&&p>=1)line(c,[ox,cy+y],[ox-fp,cy],C.grey,1,[3,4])})})}
+// 2-reja: fokus masofasi F va optik kuch
+function draw2(c,g,F,p){
+  const C=col(),cy=g.Y(0);axis(c,g);marks(c,g,F);lens(c,g,1);
+  [-18,-9,9,18].forEach(y=>poly(c,[[g.X(-70),g.Y(y)],[g.X(0),g.Y(y)],[g.X(70),g.Y(y*(1-70/F))]],p,C.ray,1.6));
+  line(c,[g.X(0),cy-14],[g.X(F),cy-14],C.tx,1);c.fillStyle=C.tx;c.textAlign='center';c.fillText('F = '+F+' sm',g.X(F/2),cy-19)}
+// 3-6 rejalar: buyum, xarakterli nurlar va tasvir (F<0 — sochuvchi)
+function scene(c,g,F,d,h,p,seq,o){
+  const C=col(),cy=g.Y(0),XM=70,f=Math.abs(d-F)<1e-9?Infinity:1/(1/F-1/d),hi=-h*f/d;
+  axis(c,g);marks(c,g,F);lens(c,g,F>0?1:-1);
+  if(o.rays){
+    const yl=-h*F/(d-F);                       // (c) nurning linzadagi balandligi
+    const R=[[[-d,h],[0,0],[XM,-h*XM/d]],      // (a) markazdan o'tuvchi
+             [[-d,h],[0,h],[XM,h*(1-XM/F)]]];  // (b) o'qqa parallel
+    if(Math.abs(d-F)>.5)R.push([[-d,h],[0,yl],[XM,yl]]); // (c) fokusdan o'tgan
+    R.forEach((r,i)=>{const pp=seq?Math.max(0,Math.min(1,p*3-i)):p;
+      poly(c,r.map(q=>[g.X(q[0]),g.Y(q[1])]),pp,C.ray,1.8);
+      if(f<0&&pp>=1)poly(c,[[g.X(0),g.Y(r[1][1])],[g.X(f),g.Y(hi)]],1,C.grey,1.2,[4,4])})}
+  if(o.obj)arrow(c,g.X(-d),cy,g.Y(h),C.obj);
+  if(o.img&&p>=1&&isFinite(f)&&Math.abs(f)<300)arrow(c,g.X(f),cy,g.Y(hi),C.img,f<0)}
+
+/* ---------- Fizik hisob ---------- */
+function pr(F,d){if(d===F)return null;const f=1/(1/F-1/d),G=Math.abs(f)/d;
+  return{f,G,t:(f>0?"haqiqiy, teskari":"mavhum, to'g'ri")+", "+(G>1.005?"kattalashgan":G<.995?"kichraygan":"teng kattalikda")}}
+
+/* ---------- Holat ---------- */
+let F2=20,s4={d:40,s:1},d5=30,F5=20,pi=0,cs=1,act=0;
+const T=[1,1,1,1,1,1],R=[0,0,0,0,0,0];       // animatsiya progressi va holati
+const PR=[
+ {F:20,d:30,q:"F = 20 cm yig'uvchi linzadan d = 30 cm masofada buyum turibdi. f va Γ ni toping.",s:[
+  "<b>Berilgan:</b> F = 20 sm, d = 30 sm. <b>Topish kerak:</b> f, Γ.",
+  "Linza formulasi: 1/F = 1/d + 1/f, bundan 1/f = 1/F − 1/d.",
+  "1/f = 1/20 − 1/30 = 3/60 − 2/60 = 1/60 → <b>f = 60 sm</b>.",
+  "Γ = f/d = 60/30 = <b>2</b>.",
+  "<b>Javob:</b> f = 60 sm, Γ = 2 (tasvir haqiqiy, teskari, 2 marta kattalashgan)."]},
+ {F:25,d:null,q:"Fokus masofasi 25 cm bo'lgan linzaning optik kuchini toping.",s:[
+  "<b>Berilgan:</b> F = 25 sm = 0,25 m. <b>Topish kerak:</b> D.",
+  "Optik kuch: D = 1/F (F metrda olinadi).",
+  "D = 1/0,25 m = <b>4 dptr</b>.",
+  "<b>Javob:</b> D = 4 dptr."]},
+ {F:15,d:30,q:"F = 15 cm, d = 30 cm. Tasvir qayerda va qanday?",s:[
+  "<b>Berilgan:</b> F = 15 sm, d = 30 sm. <b>Topish kerak:</b> f va tasvir tavsifi.",
+  "1/f = 1/F − 1/d.",
+  "1/f = 1/15 − 1/30 = 2/30 − 1/30 = 1/30 → <b>f = 30 sm</b>.",
+  "Γ = f/d = 30/30 = <b>1</b>.",
+  "<b>Javob:</b> f = 30 sm, Γ = 1. d = 2F bo'lgani uchun tasvir haqiqiy, teskari, buyumga teng."]},
+ {F:-10,d:30,q:"Sochuvchi linza F = −10 cm, d = 30 cm. f va Γ ni toping.",s:[
+  "<b>Berilgan:</b> F = −10 sm (sochuvchi linzada F &lt; 0), d = 30 sm.",
+  "1/f = 1/F − 1/d.",
+  "1/f = −1/10 − 1/30 = −3/30 − 1/30 = −4/30 → <b>f = −7,5 sm</b>.",
+  "Γ = |f|/d = 7,5/30 = <b>0,25</b>.",
+  "<b>Javob:</b> f = −7,5 sm, Γ = 0,25 (f &lt; 0: tasvir mavhum, to'g'ri, kichraygan)."]}];
+const S=[
+ (c,g,p)=>draw1(c,g,p),
+ (c,g,p)=>draw2(c,g,F2,p),
+ (c,g,p)=>scene(c,g,20,30,10,p,true,{obj:1,rays:1,img:1}),
+ (c,g,p)=>scene(c,g,s4.s*15,s4.d,10,p,false,{obj:1,rays:1,img:1}),
+ (c,g,p)=>scene(c,g,F5,d5,10,p,false,{obj:1,rays:1,img:1}),
+ (c,g)=>{const q=PR[pi];if(q.d==null)draw2(c,g,q.F,cs>=2?1:0);
+   else scene(c,g,q.F,q.d,10,1,false,{obj:cs>=1,rays:cs>=2,img:cs>=3})}];
+
+/* ---------- Sahifa tuzilishi ---------- */
+const NAMES=['1 · Turlari','2 · Elementlari','3 · Nurlar','4 · Tasvir','5 · Formula','6 · Masalalar','Test'];
+const TT=['Linza tushunchasi va turlari','Linza elementlari','Xarakterli nurlar','Tasvir yasash','Linza formulasi'];
+const TXT=[
+ "Linza — ikki sferik sirt bilan chegaralangan shaffof jism. O'rtasi qalin, chetlari yupqa bo'lsa — <b>yig'uvchi (qavariq)</b> linza: parallel nurlar dastasini fokusda yig'adi. O'rtasi yupqa, chetlari qalin bo'lsa — <b>sochuvchi (botiq)</b> linza: nurlarni tarqatadi. Qalinligi sirtlar egrilik radiusidan ancha kichik bo'lsa, u <b>yupqa linza</b> deyiladi.",
+ "<b>O</b> — optik markaz (undan o'tgan nur sinmaydi). <b>Bosh optik o'q</b> — O dan linza tekisligiga perpendikulyar o'tgan to'g'ri chiziq. <b>F</b> — fokus: parallel nurlar yig'iladigan nuqta; <b>F = OF</b> — fokus masofasi. <b>Optik kuch D = 1/F</b>, birligi dioptriya (1 dptr = 1/m). F ni o'zgartiring:",
+ "Tasvirni yasash uchun xarakterli nurlardan ikkitasi yetarli. Ular ketma-ket chiziladi: <b>(a)</b> optik markazdan o'tgan nur sinmaydi; <b>(b)</b> o'qqa parallel nur sinib, fokusdan o'tadi; <b>(c)</b> fokusdan o'tgan nur sinib, o'qqa parallel chiqadi. Nurlar kesishgan nuqta — tasvirning uchi.",
+ "Yig'uvchi linzada: d &gt; 2F — haqiqiy, teskari, kichraygan; d = 2F — haqiqiy, teskari, teng; F &lt; d &lt; 2F — haqiqiy, teskari, kattalashgan; d = F — tasvir hosil bo'lmaydi; d &lt; F — mavhum, to'g'ri, kattalashgan. Sochuvchi linzada tasvir doim mavhum, to'g'ri, kichraygan. Qizil buyumni barmoq/sichqoncha bilan sudrang.",
+ "<b>1/F = 1/d + 1/f</b> va <b>Γ = H/h = f/d</b>. Ishora qoidasi: yig'uvchi linzada F &gt; 0, sochuvchida F &lt; 0; haqiqiy tasvirda f &gt; 0, mavhum tasvirda f &lt; 0. Yashil strelka — tasvir (punktir — mavhum tasvir)."];
+const TOP=['','','','<div class="btns"><button class="ty on" data-ty="1">Yig\'uvchi linza</button><button class="ty" data-ty="-1">Sochuvchi linza</button></div>',''];
+const CTL=['',
+ '<label>F = <b id="v1">20</b> sm</label><input type="range" id="r1" min="5" max="40" value="20"><div class="out" id="o1"></div>',
+ '<div class="out">(a) markazdan o\'tgan nur sinmaydi · (b) o\'qqa parallel nur fokusdan o\'tadi · (c) fokusdan o\'tgan nur o\'qqa parallel chiqadi. Buyum: d = 30 sm, F = 20 sm.</div>',
+ '<div class="out" id="o3"></div>',
+ '<label>d = <b id="v4d">30</b> sm</label><input type="range" id="r4d" min="5" max="60" value="30"><label>F = <b id="v4f">20</b> sm (manfiy — sochuvchi)</label><input type="range" id="r4f" min="-30" max="30" value="20"><div class="out" id="o4"></div>'];
+let html='';
+for(let i=0;i<5;i++)html+=`<section class="p" id="p${i}"${i?' hidden':''}><h2>${i+1}-reja. ${TT[i]}</h2><p>${TXT[i]}</p>${TOP[i]}<canvas id="c${i}"></canvas><div class="btns"><button data-a="s">Boshlash</button><button data-a="p">To'xtatish</button><button data-a="r">Qayta boshlash</button></div>${CTL[i]}</section>`;
+html+=`<section class="p" id="p5" hidden><h2>6-reja. Masalalar yechish</h2><div class="btns">${PR.map((_,i)=>`<button class="pp" data-p="${i}">${i+1}-masala</button>`).join('')}</div><div class="out" id="pq"></div><canvas id="c5"></canvas><ol id="ps"></ol><div class="btns"><button id="nx">Keyingi qadam</button><button id="rs">Qayta boshlash</button></div></section>`;
+html+=`<section class="p" id="p6" hidden><h2>Test</h2><div id="tq"></div><div class="out" id="tr"></div><div class="btns"><button id="tre">Qayta boshlash</button></div></section>`;
+$('#main').innerHTML=html;
+$('#tabs').innerHTML=NAMES.map((n,i)=>`<button data-t="${i}">${n}</button>`).join('');
+
+/* ---------- Tablar va mavzu ---------- */
+function show(i){act=i;$$('.p').forEach((s,j)=>s.hidden=j!==i);
+  $$('#tabs button').forEach((b,j)=>{b.classList.toggle('on',j===i);if(j===i)b.scrollIntoView({inline:'center',block:'nearest'})});scrollTo(0,0)}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)show(+b.dataset.t)});
+$('#th').onclick=()=>{document.documentElement.dataset.theme=dark()?'light':'dark'};
+
+/* ---------- Boshlash / To'xtatish / Qayta boshlash ---------- */
+$('#main').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const i=act,a=b.dataset.a;
+  if(a==='s'){if(T[i]>=1)T[i]=0;R[i]=1}else if(a==='p')R[i]=0;else{T[i]=0;R[i]=0}});
+
+/* ---------- 2-reja: F slayderi ---------- */
+function u2(){F2=+$('#r1').value;$('#v1').textContent=F2;
+  $('#o1').innerHTML=`D = 1/F = 1/${fmt(F2/100)} m = <b>${fmt(100/F2)} dptr</b>`}
+$('#r1').oninput=u2;u2();
+
+/* ---------- 4-reja: buyumni sudrash ---------- */
+function u3(){const a=15,d=s4.d,q=pr(s4.s*a,d);let t;
+  if(s4.s>0){const nm=d>2*a+.01?'d > 2F':d>2*a-.01?'d = 2F':d>a+.01?'F < d < 2F':d>a-.01?'d = F':'d < F';
+    t=`<b>${nm}</b> (F = 15 sm, d = ${fmt(d)} sm)<br>`+(q?`Tasvir: ${q.t}<br>f = ${fmt(q.f)} sm · Γ = ${fmt(q.G)}`:"Tasvir hosil bo'lmaydi: nurlar parallel chiqadi.")}
+  else t=`<b>Sochuvchi linza</b> (F = −15 sm, d = ${fmt(d)} sm)<br>Tasvir: ${q.t}<br>f = ${fmt(q.f)} sm · Γ = ${fmt(q.G)}`;
+  $('#o3').innerHTML=t}
+function setD(v){v=Math.max(3,Math.min(66,v));
+  if(s4.s>0){if(Math.abs(v-15)<1.2)v=15;else if(Math.abs(v-30)<1.2)v=30}   // F va 2F ga yopishish
+  s4.d=Math.round(v*10)/10;T[3]=1;R[3]=0;u3()}
+const cv4=$('#c3');
+const mv=e=>{if(!e.buttons)return;const r=cv4.getBoundingClientRect();setD(-(e.clientX-r.left-r.width/2)/(r.width/140))};
+cv4.addEventListener('pointerdown',e=>{cv4.setPointerCapture(e.pointerId);mv(e)});
+cv4.addEventListener('pointermove',mv);
+$$('.ty').forEach(b=>b.onclick=()=>{s4.s=+b.dataset.ty;$$('.ty').forEach(x=>x.classList.toggle('on',x===b));setD(s4.d)});
+u3();
+
+/* ---------- 5-reja: linza formulasi ---------- */
+function u4(){let F=+$('#r4f').value;if(Math.abs(F)<3){F=F<0?-3:3;$('#r4f').value=F}
+  F5=F;d5=+$('#r4d').value;$('#v4d').textContent=d5;$('#v4f').textContent=F5;
+  const q=pr(F5,d5);
+  $('#o4').innerHTML=q?`1/f = 1/F − 1/d → <b>f = ${fmt(q.f)} sm</b><br>Γ = |f|/d = <b>${fmt(q.G)}</b><br>Tasvir: ${q.t}`:"d = F: f = ∞, tasvir hosil bo'lmaydi."}
+$('#r4d').oninput=$('#r4f').oninput=u4;u4();
+
+/* ---------- 6-reja: masalalar ---------- */
+function rp(){const q=PR[pi];$('#pq').innerHTML=q.q;
+  $('#ps').innerHTML=q.s.slice(0,cs).map((x,i)=>`<li${i===cs-1?' class="cur"':''}>${x}</li>`).join('');
+  $$('.pp').forEach((b,i)=>b.classList.toggle('on',i===pi));$('#nx').disabled=cs>=q.s.length}
+$$('.pp').forEach(b=>b.onclick=()=>{pi=+b.dataset.p;cs=1;rp()});
+$('#nx').onclick=()=>{cs++;rp()};$('#rs').onclick=()=>{cs=1;rp()};rp();
+
+/* ---------- Test ---------- */
+const Q=[
+ [`Parallel nurlar dastasini bir nuqtaga yig'adigan linza qaysi?`,[`Botiq (sochuvchi)`,`Qavariq (yig'uvchi)`,`Yassi shisha plastinka`,`Tekis oyna`],1],
+ [`Bosh optik o'qqa parallel nur yig'uvchi linzadan o'tgach qayerdan o'tadi?`,[`Optik markazdan`,`Fokusdan`,`2F nuqtadan`,`Hech qayerdan o'tmaydi`],1],
+ [`Fokus masofasi F = 50 cm bo'lgan linzaning optik kuchi qancha?`,[`0,5 dptr`,`2 dptr`,`5 dptr`,`50 dptr`],1],
+ [`Sochuvchi linza real buyumning qanday tasvirini beradi?`,[`Haqiqiy, teskari, katta`,`Haqiqiy, to'g'ri, kichik`,`Mavhum, to'g'ri, kichraygan`,`Mavhum, teskari, katta`],2],
+ [`F = 10 cm, d = 15 cm bo'lsa, tasvirgacha masofa f nimaga teng?`,[`6 sm`,`25 sm`,`30 sm`,`5 sm`],2]];
+let sc=0,an=0;
+function rt(){sc=an=0;$('#tr').textContent='';
+  $('#tq').innerHTML=Q.map((q,i)=>`<div class="q"><p><b>${i+1}.</b> ${q[0]}</p>${q[1].map((o,j)=>`<button class="o" data-q="${i}" data-j="${j}">${'ABCD'[j]}) ${o}</button>`).join('')}</div>`).join('')}
+$('#tq').addEventListener('click',e=>{const b=e.target.closest('.o');if(!b||b.disabled)return;
+  const i=+b.dataset.q,j=+b.dataset.j,all=[...b.parentElement.querySelectorAll('.o')];
+  all.forEach(x=>x.disabled=true);all[Q[i][2]].classList.add('ok');
+  if(j===Q[i][2])sc++;else b.classList.add('bad');
+  if(++an===Q.length)$('#tr').textContent=`Natija: ${sc}/${Q.length} ball — `+(sc===5?"a'lo!":sc>=3?"yaxshi!":"yana takrorlab ko'ring.")});
+$('#tre').onclick=rt;rt();
+
+/* ---------- Asosiy sikl: canvas o'lchami va chizish ---------- */
+function fit(cv){const w=Math.round(cv.clientWidth),h=Math.round(w*.66),d=devicePixelRatio||1;
+  if(cv.width!==w*d||cv.height!==h*d){cv.width=w*d;cv.height=h*d;cv.style.height=h+'px'}
+  const c=cv.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);c.font='12px system-ui,sans-serif';
+  return{c,W:w,H:h,X:x=>w/2+x*w/140,Y:y=>h/2-y*w/140}}
+let last=0;
+function loop(ts){
+  const dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+  const cv=$('#c'+act);
+  if(cv&&cv.clientWidth>0){
+    if(R[act]){T[act]=Math.min(1,T[act]+dt*.3);if(T[act]>=1)R[act]=0}
+    const g=fit(cv);S[act](g.c,g,T[act])}
+  requestAnimationFrame(loop)}
+show(0);requestAnimationFrame(loop);
+</script>
+</body>
+</html>

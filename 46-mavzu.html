@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9-sinf Fizika — 46-mavzu: Masalalar yechish</title>
+<style>
+:root{--bg:#f3f6fb;--card:#ffffff;--text:#1b2733;--muted:#5b6b7b;--accent:#2563eb;--accent-t:#ffffff;--border:#d9e2ec;--formula:#fff8db;--formulaB:#f0c53b;--good:#16a34a;--goodbg:#dcfce7;--bad:#dc2626;--badbg:#fee2e2;--chip:#e8eef7;--ans:#e0f2fe}
+[data-theme="dark"]{--bg:#0e151d;--card:#17212c;--text:#e8eef5;--muted:#9fb0c1;--accent:#60a5fa;--accent-t:#0b1220;--border:#2a3a4b;--formula:#2b2610;--formulaB:#8a6d12;--good:#4ade80;--goodbg:#14341f;--bad:#f87171;--badbg:#3b1717;--chip:#223142;--ans:#10283a}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.5;font-size:16px}
+header{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--border);padding:8px 12px}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:900px;margin:0 auto}
+header h1{font-size:15px;margin:0;line-height:1.25}
+header h1 small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+#theme{border:1px solid var(--border);background:var(--chip);color:var(--text);border-radius:20px;padding:6px 12px;font-size:14px;cursor:pointer;white-space:nowrap}
+nav#tabs{display:flex;gap:6px;overflow-x:auto;max-width:900px;margin:8px auto 0;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+nav#tabs button{flex:0 0 auto;border:1px solid var(--border);background:var(--chip);color:var(--text);border-radius:18px;padding:7px 13px;font-size:14px;cursor:pointer;white-space:nowrap}
+nav#tabs button.on{background:var(--accent);color:var(--accent-t);border-color:var(--accent);font-weight:600}
+main{max-width:900px;margin:0 auto;padding:12px}
+.panel{display:none}
+.panel.on{display:block}
+h2{font-size:19px;margin:6px 0 12px}
+h3{font-size:15px;margin:0 0 8px;color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:12px}
+.card p{margin:4px 0}
+table.gt{width:100%;border-collapse:collapse}
+table.gt th{background:var(--chip);text-align:left;padding:7px 9px;border:1px solid var(--border);font-size:14px}
+table.gt td{vertical-align:top;padding:7px 9px;border:1px solid var(--border);font-size:15px}
+table.gt td div{margin:2px 0}
+.formula{background:var(--formula);border:2px solid var(--formulaB);border-radius:12px;padding:10px 14px;font-size:18px;line-height:1.8}
+.formula div{margin:2px 0}
+canvas{display:block;width:100%;height:auto;background:#13202c;border-radius:10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.btn{border:none;background:var(--accent);color:var(--accent-t);padding:10px 16px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--chip);color:var(--text);border:1px solid var(--border)}
+.btn:disabled{opacity:.45;cursor:default}
+.muted{color:var(--muted);font-size:14px}
+ol.steps{padding-left:22px;margin:10px 0 0}
+ol.steps li{margin:6px 0;animation:fade .35s ease}
+ol.steps li.ans{list-style:none;margin-left:-22px;background:var(--ans);border-left:4px solid var(--accent);padding:8px 10px;border-radius:8px;font-weight:600}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ctl{margin-top:10px}
+.ctl label{display:block;font-size:15px;margin-bottom:2px}
+.ctl input[type=range]{width:100%;height:32px;accent-color:var(--accent)}
+.readout{margin-top:8px;background:var(--chip);border-radius:10px;padding:9px 11px;font-size:15px}
+.readout div{margin:2px 0}
+.uz{border-left:5px solid #22c55e}
+.q{margin-bottom:14px}
+.q .qt{font-weight:600;margin-bottom:6px}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;border-radius:10px;border:2px solid var(--border);background:var(--card);color:var(--text);font-size:15px;cursor:pointer}
+.opt.good{background:var(--goodbg);border-color:var(--good)}
+.opt.bad{background:var(--badbg);border-color:var(--bad)}
+.opt:disabled{cursor:default;color:var(--text)}
+.exp{margin-top:6px;font-size:14px;color:var(--muted)}
+.score{font-size:18px;font-weight:700;text-align:center;padding:14px}
+.hid{display:none}
+@media (min-width:700px){header h1{font-size:17px}.formula{font-size:20px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <h1>46-mavzu. Masalalar yechish<small>9-sinf fizika · Yorug'likning qaytish va sinish qonunlari</small></h1>
+    <button id="theme" type="button">🌙 To'q</button>
+  </div>
+  <nav id="tabs" role="tablist"></nav>
+</header>
+<main id="app"></main>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Yordamchi funksiyalar ---------- */
+const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
+const f=(x,d=1)=>(+x).toFixed(d).replace('.',',');
+const g=x=>String(+(+x).toFixed(2)).replace('.',',');
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const seg=(t,a,b)=>clamp((t-a)/(b-a),0,1);
+const W=640,H=380,OX=320,OY=190,R=165;
+const COL={ray:'#ffd21f',weak:'rgba(255,210,31,.42)',mir:'#cfd6de',water:'rgba(79,195,247,.42)',glass:'rgba(129,230,160,.45)',norm:'#e6edf5',arc:'#ff9f43',pink:'#ff7ab6',blue:'#7dd3fc',bg:'#13202c',txt:'#ffffff',red:'#ff6b6b'};
+
+function L(c,x1,y1,x2,y2,col,w,dash){c.save();c.strokeStyle=col;c.lineWidth=w||2;c.setLineDash(dash||[]);c.lineCap='round';c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.restore();}
+function T(c,s,x,y,o){o=o||{};c.save();c.font=(o.b?'bold ':'')+(o.s||18)+'px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif';c.textAlign=o.al||'center';c.textBaseline='middle';c.lineJoin='round';c.lineWidth=5;c.strokeStyle=COL.bg;c.strokeText(s,x,y);c.fillStyle=o.col||COL.txt;c.fillText(s,x,y);c.restore();}
+function bgFill(c){c.clearRect(0,0,W,H);c.fillStyle=COL.bg;c.fillRect(0,0,W,H);}
+function arrowHead(c,x,y,ang,col,s){s=s||13;c.save();c.fillStyle=col;c.translate(x,y);c.rotate(ang);c.beginPath();c.moveTo(s,0);c.lineTo(-s*0.6,s*0.6);c.lineTo(-s*0.6,-s*0.6);c.closePath();c.fill();c.restore();}
+const P=(ang,len)=>[OX+len*Math.cos(ang),OY+len*Math.sin(ang)];
+function ray(c,from,to,p,col,w){
+  if(p<=0)return;
+  const x=from[0]+(to[0]-from[0])*p,y=from[1]+(to[1]-from[1])*p;
+  L(c,from[0],from[1],x,y,col,w);
+  if(p>=0.5){const mx=from[0]+(to[0]-from[0])*0.5,my=from[1]+(to[1]-from[1])*0.5;arrowHead(c,mx,my,Math.atan2(to[1]-from[1],to[0]-from[0]),col,12);}
+}
+function mark(c,a0,a1,r,txt,col){
+  c.save();c.strokeStyle=col;c.lineWidth=3;c.beginPath();c.arc(OX,OY,r,a0,a1,false);c.stroke();c.restore();
+  if(txt){const m=(a0+a1)/2;T(c,txt,OX+(r+38)*Math.cos(m),OY+(r+38)*Math.sin(m),{col:col,s:18,b:true});}
+}
+
+/* ---------- Umumiy sahna: ko'zgu / havo→muhit / muhit→havo ---------- */
+function scene(c,o){
+  const U=-Math.PI/2,D=Math.PI/2,a=rad(o.a||0);
+  bgFill(c);
+  const inside=o.type==='inside',mirror=o.type==='mirror';
+  if(mirror){
+    const gr=c.createLinearGradient(0,OY,0,OY+14);gr.addColorStop(0,'#f3f6f9');gr.addColorStop(1,'#8a96a3');
+    c.fillStyle=gr;c.fillRect(30,OY,W-60,14);
+    c.strokeStyle='#7d8895';c.lineWidth=2;
+    for(let x=44;x<W-30;x+=16){c.beginPath();c.moveTo(x,OY+14);c.lineTo(x-10,OY+27);c.stroke();}
+    T(c,"Yassi ko'zgu",14,OY+48,{al:'left',col:COL.mir,s:17});
+  }else{
+    c.fillStyle=o.med;c.fillRect(0,OY,W,H-OY);
+    L(c,0,OY,W,OY,'#b8c7d6',2);
+    T(c,'Havo',12,26,{al:'left',col:'#cfe0ee',s:17});
+    T(c,o.name,12,H-22,{al:'left',col:'#e6f4ff',s:17});
+  }
+  if(o.normal){L(c,OX,12,OX,H-12,COL.norm,2,[9,7]);T(c,'normal',OX+44,26,{col:COL.norm,s:16});}
+  const incAng=inside?D+a:U-a, reflAng=inside?D-a:U+a;
+  let refrAng=null;
+  if(o.b!=null&&o.b!==undefined){refrAng=inside?U+rad(o.b):D-rad(o.b);}
+  const O=[OX,OY];
+  if(o.refl>0)ray(c,O,P(reflAng,R),o.refl,o.reflWeak?COL.weak:COL.ray,o.reflWeak?2.5:4);
+  if(refrAng!==null&&o.refr>0)ray(c,O,P(refrAng,R),o.refr,COL.ray,4);
+  if(o.inc>0)ray(c,P(incAng,R),O,o.inc,COL.ray,4);
+  const full=p=>p>=0.999;
+  if(o.surf&&full(o.inc))mark(c,-Math.PI,U-a,92,o.surfTxt,COL.pink);
+  if(o.incAng&&full(o.inc))mark(c,inside?D:U-a,inside?D+a:U,60,o.incTxt,COL.arc);
+  if(o.reflAng&&full(o.refl))mark(c,inside?D-a:U,inside?D:U+a,60,o.reflTxt,COL.arc);
+  if(o.refrAng&&refrAng!==null&&full(o.refr)){const b=rad(o.b);mark(c,inside?U:D-b,inside?U+b:D,60,o.refrTxt,COL.arc);}
+  if(o.between&&full(o.refl)&&full(o.inc))mark(c,U-a,U+a,118,o.betweenTxt,COL.blue);
+  if(o.inc>0||o.refl>0){c.save();c.fillStyle='#fff';c.beginPath();c.arc(OX,OY,4.5,0,Math.PI*2);c.fill();c.restore();}
+  if(o.banner)T(c,o.banner,OX,66,{b:true,s:26,col:COL.red});
+  if(o.note)T(c,o.note,14,56,{al:'left',s:16,col:'#ffd9a8'});
+}
+
+/* ---------- 2-masala sahnasi: yassi ko'zguda tasvir ---------- */
+const MX=330,SC=62,GY=330;
+function person(c,x,col,alpha,dash){
+  c.save();c.globalAlpha=alpha;c.strokeStyle=col;c.lineWidth=4;c.lineCap='round';c.setLineDash(dash||[]);
+  c.beginPath();c.arc(x,GY-122,14,0,Math.PI*2);c.stroke();
+  c.beginPath();c.moveTo(x,GY-108);c.lineTo(x,GY-52);
+  c.moveTo(x,GY-52);c.lineTo(x-14,GY);c.moveTo(x,GY-52);c.lineTo(x+14,GY);
+  c.moveTo(x-22,GY-84);c.lineTo(x+22,GY-84);c.stroke();c.restore();
+}
+function dim(c,xa,xb,y,txt,col,dash){
+  L(c,xa,y,xb,y,col,2.5,dash);L(c,xa,y-8,xa,y+8,col,2.5);L(c,xb,y-8,xb,y+8,col,2.5);
+  T(c,txt,(xa+xb)/2,y-15,{col:col,s:17,b:true});
+}
+function scene2(c,d,o){
+  bgFill(c);
+  L(c,20,GY,620,GY,'#33475b',2);
+  const gr=c.createLinearGradient(MX-5,0,MX+5,0);gr.addColorStop(0,'#f3f6f9');gr.addColorStop(1,'#8a96a3');
+  c.fillStyle=gr;c.fillRect(MX-4,84,8,GY-84);
+  c.strokeStyle='#7d8895';c.lineWidth=2;
+  for(let y=96;y<GY-8;y+=16){c.beginPath();c.moveTo(MX+4,y);c.lineTo(MX+14,y+10);c.stroke();}
+  T(c,"Ko'zgu",MX,68,{col:COL.mir,s:17});
+  const x1=MX-d*SC,x2=MX+d*SC;
+  person(c,x1,'#e6edf5',1);
+  T(c,'Odam',x1,GY-160,{s:16});
+  if(o.image){person(c,x2,COL.blue,0.6,[5,5]);T(c,'Tasvir (xayoliy)',x2,GY-160,{s:16,col:COL.blue});}
+  if(o.dimL)dim(c,x1,MX,GY+30,'d = '+g(d)+' m','#ffd21f');
+  if(o.dimR&&o.image)dim(c,MX,x2,GY+30,'f = '+g(d)+' m',COL.blue,[6,5]);
+  if(o.total&&o.image)dim(c,x1,x2,38,'Odam–tasvir: 2d = '+g(2*d)+' m',COL.arc);
+}
+
+/* ---------- 5-masala sahnasi: optik tola ---------- */
+const FP=[[40,190],[75,140],[145,240],[215,140],[285,240],[355,140],[425,240],[495,140],[565,240],[600,190]];
+function polyPartial(pts,t){
+  let tot=0;const sg=[];
+  for(let i=0;i<pts.length-1;i++){const d=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);sg.push(d);tot+=d;}
+  let tg=tot*t;const out=[pts[0]];
+  for(let i=0;i<sg.length;i++){
+    if(tg>=sg[i]){out.push(pts[i+1]);tg-=sg[i];}
+    else{const r=tg/sg[i];out.push([pts[i][0]+(pts[i+1][0]-pts[i][0])*r,pts[i][1]+(pts[i+1][1]-pts[i][1])*r]);break;}
+  }
+  return out;
+}
+function fiber(c,o){
+  bgFill(c);
+  c.fillStyle='#2a3b4c';c.fillRect(30,118,580,144);
+  c.fillStyle=COL.glass;c.fillRect(30,140,580,100);
+  L(c,30,140,610,140,'#a5e8b0',2);L(c,30,240,610,240,'#a5e8b0',2);
+  T(c,'Qobiq (n kichikroq)',320,129,{s:13,col:'#9fb3c8',halo:false});
+  T(c,'Qobiq',320,251,{s:13,col:'#9fb3c8'});
+  T(c,'Tola: n = '+g(o.n),320,282,{s:17,col:'#c8f5d4',b:true});
+  dim(c,30,610,322,'l = '+g(o.l)+' km = '+g(o.l*1000)+' m','#ffd21f');
+  if(o.vlab){L(c,200,88,440,88,COL.blue,3);arrowHead(c,440,88,0,COL.blue,12);T(c,o.vlab,320,66,{col:COL.blue,s:18,b:true});}
+  if(o.tlab)T(c,o.tlab,320,352,{col:COL.arc,s:18,b:true});
+  if(o.ray>0){
+    const pts=polyPartial(FP,o.ray);
+    c.save();c.strokeStyle=COL.ray;c.lineWidth=4;c.lineJoin='round';c.beginPath();
+    pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();c.restore();
+    if(o.dot){const e=pts[pts.length-1];c.save();c.fillStyle='#fff';c.beginPath();c.arc(e[0],e[1],7,0,Math.PI*2);c.fill();c.restore();}
+  }
+}
+
+/* ---------- Masalalar ma'lumotlari ---------- */
+const PROBS=[];
+
+/* 1-masala */
+PROBS.push({
+  tab:'1-masala',
+  title:`Yorug'likning qaytish qonuni`,
+  text:`Nur yassi ko'zgu sirti bilan <b>30°</b> burchak hosil qilib tushmoqda. Tushish burchagini, qaytish burchagini va tushgan hamda qaytgan nurlar orasidagi burchakni toping.`,
+  given:[`φ = 30° (π/6 rad) — nur bilan ko'zgu sirti orasidagi burchak`],
+  find:[`α — tushish burchagi`,`β — qaytish burchagi`,`∠(tushgan, qaytgan) — nurlar orasidagi burchak`],
+  formulas:[`α = 90° − φ`,`β = α  (qaytish qonuni)`,`∠ orasidagi = α + β = 2α`],
+  steps:[
+    `Chizma: ko'zgu va unga perpendikulyar <b>normal</b> chiziladi. Burchaklar normaldan o'lchanadi.`,
+    `Tushayotgan nur ko'zgu sirti bilan φ = 30° burchak hosil qiladi.`,
+    `Tushish burchagi normaldan o'lchanadi: α = 90° − 30° = <b>60°</b>.`,
+    `Qaytish qonuni: qaytish burchagi tushish burchagiga teng, β = α = <b>60°</b>.`,
+    `Tushgan va qaytgan nurlar orasidagi burchak: α + β = 60° + 60° = <b>120°</b>.`
+  ],
+  ans:`Javob: α = 60°, β = 60°, nurlar orasidagi burchak 120°.`,
+  stage(c,k){
+    scene(c,{type:'mirror',a:60,normal:k>=1,inc:k>=2?1:0,surf:k>=2,surfTxt:'30°',incAng:k>=3,incTxt:'α = 60°',refl:k>=4?1:0,reflAng:k>=4,reflTxt:'β = 60°',between:k>=5,betweenTxt:'120°'});
+  },
+  sim:{
+    ctl:[{k:'a',label:'Tushish burchagi α',min:0,max:89,step:1,val:60,unit:'°',dec:0}],
+    draw(c,v){scene(c,{type:'mirror',a:v.a,normal:true,inc:1,refl:1,surf:true,surfTxt:f(90-v.a,0)+'°',incAng:true,incTxt:'α = '+f(v.a,0)+'°',reflAng:true,reflTxt:'β = '+f(v.a,0)+'°',between:true,betweenTxt:f(2*v.a,0)+'°'});},
+    out(v){return `<div>Tushish burchagi: α = <b>${f(v.a,0)}°</b></div><div>Qaytish burchagi: β = α = <b>${f(v.a,0)}°</b></div><div>Nurlar orasidagi burchak: 2α = <b>${f(2*v.a,0)}°</b></div><div>Nur ko'zgu sirti bilan: 90° − α = <b>${f(90-v.a,0)}°</b></div>`;}
+  },
+  anim:{dur:4500,draw(c,t){
+    scene(c,{type:'mirror',a:60,normal:true,inc:seg(t,0,0.45),refl:seg(t,0.45,0.9),surf:true,surfTxt:'30°',incAng:true,incTxt:'α = 60°',reflAng:true,reflTxt:'β = 60°',between:t>0.95,betweenTxt:'120°'});
+  }},
+  uz:`Toshkent metrosi bekatlarida sayqallangan marmar devor va pollar nurni qaytaradi. Chiroq nuri polga tushganda qaytish qonuniga ko'ra tushish burchagiga teng burchak bilan qaytadi — shu sababli bekat yorug' va keng ko'rinadi.`,
+  similar:{q:`Nur yassi ko'zgu sirti bilan <b>20°</b> burchak hosil qilib tushmoqda. Tushish burchagi, qaytish burchagi va tushgan hamda qaytgan nurlar orasidagi burchakni toping.`,a:`α = 90° − 20° = 70°; β = α = 70°; nurlar orasidagi burchak 2α = 140°.`}
+});
+
+/* 2-masala */
+PROBS.push({
+  tab:'2-masala',
+  title:`Yassi ko'zguda tasvir`,
+  text:`Odam yassi ko'zgudan <b>2 m</b> masofada turibdi. U ko'zguga <b>0,5 m</b> yaqinlashdi. Tasvirgacha masofa avval va keyin qancha? Odam bilan uning tasviri orasidagi masofa qancha?`,
+  given:[`d₁ = 2 m — odam–ko'zgu masofasi`,`Δd = 0,5 m — yaqinlashish`],
+  find:[`f₁, f₂ — tasvirgacha masofa (avval va keyin)`,`L₁, L₂ — odam bilan tasviri orasidagi masofa`],
+  formulas:[`f = d  (tasvir ko'zgu orqasida, teng masofada)`,`d₂ = d₁ − Δd`,`L = d + f = 2d`],
+  steps:[
+    `Chizma: ko'zgu va undan d₁ = 2 m masofada turgan odam.`,
+    `Yassi ko'zguda tasvir ko'zgu orqasida, ko'zgudan teng masofada hosil bo'ladi (xayoliy tasvir): f₁ = d₁ = <b>2 m</b>.`,
+    `Odam 0,5 m yaqinlashdi: d₂ = 2 − 0,5 = <b>1,5 m</b>.`,
+    `Tasvir ham shuncha masofada bo'ladi: f₂ = d₂ = <b>1,5 m</b> (ko'zgu orqasida).`,
+    `Odam bilan tasviri orasi: L₁ = 2·2 = <b>4 m</b>, L₂ = 2·1,5 = <b>3 m</b>.`
+  ],
+  ans:`Javob: tasvirgacha 2 m va 1,5 m (ko'zgu orqasida); odam bilan tasviri orasi 4 m va 3 m.`,
+  stage(c,k){
+    const d=k<=2?2:1.5;
+    scene2(c,d,{image:k===2||k>=4,dimL:k>=1,dimR:k===2||k>=4,total:k>=5});
+  },
+  sim:{
+    ctl:[{k:'d',label:`Odam–ko'zgu masofasi d`,min:0.5,max:4,step:0.1,val:2,unit:' m',dec:1}],
+    draw(c,v){scene2(c,v.d,{image:true,dimL:true,dimR:true,total:true});},
+    out(v){return `<div>Odam ko'zgudan: d = <b>${g(v.d)} m</b></div><div>Tasvir ko'zgu orqasida: f = d = <b>${g(v.d)} m</b></div><div>Odam bilan tasviri orasi: 2d = <b>${g(2*v.d)} m</b></div>`;}
+  },
+  anim:{dur:5000,draw(c,t){
+    const e=seg(t,0.2,0.8);const d=2-0.5*(e*e*(3-2*e));
+    scene2(c,d,{image:true,dimL:true,dimR:true,total:true});
+  }},
+  uz:`Toshkentdagi kiyim do'konlari va sartaroshxonalardagi katta devoriy ko'zgularni ko'rgansiz. Kiyim sinab ko'rayotgan odam ko'zgudan 1 m tursa, tasviri ko'zgu orqasida 1 m masofada ko'rinadi, ya'ni ular orasida 2 m bor.`,
+  similar:{q:`Qiz yassi ko'zgudan <b>3 m</b> masofada turibdi. U ko'zgudan <b>1 m</b> uzoqlashdi. Tasvirgacha masofa avval va keyin qancha? Qiz bilan tasviri orasidagi masofa-chi?`,a:`Tasvirgacha: avval 3 m, keyin 4 m. Qiz bilan tasviri orasi: avval 6 m, keyin 8 m.`}
+});
+
+/* 3-masala */
+{
+  const n=1.33,a=45,sa=Math.sin(rad(a)),sb=sa/n,b=deg(Math.asin(sb));
+  PROBS.push({
+    tab:'3-masala',
+    title:`Havodan suvga sinish`,
+    text:`Nur havodan suvga <b>45°</b> burchak ostida tushmoqda. Suvning sinish ko'rsatkichi n = 1,33. Sinish burchagini toping.`,
+    given:[`α = 45° (π/4 rad)`,`n = 1,33`],
+    find:[`β — sinish burchagi`],
+    formulas:[`sin α / sin β = n`,`sin β = sin α / n`,`β = arcsin(sin α / n)`],
+    steps:[
+      `Chizma: havo–suv chegarasi va normal chiziladi. Nur siyrakroq muhitdan (havo) zichroq muhitga (suv) o'tmoqda.`,
+      `Tushayotgan nur normal bilan α = 45° burchak hosil qiladi.`,
+      `Sinish qonuni: sin α / sin β = n, bundan sin β = sin α / n.`,
+      `Hisoblaymiz: sin 45° = ${f(sa,4)}; sin β = ${f(sa,4)} / 1,33 = <b>${f(sb,4)}</b>.`,
+      `β = arcsin(${f(sb,4)}) ≈ <b>${f(b,1)}°</b>. β < α, ya'ni nur normalga yaqinlashdi.`
+    ],
+    ans:`Javob: sinish burchagi β ≈ ${f(b,1)}°.`,
+    stage(c,k){
+      scene(c,{type:'top',med:COL.water,name:'Suv (n = 1,33)',a:a,b:b,normal:k>=1,inc:k>=2?1:0,incAng:k>=2,incTxt:'α = 45°',refr:k>=5?1:0,refrAng:k>=5,refrTxt:'β = '+f(b,1)+'°',refl:k>=5?1:0,reflWeak:true});
+    },
+    sim:{
+      ctl:[{k:'a',label:'Tushish burchagi α',min:0,max:89,step:1,val:45,unit:'°',dec:0},{k:'n',label:'Suvning sinish ko\'rsatkichi n',min:1,max:2,step:0.01,val:1.33,unit:'',dec:2}],
+      draw(c,v){const s=Math.sin(rad(v.a))/v.n,bb=deg(Math.asin(s));scene(c,{type:'top',med:COL.water,name:'Suv (n = '+f(v.n,2)+')',a:v.a,b:bb,normal:true,inc:1,refr:1,refl:1,reflWeak:true,incAng:true,incTxt:'α = '+f(v.a,0)+'°',refrAng:true,refrTxt:'β = '+f(bb,1)+'°'});},
+      out(v){const s=Math.sin(rad(v.a))/v.n;return `<div>sin α = ${f(Math.sin(rad(v.a)),4)}</div><div>sin β = sin α / n = <b>${f(s,4)}</b></div><div>Sinish burchagi: β = <b>${f(deg(Math.asin(s)),1)}°</b></div><div class="muted">n qancha katta bo'lsa, nur normalga shuncha ko'proq yaqinlashadi.</div>`;}
+    },
+    anim:{dur:4500,draw(c,t){
+      scene(c,{type:'top',med:COL.water,name:'Suv (n = 1,33)',a:a,b:b,normal:true,inc:seg(t,0,0.4),refr:seg(t,0.4,0.85),refl:seg(t,0.4,0.6),reflWeak:true,incAng:true,incTxt:'α = 45°',refrAng:true,refrTxt:'β = '+f(b,1)+'°'});
+    }},
+    uz:`Chorvoq ko'lining tiniq suviga qaraganda tubi haqiqatdagidan sayoz ko'rinadi. Sababi — nur suvdan havoga o'tganda sinadi. Shuning uchun suvga tushishda chuqurlikni ko'zda chamalash xavfli.`,
+    similar:{q:`Nur havodan shishaga <b>60°</b> burchak ostida tushmoqda. Shishaning sinish ko'rsatkichi n = 1,5. Sinish burchagini toping.`,a:`sin β = sin 60° / 1,5 = 0,8660 / 1,5 = 0,5774; β = arcsin(0,5774) ≈ 35,3°.`}
+  });
+}
+
+/* 4-masala */
+{
+  const a=50,b=30,sa=Math.sin(rad(a)),sb=Math.sin(rad(b)),n=sa/sb;
+  PROBS.push({
+    tab:'4-masala',
+    title:`Sinish ko'rsatkichini topish`,
+    text:`Nur havodan shaffof moddaga <b>50°</b> burchak ostida tushdi, sinish burchagi <b>30°</b> bo'ldi. Moddaning sinish ko'rsatkichini toping.`,
+    given:[`α = 50° (5π/18 rad)`,`β = 30° (π/6 rad)`],
+    find:[`n — moddaning sinish ko'rsatkichi`],
+    formulas:[`sin α / sin β = n`,`n = sin α / sin β`],
+    steps:[
+      `Chizma: havo–shaffof modda (shisha) chegarasi va normal.`,
+      `Tushayotgan nur normal bilan α = 50° burchak hosil qiladi.`,
+      `Sinib o'tgan nur normal bilan β = 30° burchak hosil qiladi.`,
+      `Sinish qonuni: sin α / sin β = n, bundan n = sin α / sin β.`,
+      `Hisoblaymiz: sin 50° = ${f(sa,4)}, sin 30° = ${f(sb,4)}; n = ${f(sa,4)} / ${f(sb,4)} = <b>${f(n,3)}</b> ≈ <b>${f(n,2)}</b>.`
+    ],
+    ans:`Javob: n ≈ ${f(n,2)}.`,
+    stage(c,k){
+      scene(c,{type:'top',med:COL.glass,name:'Shisha (n = ?)',a:a,b:b,normal:k>=1,inc:k>=2?1:0,incAng:k>=2,incTxt:'α = 50°',refr:k>=3?1:0,refrAng:k>=3,refrTxt:'β = 30°',refl:k>=3?1:0,reflWeak:true});
+    },
+    sim:{
+      ctl:[{k:'a',label:'Tushish burchagi α',min:0,max:89,step:1,val:50,unit:'°',dec:0},{k:'n',label:`Shishaning sinish ko'rsatkichi n`,min:1,max:2,step:0.01,val:1.53,unit:'',dec:2}],
+      draw(c,v){const bb=deg(Math.asin(Math.sin(rad(v.a))/v.n));scene(c,{type:'top',med:COL.glass,name:'Shisha (n = '+f(v.n,2)+')',a:v.a,b:bb,normal:true,inc:1,refr:1,refl:1,reflWeak:true,incAng:true,incTxt:'α = '+f(v.a,0)+'°',refrAng:true,refrTxt:'β = '+f(bb,1)+'°'});},
+      out(v){const s=Math.sin(rad(v.a))/v.n,bb=deg(Math.asin(s));return `<div>sin β = sin α / n = <b>${f(s,4)}</b></div><div>Sinish burchagi: β = <b>${f(bb,1)}°</b></div><div>Tekshiruv: sin α / sin β = ${f(Math.sin(rad(v.a))/Math.sin(rad(bb)),2)} = n</div>`;}
+    },
+    anim:{dur:4500,draw(c,t){
+      scene(c,{type:'top',med:COL.glass,name:'Shisha (n = '+f(n,2)+')',a:a,b:b,normal:true,inc:seg(t,0,0.4),refr:seg(t,0.4,0.85),refl:seg(t,0.4,0.6),reflWeak:true,incAng:true,incTxt:'α = 50°',refrAng:true,refrTxt:'β = 30°',note:t>0.9?'n = sin 50° / sin 30° ≈ '+f(n,2):''});
+    }},
+    uz:`Toshkent va Samarqanddagi optika ustaxonalarida ko'zoynak linzalari shisha yoki plastikdan yasaladi. Shisha linzaning sinish ko'rsatkichi taxminan 1,5 bo'ladi — uni aynan tushish va sinish burchaklarini o'lchab aniqlash mumkin.`,
+    similar:{q:`Nur havodan suyuqlikka <b>60°</b> burchak ostida tushdi, sinish burchagi <b>40°</b> bo'ldi. Suyuqlikning sinish ko'rsatkichini toping.`,a:`n = sin 60° / sin 40° = 0,8660 / 0,6428 ≈ 1,35.`}
+  });
+}
+
+/* 5-masala */
+{
+  const c0=3e8,n0=1.5,l0=2;
+  const v0=c0/n0,t0=l0*1000/v0;
+  const vt=(n)=>`${f(3/n,2)}·10⁸ m/s`;
+  PROBS.push({
+    tab:'5-masala',
+    title:`Optik tolada yorug'lik`,
+    text:`Optik tolaning sinish ko'rsatkichi n = 1,5, uzunligi 2 km. Yorug'likning tolada tezligini va tola bo'ylab o'tish vaqtini toping. c = 3·10⁸ m/s.`,
+    given:[`n = 1,5`,`l = 2 km = 2000 m`,`c = 3·10⁸ m/s`],
+    find:[`v — yorug'likning tolada tezligi`,`t — tola bo'ylab o'tish vaqti`],
+    formulas:[`n = c / v  ⇒  v = c / n`,`t = l / v`],
+    steps:[
+      `Chizma: sinish ko'rsatkichi n = 1,5 va uzunligi l = 2 km = 2000 m bo'lgan optik tola.`,
+      `Tezlik: v = c / n = 3·10⁸ / 1,5 = <b>2·10⁸ m/s</b>.`,
+      `Vaqt: t = l / v = 2000 / (2·10⁸) = <b>10⁻⁵ s = 10 mikrosekund</b>.`,
+      `Yorug'lik tola ichida to'liq ichki qaytish tufayli zig-zag bo'lib, tola devorlaridan chiqib ketmay ilgarilaydi.`
+    ],
+    ans:`Javob: v = 2·10⁸ m/s, t = 10⁻⁵ s = 10 mks.`,
+    stage(c,k){
+      fiber(c,{n:1.5,l:2,vlab:k>=2?'v = c/n = 2·10⁸ m/s':'',tlab:k>=3?'t = l/v = 10⁻⁵ s = 10 mks':'',ray:k>=4?1:0});
+    },
+    sim:{
+      ctl:[{k:'n',label:`Sinish ko'rsatkichi n`,min:1.2,max:2,step:0.01,val:1.5,unit:'',dec:2},{k:'l',label:'Tola uzunligi l',min:0.5,max:10,step:0.5,val:2,unit:' km',dec:1}],
+      draw(c,v){const vv=3e8/v.n,tt=v.l*1000/vv*1e6;fiber(c,{n:v.n,l:v.l,vlab:'v = '+vt(v.n),tlab:'t = '+f(tt,2)+' mks',ray:1});},
+      out(v){const vv=3e8/v.n,tt=v.l*1000/vv;return `<div>Tezlik: v = c/n = <b>${vt(v.n)}</b></div><div>Vaqt: t = l/v = <b>${f(tt*1e6,2)} mks</b> (${f(tt*1e5,2)}·10⁻⁵ s)</div><div class="muted">n oshsa, tezlik kamayadi va vaqt ortadi; l oshsa, vaqt ham ortadi.</div>`;}
+    },
+    anim:{dur:6000,draw(c,t){
+      fiber(c,{n:1.5,l:2,vlab:'v = 2·10⁸ m/s',tlab:`O'tgan vaqt: ${f(t*10,1)} mks / 10 mks   |   yo'l: ${f(t*2,2)} km`,ray:Math.max(t,0.0001),dot:true});
+    }},
+    uz:`Toshkent–Samarqand kabi shaharlar o'rtasidagi optik tolali internet liniyalarida signal yorug'lik bilan uzatiladi. Masofani taxminan 300 km deb olsak, n = 1,5 bo'lgan tolada yorug'lik uni t = 3·10⁵ / (2·10⁸) ≈ 1,5 ms da bosib o'tadi.`,
+    similar:{q:`Optik tolaning sinish ko'rsatkichi n = 1,2, uzunligi 5 km. Yorug'likning tolada tezligini va tola bo'ylab o'tish vaqtini toping. (c = 3·10⁸ m/s)`,a:`v = c/n = 3·10⁸ / 1,2 = 2,5·10⁸ m/s; t = l/v = 5000 / (2,5·10⁸) = 2·10⁻⁵ s = 20 mks.`}
+  });
+}
+
+/* 6-masala */
+{
+  const n=1.33,a0=deg(Math.asin(1/n)),a=55;
+  const inW=(o)=>Object.assign({type:'inside',med:COL.water,name:'Suv (n = 1,33)',normal:true},o);
+  PROBS.push({
+    tab:'6-masala',
+    title:`To'liq ichki qaytish`,
+    text:`Nur suvdan (n = 1,33) havoga <b>55°</b> burchak ostida chiqmoqda. Chegaraviy burchakni toping va nur havoga chiqadimi yoki to'liq qaytadimi, aniqlang.`,
+    given:[`n = 1,33`,`α = 55° (11π/36 rad)`],
+    find:[`α₀ — chegaraviy burchak`,`Nur havoga chiqadimi yoki to'liq qaytadimi?`],
+    formulas:[`sin α₀ = 1 / n`,`α > α₀  ⇒  to'liq ichki qaytish`],
+    steps:[
+      `Chizma: suv–havo chegarasi va normal. Nur zichroq muhitdan (suv) siyrakroq muhitga (havo) o'tmoqda.`,
+      `Chegaraviy burchak α₀ — sinish burchagi 90° bo'ladigan tushish burchagi: sinish nuri sirt bo'ylab o'tadi.`,
+      `Sinish qonuni: sin α₀ / sin 90° = 1/n, ya'ni sin α₀ = 1 / n = 1 / 1,33 = <b>${f(1/n,4)}</b>.`,
+      `α₀ = arcsin(${f(1/n,4)}) ≈ <b>${f(a0,1)}°</b>.`,
+      `α = 55° > α₀ = ${f(a0,1)}°, shuning uchun sinish nuri hosil bo'lmaydi: nur havoga chiqmaydi, butunlay suvga qaytadi — <b>to'liq ichki qaytish</b> (qaytish burchagi 55°).`
+    ],
+    ans:`Javob: α₀ ≈ ${f(a0,1)}°; 55° > ${f(a0,1)}° bo'lgani uchun to'liq ichki qaytish yuz beradi.`,
+    stage(c,k){
+      if(k<=1)scene(c,inW({a:0,normal:k>=1}));
+      else if(k<=3)scene(c,inW({a:a0,b:90,inc:1,incAng:true,incTxt:'α₀',refr:1,refrAng:true,refrTxt:'90°'}));
+      else if(k===4)scene(c,inW({a:a0,b:90,inc:1,incAng:true,incTxt:'α₀ = '+f(a0,1)+'°',refr:1,refrAng:true,refrTxt:'90°'}));
+      else scene(c,inW({a:a,inc:1,incAng:true,incTxt:'α = 55°',refl:1,reflAng:true,reflTxt:"α' = 55°",banner:"To'liq ichki qaytish!",note:'α₀ = '+f(a0,1)+'° < 55°'}));
+    },
+    sim:{
+      ctl:[{k:'a',label:'Tushish burchagi α',min:0,max:89,step:1,val:55,unit:'°',dec:0},{k:'n',label:`Suvning sinish ko'rsatkichi n`,min:1.1,max:2,step:0.01,val:1.33,unit:'',dec:2}],
+      draw(c,v){
+        const a0v=deg(Math.asin(1/v.n)),s=v.n*Math.sin(rad(v.a)),tir=s>=1;
+        const o={type:'inside',med:COL.water,name:'Suv (n = '+f(v.n,2)+')',normal:true,a:v.a,inc:1,incAng:true,incTxt:'α = '+f(v.a,0)+'°',note:'α₀ = '+f(a0v,1)+'°'};
+        if(tir){o.refl=1;o.reflAng=true;o.reflTxt="α' = "+f(v.a,0)+'°';o.banner="To'liq ichki qaytish!";}
+        else{const gg=deg(Math.asin(s));o.b=gg;o.refr=1;o.refrAng=true;o.refrTxt='γ = '+f(gg,1)+'°';o.refl=1;o.reflWeak=true;}
+        scene(c,o);
+      },
+      out(v){
+        const a0v=deg(Math.asin(1/v.n)),s=v.n*Math.sin(rad(v.a)),tir=s>=1;
+        return `<div>Chegaraviy burchak: sin α₀ = 1/n ⇒ α₀ = <b>${f(a0v,1)}°</b></div><div>Tushish burchagi: α = <b>${f(v.a,0)}°</b></div>`+(tir?`<div style="color:var(--bad);font-weight:700">To'liq ichki qaytish! (α ≥ α₀)</div>`:`<div>Nur havoga chiqadi (α &lt; α₀), sinish burchagi γ = <b>${f(deg(Math.asin(s)),1)}°</b></div>`);
+      }
+    },
+    anim:{dur:5000,draw(c,t){
+      scene(c,inW({a:a,inc:seg(t,0,0.4),refl:seg(t,0.4,0.85),incAng:true,incTxt:'α = 55°',reflAng:true,reflTxt:"α' = 55°",banner:t>0.9?"To'liq ichki qaytish!":'',note:'α₀ = '+f(a0,1)+'° < 55°'}));
+    }},
+    uz:`Chorvoq yoki shaharlardagi basseynda suv ostida suzayotganda, suv sirtiga yassi burchak ostida qarasangiz, sirt ko'zgudek yaltirab ko'rinadi — bu to'liq ichki qaytish. Xuddi shu hodisa optik tolada ham signalni tashqariga chiqarmasdan uzatadi.`,
+    similar:{q:`Nur shishadan (n = 1,5) havoga <b>40°</b> burchak ostida chiqmoqda. Chegaraviy burchakni toping va nur havoga chiqadimi yoki to'liq qaytadimi, aniqlang.`,a:`sin α₀ = 1/1,5 = 0,6667, α₀ ≈ 41,8°. 40° < 41,8° bo'lgani uchun nur havoga chiqadi (to'liq ichki qaytish bo'lmaydi).`}
+  });
+}
+
+/* ---------- Test ---------- */
+const QS=[
+  {q:`Nur yassi ko'zgu sirti bilan 25° burchak hosil qilib tushmoqda. Qaytish burchagi qancha?`,o:['25°','65°','50°','130°'],c:1,e:`Tushish burchagi normaldan o'lchanadi: 90° − 25° = 65°. Qaytish burchagi tushish burchagiga teng: 65°.`},
+  {q:`Odam yassi ko'zgudan 1,5 m masofada turibdi. Uning tasviri bilan orasidagi masofa qancha?`,o:['1,5 m','3 m','0,75 m','4,5 m'],c:1,e:`Tasvir ko'zgu orqasida 1,5 m da, shuning uchun odam bilan tasviri orasi 2·1,5 = 3 m.`},
+  {q:`Nur havodan suvga o'tganda sinish burchagi tushish burchagiga nisbatan qanday bo'ladi?`,o:['Katta','Teng','Kichik','90° ga teng'],c:2,e:`Siyrakroq muhitdan zichroq muhitga o'tganda nur normalga yaqinlashadi, shuning uchun β < α.`},
+  {q:`Yorug'likning shishadagi tezligi qancha? (n = 1,5; c = 3·10⁸ m/s)`,o:['4,5·10⁸ m/s','2·10⁸ m/s','3·10⁸ m/s','1,5·10⁸ m/s'],c:1,e:`v = c / n = 3·10⁸ / 1,5 = 2·10⁸ m/s.`},
+  {q:`To'liq ichki qaytish qachon yuz beradi?`,o:[`Nur zichroq muhitdan siyrakroq muhitga o'tib, tushish burchagi chegaraviy burchakdan katta bo'lganda`,`Nur siyrakroq muhitdan zichroq muhitga o'tganda`,`Har qanday tushish burchagida`,`Nur normal bo'ylab tushganda`],c:0,e:`To'liq ichki qaytish faqat zichroq muhitdan siyrakroq muhitga o'tishda va α > α₀ bo'lganda yuz beradi.`}
+];
+const LET=['A','B','C','D'];
+
+/* ---------- DOM qurish ---------- */
+const tabsEl=document.getElementById('tabs'),app=document.getElementById('app');
+const panels=[],tabBtns=[],redraws=[];
+
+function panelHTML(p,i){
+  return `
+  <h2>${i+1}-masala. ${p.title}</h2>
+  <div class="card"><h3>1. Masala sharti</h3><p>${p.text}</p></div>
+  <div class="card"><h3>2. Berilgan va topish kerak</h3>
+    <table class="gt"><thead><tr><th>Berilgan</th><th>Topish kerak</th></tr></thead>
+    <tbody><tr><td>${p.given.map(x=>`<div>${x}</div>`).join('')}</td><td>${p.find.map(x=>`<div>${x}</div>`).join('')}</td></tr></tbody></table></div>
+  <div class="card"><h3>3. Formulalar</h3><div class="formula">${p.formulas.map(x=>`<div>${x}</div>`).join('')}</div></div>
+  <div class="card"><h3>4. Bosqichma-bosqich yechim</h3>
+    <canvas id="cs${i}" width="${W}" height="${H}"></canvas>
+    <div class="row"><button type="button" class="btn" id="next${i}">Keyingi qadam ▶</button><button type="button" class="btn ghost" id="rst${i}">Boshidan</button><span class="muted" id="cnt${i}"></span></div>
+    <ol class="steps" id="steps${i}"></ol></div>
+  <div class="card"><h3>5. Simulyatsiya</h3>
+    <canvas id="csim${i}" width="${W}" height="${H}"></canvas>
+    <div id="ctl${i}"></div><div class="readout" id="out${i}"></div></div>
+  <div class="card"><h3>6. Animatsiya</h3>
+    <canvas id="can${i}" width="${W}" height="${H}"></canvas>
+    <div class="row"><button type="button" class="btn" id="bs${i}">▶ Boshlash</button><button type="button" class="btn ghost" id="bp${i}">⏸ To'xtatish</button><button type="button" class="btn ghost" id="br${i}">↻ Qayta boshlash</button></div></div>
+  <div class="card uz"><h3>7. O'zbekiston hayotidan misol</h3><p>${p.uz}</p></div>
+  <div class="card"><h3>8. Mustaqil ishlash uchun masala</h3><p>${p.similar.q}</p>
+    <div class="row"><button type="button" class="btn ghost" id="sa${i}">Javobni ko'rsatish</button></div>
+    <div class="readout hid" id="sans${i}">${p.similar.a}</div></div>`;
+}
+
+function setupSteps(p,i){
+  const c=document.getElementById('cs'+i).getContext('2d');
+  const next=document.getElementById('next'+i),rst=document.getElementById('rst'+i),ol=document.getElementById('steps'+i),cnt=document.getElementById('cnt'+i);
+  let k=0;const N=p.steps.length;
+  function draw(){p.stage(c,k);cnt.textContent=k+' / '+N+' qadam';}
+  next.addEventListener('click',function(){
+    if(k>=N)return;
+    k++;
+    const li=document.createElement('li');li.innerHTML=p.steps[k-1];ol.appendChild(li);
+    if(k===N){const a=document.createElement('li');a.className='ans';a.textContent=p.ans;ol.appendChild(a);next.disabled=true;}
+    draw();
+  });
+  rst.addEventListener('click',function(){k=0;ol.innerHTML='';next.disabled=false;draw();});
+  draw();
+  redraws.push(draw);
+}
+
+function setupSim(p,i){
+  const c=document.getElementById('csim'+i).getContext('2d'),box=document.getElementById('ctl'+i),out=document.getElementById('out'+i);
+  const inputs={};
+  function upd(){
+    const v={};
+    p.sim.ctl.forEach(function(d){
+      v[d.k]=parseFloat(inputs[d.k].value);
+      document.getElementById('v'+i+d.k).textContent=f(v[d.k],d.dec)+d.unit;
+    });
+    p.sim.draw(c,v);out.innerHTML=p.sim.out(v);
+  }
+  p.sim.ctl.forEach(function(d){
+    const w=document.createElement('div');w.className='ctl';
+    w.innerHTML=`<label for="s${i}${d.k}">${d.label}: <b id="v${i}${d.k}"></b></label><input type="range" id="s${i}${d.k}" min="${d.min}" max="${d.max}" step="${d.step}" value="${d.val}">`;
+    box.appendChild(w);inputs[d.k]=w.querySelector('input');inputs[d.k].addEventListener('input',upd);
+  });
+  upd();
+  redraws.push(upd);
+}
+
+function setupAnim(p,i){
+  const c=document.getElementById('can'+i).getContext('2d');
+  let t=0,run=false,last=0,raf=0;
+  function frame(ts){
+    if(!run)return;
+    const dt=ts-last;last=ts;
+    t=Math.min(1,t+dt/p.anim.dur);
+    p.anim.draw(c,t);
+    if(t>=1){run=false;return;}
+    raf=requestAnimationFrame(frame);
+  }
+  function go(){if(run)return;run=true;last=performance.now();raf=requestAnimationFrame(frame);}
+  document.getElementById('bs'+i).addEventListener('click',function(){if(t>=1){t=0;}go();});
+  document.getElementById('bp'+i).addEventListener('click',function(){run=false;cancelAnimationFrame(raf);});
+  document.getElementById('br'+i).addEventListener('click',function(){run=false;cancelAnimationFrame(raf);t=0;p.anim.draw(c,0);go();});
+  p.anim.draw(c,0);
+  redraws.push(function(){p.anim.draw(c,t);});
+}
+
+PROBS.forEach(function(p,i){
+  const sec=document.createElement('section');sec.className='panel';sec.innerHTML=panelHTML(p,i);app.appendChild(sec);panels.push(sec);
+  const b=document.createElement('button');b.type='button';b.textContent=p.tab;b.setAttribute('role','tab');tabsEl.appendChild(b);tabBtns.push(b);
+  b.addEventListener('click',function(){show(i);});
+  setupSteps(p,i);setupSim(p,i);setupAnim(p,i);
+  document.getElementById('sa'+i).addEventListener('click',function(){
+    const el=document.getElementById('sans'+i);const hidden=el.classList.toggle('hid');
+    this.textContent=hidden?"Javobni ko'rsatish":"Javobni yashirish";
+  });
+});
+
+/* Test tabi */
+(function(){
+  const sec=document.createElement('section');sec.className='panel';
+  sec.innerHTML=`<h2>Test</h2><div id="quiz"></div><div class="card hid" id="res"><div class="score" id="score"></div><div class="row" style="justify-content:center"><button type="button" class="btn" id="qre">Qayta boshlash</button></div></div>`;
+  app.appendChild(sec);panels.push(sec);
+  const b=document.createElement('button');b.type='button';b.textContent='Test';b.setAttribute('role','tab');tabsEl.appendChild(b);tabBtns.push(b);
+  const idx=PROBS.length;b.addEventListener('click',function(){show(idx);});
+  const quiz=sec.querySelector('#quiz'),res=sec.querySelector('#res'),sc=sec.querySelector('#score');
+  let score=0,done=0;
+  function build(){
+    score=0;done=0;res.classList.add('hid');quiz.innerHTML='';
+    QS.forEach(function(q,qi){
+      const d=document.createElement('div');d.className='card q';
+      d.innerHTML=`<div class="qt">${qi+1}. ${q.q}</div>`;
+      const btns=[];
+      q.o.forEach(function(t,oi){
+        const ob=document.createElement('button');ob.type='button';ob.className='opt';ob.textContent=LET[oi]+') '+t;
+        ob.addEventListener('click',function(){
+          btns.forEach(function(x){x.disabled=true;});
+          const ok=oi===q.c;
+          if(ok){ob.classList.add('good');score++;}else{ob.classList.add('bad');btns[q.c].classList.add('good');}
+          const e=document.createElement('div');e.className='exp';e.innerHTML=(ok?'✅ To\'g\'ri! ':'❌ Noto\'g\'ri. ')+q.e;d.appendChild(e);
+          done++;
+          if(done===QS.length){
+            const m=score===QS.length?'Ajoyib! 🎉':score>=3?'Yaxshi natija! 👍':'Mavzuni yana takrorlang 📘';
+            sc.innerHTML=`Umumiy ball: ${score} / ${QS.length}<br><span class="muted">${m}</span>`;
+            res.classList.remove('hid');res.scrollIntoView({behavior:'smooth',block:'nearest'});
+          }
+        });
+        btns.push(ob);d.appendChild(ob);
+      });
+      quiz.appendChild(d);
+    });
+  }
+  sec.querySelector('#qre').addEventListener('click',function(){build();window.scrollTo({top:0,behavior:'smooth'});});
+  build();
+})();
+
+function show(i){
+  panels.forEach(function(p,j){p.classList.toggle('on',j===i);});
+  tabBtns.forEach(function(b,j){b.classList.toggle('on',j===i);b.setAttribute('aria-selected',j===i?'true':'false');});
+  if(tabBtns[i].scrollIntoView)tabBtns[i].scrollIntoView({inline:'center',block:'nearest'});
+  window.scrollTo(0,0);
+}
+show(0);
+
+/* Mavzu tugmasi */
+const themeBtn=document.getElementById('theme');
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?"☀️ Och":"🌙 To'q";}
+themeBtn.addEventListener('click',function(){setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
+if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)setTheme('dark');
+})();
+</script>
+</body>
+</html>

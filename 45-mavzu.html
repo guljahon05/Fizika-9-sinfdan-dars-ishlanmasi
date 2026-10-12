@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yorug'likning sinish va qaytish qonunlari</title>
+<style>
+:root{--bg:#f3f5f9;--cd:#fff;--tx:#1d2330;--mu:#5d6679;--bd:#d9dee8;--ac:#2f6fdd;--fm:#fff6c9;--cv:#f7f9fc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=dark]{--bg:#0f1218;--cd:#1a1f29;--tx:#e8eaf0;--mu:#9aa3b5;--bd:#2c3445;--ac:#6ea0ff;--fm:#33300f;--cv:#11141b}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:var(--cd);border-bottom:1px solid var(--bd)}
+header h1{font-size:15px;margin:0}header small{color:var(--mu)}
+button,select,input{font:inherit}
+button{cursor:pointer;border:1px solid var(--bd);background:var(--cd);color:var(--tx);border-radius:10px;padding:8px 12px}
+#tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:var(--cd);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+#tabs button{white-space:nowrap;flex:0 0 auto}#tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+main{max-width:820px;margin:0 auto;padding:10px}
+.pan{display:none}.pan.on{display:block}
+h2{font-size:18px;margin:6px 0 10px}h3{font-size:14px;margin:0 0 6px;color:var(--ac)}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px}
+.card p{margin:0 0 8px}.card ul{margin:0;padding-left:20px}
+.fm{background:var(--fm);border:2px solid #e0b800;border-radius:14px;padding:12px;margin-bottom:10px;text-align:center;font-size:19px;font-weight:700}
+.fm small{font-weight:400;font-size:13px;color:var(--mu)}
+.ex{border-left:5px solid #3fa7d6}
+table{border-collapse:collapse;width:100%;margin:6px 0}td,th{border:1px solid var(--bd);padding:5px 8px;text-align:center}th{background:var(--bg)}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:8px}
+.ctl label{display:flex;flex-direction:column;gap:2px;flex:1 1 200px;font-size:13px}
+input[type=range]{width:100%}
+select,input[type=text]{padding:7px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)}
+.res{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.res div{flex:1 1 70px;background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:5px 8px;text-align:center}
+.res span{display:block;font-size:12px;color:var(--mu)}.res b{font-size:15px}
+canvas{width:100%;height:260px;display:block;background:var(--cv);border-radius:10px}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.btns button{flex:1 1 90px}
+.row{display:flex;gap:6px;flex-wrap:wrap}.row input{flex:1 1 120px}
+.ok{color:#1e9e4a;font-weight:700}.no{color:#d83a3a;font-weight:700}.out{margin-top:6px}
+.step{background:var(--bg);border-radius:8px;padding:6px 8px;margin:4px 0}
+.opt{display:block;width:100%;text-align:left;margin:5px 0}
+.opt.ok2{background:#27ae60;color:#fff;border-color:#27ae60}.opt.no2{background:#e74c3c;color:#fff;border-color:#e74c3c}
+.score{font-size:20px;font-weight:700;text-align:center;padding:10px}
+</style></head><body>
+<header><div><h1>⚡ Yorug'likning sinish va qaytish qonunlari</h1><small>9-sinf fizika · 45-mavzu</small></div><button id="th" aria-label="Mavzu">🌙</button></header>
+<nav id="tabs"></nav><main id="main"></main>
+<script>
+const $=s=>document.querySelector(s),D2R=Math.PI/180,RAY='#f5c518';
+const NS=[1,1.33,1.5,2.42],MN=["Havo (n=1)","Suv (n=1,33)","Shisha (n=1,5)","Olmos (n=2,42)"];
+const MF=[null,'rgba(100,185,235,.5)','rgba(140,215,160,.55)','rgba(205,195,245,.55)'];
+const fm=(v,d)=>v.toFixed(d).replace('.',',');
+const TB=`<table><tr><th>Muhit</th><th>n</th></tr><tr><td>Havo</td><td>1</td></tr><tr><td>Suv</td><td>1,33</td></tr><tr><td>Shisha</td><td>1,5</td></tr><tr><td>Olmos</td><td>2,42</td></tr></table>`;
+const T=[
+{s:"Manbalar",t:"Yorug'lik manbalari va to'g'ri chiziqli tarqalish",
+th:`<p><b>Yorug'lik manbalari</b> ikki xil: tabiiy (Quyosh, yulduzlar, chaqmoq) va sun'iy (lampa, chiroq, sham).</p><p>Bir jinsli muhitda yorug'lik <b>to'g'ri chiziq</b> bo'ylab tarqaladi. Yorug'lik tarqalish yo'nalishini ko'rsatuvchi chiziq <b>nur</b> deyiladi.</p><p>Nuqtaviy manba to'siq ortida faqat <b>soya</b> hosil qiladi. Manba o'lchamli bo'lsa, soya atrofida <b>yarim soya</b> ham paydo bo'ladi (manbaning faqat bir qismi ko'rinadigan joy).</p>`,
+fm:`s = c · t<br><small>c = 3·10⁸ m/s — yorug'likning vakuumdagi tezligi</small>`,
+ex:`Samarqanddagi Registon peshtoqining soyasi kun davomida o'zgaradi: tushda qisqa, kechqurun uzun. Quyosh tutilishida ham Oy soya va yarim soya hosil qiladi.`,
+lab:"Manba o'lchami",unit:"",max:90,def:20,mode:'shadow',
+task:{q:"Quyoshdan Yerga yorug'lik 500 s da yetib keladi. Quyosh–Yer masofasi necha million km? (c = 3·10⁸ m/s)",a:150,tol:.5}},
+{s:"Qaytish",t:"Yorug'likning qaytish qonuni",
+th:`<p>Yorug'lik ikki muhit chegarasiga tushib, ortga qaytadi.</p><p><b>Qaytish qonuni:</b> tushish burchagi α qaytish burchagi γ ga teng. Tushuvchi nur, qaytgan nur va tushish nuqtasiga o'tkazilgan <b>normal</b> bir tekislikda yotadi.</p><p>Burchaklar sirt bilan emas, <b>normal</b> bilan nur orasida o'lchanadi.</p>`,
+fm:`α = γ`,
+ex:`Uyingizdagi shkaf ko'zgusiga qarasangiz, yorug'lik ko'zgudan qaytib ko'zingizga tushadi va o'zingizni ko'rasiz. Mashinaning yon ko'zgusi ham shu qonun bilan ishlaydi.`,
+lab:"Tushish burchagi α",unit:"°",max:90,def:40,mode:'refl',
+task:{q:"Nur ko'zgu sirti bilan 30° burchak hosil qilib tushdi. Qaytish burchagi necha gradus?",a:60,tol:.5}},
+{s:"Ko'zgu",t:"Yassi ko'zgu va tasvir hosil bo'lishi",
+th:`<p><b>Yassi ko'zgu</b>dagi tasvir: <b>mavhum</b> (nurlarning o'zi emas, davomi kesishadi), <b>to'g'ri</b>, buyum o'lchamiga <b>teng</b> va ko'zgu ortida buyumga <b>simmetrik</b> joylashadi.</p><p><b>Ko'zguli qaytish</b> — silliq sirtdan parallel nurlar parallel qaytadi. <b>Sochuvchi (diffuz)</b> qaytish — g'adir-budir sirtdan nurlar turli tomonga tarqaladi; shuning uchun jismlarni har tomondan ko'ramiz.</p>`,
+fm:`d′ = d &nbsp;&nbsp; h′ = h`,
+ex:`Uydagi ko'zgudan 2 m narida turgan odam o'z tasvirini ko'zgu ortida 2 m masofada ko'radi. Daftar sahifasi esa sochuvchi sirt: uni har tomondan o'qish mumkin.`,
+lab:"Tushish burchagi α",unit:"°",max:55,def:30,mode:'plane',md:["Yassi ko'zgu","Sochuvchi (diffuz) sirt"],mdl:"Sirt turi",
+task:{q:"Odam yassi ko'zgudan 2 m masofada turibdi. U o'z tasviridan necha metr uzoqlikda?",a:4,tol:.01}},
+{s:"Sinish",t:"Yorug'likning sinishi",
+th:`<p>Yorug'lik ikki muhit chegarasidan o'tganda <b>yo'nalishini o'zgartiradi</b> — bu <b>yorug'likning sinishi</b>. Sababi: turli muhitda yorug'lik tezligi turlicha.</p><p><b>Sinish burchagi β</b> — singan nur bilan normal orasidagi burchak.</p><p>Havo → suv yoki havo → shisha: nur zichroq muhitga o'tganda <b>normalga yaqinlashadi</b> (β &lt; α). Teskari o'tishda normaldan uzoqlashadi.</p>`,
+fm:`Havo → suv, shisha: β &lt; α<br>Suv, shisha → havo: β &gt; α`,
+ex:`Hovuz suviga solingan tayoqcha suv sathida "singandek" ko'rinadi, hovuz esa haqiqatdan sayoz tuyuladi. Mashina old oynasidan o'tgan nur ham biroz sinadi.`,
+lab:"Tushish burchagi α",unit:"°",max:90,def:45,mode:'refr',md:MN,
+task:{q:"Nur havodan shishaga normal bo'ylab (tushish burchagi 0°) tushsa, sinish burchagi necha gradus?",a:0,tol:.01}},
+{s:"Sinish qonuni",t:"Sinish qonuni. To'liq ichki qaytish",
+th:`<p><b>Sinish qonuni:</b> tushish burchagi sinusining sinish burchagi sinusiga nisbati ikki muhit uchun o'zgarmas — <b>nisbiy sinish ko'rsatkichi n</b>.</p><p>Muhitning sinish ko'rsatkichi n = c / v: yorug'lik muhitda qancha sekin tarqalsa, n shuncha katta.</p>${TB}<p><b>To'liq ichki qaytish:</b> nur zich muhitdan siyrak muhitga o'tayotganda tushish burchagi <b>chegaraviy burchak α₀</b> dan katta bo'lsa, nur sinmaydi, butunlay qaytadi.</p>`,
+fm:`sin α / sin β = n<br>n = c / v<br>sin α₀ = 1 / n`,
+ex:`Issiq kunda asfalt yo'l ustida "suv ko'lmagi" ko'rinishi — to'liq ichki qaytishga o'xshash hodisa. Suv ostidagi baliqchi ham ma'lum burchakdan suv sathini ko'zgudek ko'radi.`,
+lab:"Tushish burchagi α (muhit ichida)",unit:"°",max:90,def:30,mode:'tir',md:MN,
+task:{q:"Suvning sinish ko'rsatkichi 1,33. Suvda yorug'lik tezligi necha ·10⁸ m/s? (c = 3·10⁸ m/s)",a:2.26,tol:.02}},
+{s:"Qo'llanilishi",t:"Qonunlarning qo'llanilishi",
+th:`<ul><li><b>Periskop</b> — ikki ko'zgu: to'siq ortidagi yoki suv ostidagi kemadan sirtni ko'rish.</li><li><b>Optik tola</b> — to'liq ichki qaytish: internet kabellari, tibbiy endoskop.</li><li><b>Prizma</b> — nurni sindirib, og'diradi (rangga ajratadi).</li><li><b>Kamalak</b> — yomg'ir tomchilarida sinish va qaytish.</li><li><b>Ko'zgu</b> — qaytish qonuni: uy va avtomobil ko'zgusi.</li><li><b>Linza</b> — sinish: ko'zoynak, lupa, fotoapparat.</li></ul>`,
+fm:`α = γ &nbsp;|&nbsp; sin α / sin β = n<br>n = c / v &nbsp;|&nbsp; sin α₀ = 1 / n`,
+ex:`Shaharlararo internet kabellari optik tolalardan iborat: yorug'lik tola ichida to'liq ichki qaytib, uzoqqa yetib boradi.`,
+lab:"Tushish burchagi α (prizma)",unit:"°",max:90,def:50,mode:'prism',md:MN,
+task:{q:"Olmos uchun (n = 2,42) chegaraviy burchak α₀ taxminan necha gradus? (sin α₀ = 1/n)",a:24.4,tol:.5}}];
+const PR=[
+{q:"Nur ko'zguga 30° burchak bilan tushdi. Qaytish burchagini va tushuvchi hamda qaytgan nur orasidagi burchakni toping.",g:"α = 30°",f:"γ = ?; α + γ = ?",s:["Qaytish qonuni: γ = α.","γ = 30°.","Nurlar orasidagi burchak: α + γ = 30° + 30° = 60°.","Javob: γ = 30°, nurlar orasidagi burchak 60°."]},
+{q:"Nur havodan suvga 45° burchak bilan tushadi (n = 1,33). Sinish burchagini toping.",g:"α = 45°, n = 1,33",f:"β = ?",s:["Sinish qonuni: sin α / sin β = n, demak sin β = sin α / n.","sin 45° ≈ 0,707.","sin β = 0,707 / 1,33 ≈ 0,532.","β = arcsin 0,532 ≈ 32°. Javob: β ≈ 32°."]},
+{q:"Shishada yorug'lik tezligi 2·10⁸ m/s. Shishaning sinish ko'rsatkichini toping (c = 3·10⁸ m/s).",g:"v = 2·10⁸ m/s, c = 3·10⁸ m/s",f:"n = ?",s:["Formula: n = c / v.","n = 3·10⁸ / 2·10⁸.","n = 1,5. Javob: n = 1,5."]},
+{q:"Suv uchun to'liq ichki qaytishning chegaraviy burchagini toping (sin α₀ = 1/n).",g:"n = 1,33",f:"α₀ = ?",s:["Formula: sin α₀ = 1 / n.","sin α₀ = 1 / 1,33 ≈ 0,752.","α₀ = arcsin 0,752 ≈ 48,8°.","Javob: α₀ ≈ 49°. Bundan katta burchakda nur suvdan havoga chiqmay, to'liq qaytadi."]}];
+const Q=[
+{q:"Qaytish qonuniga ko'ra:",o:["Tushish burchagi qaytish burchagidan katta","Tushish burchagi qaytish burchagiga teng","Qaytish burchagi doim 90°","Qaytish burchagi tushish burchagidan kichik"],c:1},
+{q:"Yassi ko'zgudagi tasvir qanday?",o:["Haqiqiy, teskari, kichik","Haqiqiy, to'g'ri, teng","Mavhum, to'g'ri, buyumga teng","Mavhum, teskari, katta"],c:2},
+{q:"Shishaning sinish ko'rsatkichi 1,5. Undagi yorug'lik tezligi (c = 3·10⁸ m/s):",o:["4,5·10⁸ m/s","3·10⁸ m/s","1,5·10⁸ m/s","2·10⁸ m/s"],c:3},
+{q:"To'liq ichki qaytish qachon yuz beradi?",o:["Zich → siyrak muhit, α > α₀","Siyrak → zich muhit, istalgan α","Zich → siyrak muhit, α < α₀","Havo → suv, α = 0°"],c:0},
+{q:"Havodan suvga (n = 1,33) 45° da tushgan nurning sinish burchagi taxminan:",o:["45°","60°","90°","32°"],c:3}];
+const ST=T.map(c=>({a:c.def,m:0,p:1,run:false}));let cur=0;
+function panel(i){const c=T[i];
+let h=`<section class="pan" id="p${i}"><h2>${i+1}. ${c.t}</h2><div class="card"><h3>Nazariya</h3>${c.th}</div><div class="fm">${c.fm}</div><div class="card ex"><h3>Hayotiy misol</h3>${c.ex}</div>
+<div class="card"><h3>Simulyatsiya</h3><div class="ctl"><label>${c.lab}: <b id="v${i}">${c.def}${c.unit}</b><input type="range" id="s${i}" min="0" max="${c.max}" value="${c.def}"></label>`;
+if(c.md)h+=`<label>${c.mdl||'Muhit'}:<select id="m${i}">${c.md.map((x,k)=>`<option value="${k}">${x}</option>`).join('')}</select></label>`;
+h+=`</div><div class="res" id="r${i}"></div><canvas id="c${i}" height="260"></canvas><div class="btns" data-i="${i}"><button data-a="go">▶ Boshlash</button><button data-a="stop">⏸ To'xtatish</button><button data-a="re">↻ Qayta boshlash</button></div></div>`;
+if(i==5)PR.forEach((p,k)=>{h+=`<div class="card"><h3>Masala ${k+1}</h3><p>${p.q}</p><p><b>Berilgan:</b> ${p.g}<br><b>Topish kerak:</b> ${p.f}</p><div id="st${k}"></div><button data-pr="${k}">Keyingi qadam</button></div>`});
+h+=`<div class="card"><h3>Mustaqil masala</h3><p>${c.task.q}</p><div class="row"><input type="text" inputmode="decimal" id="i${i}" placeholder="Javobni kiriting"><button data-k="${i}">Tekshirish</button></div><div class="out" id="o${i}"></div></div></section>`;
+return h}
+function testPanel(){return `<section class="pan" id="p6"><h2>Test (5 ta savol)</h2>${Q.map((q,k)=>`<div class="card"><p><b>${k+1}. ${q.q}</b></p>${q.o.map((o,j)=>`<button class="opt" data-q="${k}" data-j="${j}">${"ABCD"[j]}) ${o}</button>`).join('')}</div>`).join('')}<div class="card"><div class="score" id="sc">Ball: 0 / 5</div><button id="rst" style="width:100%">↻ Testni qayta boshlash</button></div></section>`}
+const nav=$('#tabs'),mn=$('#main');
+T.forEach((c,i)=>{nav.insertAdjacentHTML('beforeend',`<button data-t="${i}">${i+1}. ${c.s}</button>`);mn.insertAdjacentHTML('beforeend',panel(i))});
+nav.insertAdjacentHTML('beforeend',`<button data-t="6">✅ Test</button>`);mn.insertAdjacentHTML('beforeend',testPanel());
+function show(i){cur=i;document.querySelectorAll('.pan').forEach((e,k)=>e.classList.toggle('on',k==i));nav.querySelectorAll('button').forEach((e,k)=>e.classList.toggle('on',k==i));requestAnimationFrame(()=>{if(i<6)render(i)});scrollTo(0,0)}
+function render(i){const c=T[i],st=ST[i],cv=$('#c'+i),W=cv.clientWidth;if(!W)return;if(cv.width!==W)cv.width=W;
+const x=cv.getContext('2d'),H=260;x.clearRect(0,0,W,H);
+const dk=document.documentElement.dataset.theme==='dark',fg=dk?'#e9eaee':'#222',nc=dk?'#d5d8de':'#777';
+const cx=W/2,cy=H/2,L=Math.min(cx,cy)-14,p=st.p,a=st.a,ar=a*D2R,n=NS[st.m],sa=Math.sin(ar),ca=Math.cos(ar);
+const ln=(x1,y1,x2,y2,col,w,d,al)=>{x.save();x.strokeStyle=col;x.lineWidth=w||2;x.setLineDash(d||[]);x.globalAlpha=al==null?1:al;x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();x.restore()};
+const tx=(s,X,Y,col)=>{x.fillStyle=col||fg;x.font='bold 13px sans-serif';x.textAlign='center';x.fillText(s,X,Y)};
+const arc=(R,a1,a2)=>{x.save();x.strokeStyle=fg;x.lineWidth=1.5;x.beginPath();x.arc(cx,cy,R,a1,a2);x.stroke();x.restore()};
+const lab=(s,R,an)=>tx(s,cx+R*Math.cos(an),cy+R*Math.sin(an)+4);
+const ray=(pts,pp,al)=>{let tot=0;const ls=[];for(let k=1;k<pts.length;k++){const l=Math.hypot(pts[k][0]-pts[k-1][0],pts[k][1]-pts[k-1][1]);ls.push(l);tot+=l}
+let rem=pp*tot,px=pts[0][0],py=pts[0][1];x.save();x.strokeStyle=RAY;x.lineWidth=3;x.lineCap='round';x.globalAlpha=al==null?1:al;x.beginPath();x.moveTo(px,py);
+for(let k=1;k<pts.length;k++){const l=ls[k-1];if(l<=0)continue;const f=Math.min(1,rem/l);if(f<=0)break;px=pts[k-1][0]+(pts[k][0]-pts[k-1][0])*f;py=pts[k-1][1]+(pts[k][1]-pts[k-1][1])*f;x.lineTo(px,py);rem-=l;if(f<1)break}
+x.stroke();if(pp<1){x.fillStyle='#ffd400';x.beginPath();x.arc(px,py,5,0,7);x.fill()}x.restore()};
+const mir=y=>{ln(10,y,W-10,y,'#b8bec9',7);for(let X=10;X<W;X+=12)ln(X,y+4,X-8,y+14,'#8a909c',2)};
+let res=[];
+if(c.mode==='shadow'){const s=a/90*45,x0=36,x1=W*.38,x2=W-30,h=26,k=(x2-x0)/(x1-x0);
+const P1=cy+s+(-h-s)*k,U1=cy-s+(-h+s)*k,U2=cy+s+(h-s)*k,P2=cy-s+(h+s)*k,um=Math.max(0,U2-U1);
+x.save();x.globalAlpha=p;x.fillStyle='rgba(110,110,110,.4)';x.fillRect(x2-6,P1,12,P2-P1);if(um>0){x.fillStyle='rgba(15,15,15,.9)';x.fillRect(x2-6,U1,12,um)}x.restore();
+ln(x2,6,x2,H-6,nc,2,[3,3]);x.fillStyle=dk?'#777':'#444';x.fillRect(x1-5,cy-h,10,2*h);
+const lp=(ax,ay,bx,by,al)=>ln(ax,ay,ax+(bx-ax)*p,ay+(by-ay)*p,RAY,2,null,al);
+lp(x0,cy+s,x2,P1,.8);lp(x0,cy-s,x2,U1,.8);lp(x0,cy+s,x2,U2,.8);lp(x0,cy-s,x2,P2,.8);
+lp(x0,cy,x2,cy-95,.9);lp(x0,cy,x2,cy+95,.9);lp(x0,cy,x1-5,cy,.9);
+x.fillStyle=RAY;x.beginPath();x.ellipse(x0,cy,7,Math.max(s,5),0,0,7);x.fill();
+tx("manba",x0,H-8);tx("to'siq",x1,cy-h-8);tx("ekran",x2-8,H-8);
+res=[["Manba (yarim o'lchami)",fm(s/10,1)+" sm"],["Soya",fm(um/10,1)+" sm"],["Yarim soya",fm(((P2-P1)-um)/10,1)+" sm"]]}
+else if(c.mode==='refl'){mir(cy);ln(cx,cy-L-6,cx,cy+8,nc,2,[5,5]);tx('normal',cx+26,cy-L+6,nc);tx("ko'zgu",W-34,cy+30,'#8a909c');
+ray([[cx-L*sa,cy-L*ca],[cx,cy],[cx+L*sa,cy-L*ca]],p);
+arc(34,-Math.PI/2-ar,-Math.PI/2);arc(34,-Math.PI/2,-Math.PI/2+ar);
+if(a>8){lab('α',52,-Math.PI/2-ar/2);lab('γ',52,-Math.PI/2+ar/2)}
+res=[["Tushish α",a+"°"],["Qaytish γ",a+"°"],["α + γ",2*a+"°"]]}
+else if(c.mode==='plane'){const mx=W*.58,Dd=Math.min(100,W*.25),y0=H-25,yT=H-85;
+const arrow=(X,col,al,d)=>{ln(X,y0,X,yT,col,5,d,al);ln(X,yT,X-7,yT+10,col,3,d,al);ln(X,yT,X+7,yT+10,col,3,d,al)};
+if(st.m==0){mir2();arrow(mx-Dd,'#e0663a',1);arrow(mx+Dd,'#e0663a',.45,[4,4]);
+const hy=yT-Dd*Math.tan(ar);ln(mx-35,hy,mx+35,hy,nc,1.5,[4,4]);
+ray([[mx-Dd,yT],[mx,hy],[mx-90*ca,hy-90*sa]],p);if(p>=1)ln(mx,hy,mx+Dd,yT,fg,1.5,[5,4],.7);
+tx('buyum',mx-Dd,y0+14,'#e0663a');tx('tasvir',mx+Dd,y0+14,'#e0663a');
+res=[["α",a+"°"],["γ",a+"°"],["d (buyum)",fm(Dd/50,1)+" m"],["d′ (tasvir)",fm(Dd/50,1)+" m"]]}
+else{const sy=cy+40;x.save();x.strokeStyle='#9aa0ab';x.lineWidth=3;x.beginPath();x.moveTo(8,sy);for(let X=8,k=0;X<W;X+=10,k++)x.lineTo(X,sy+(k%2?4:-4));x.stroke();x.restore();
+[-70,0,70].forEach((o,k)=>{const X=cx+o,e=[-.9,.15,.85][k];ray([[X-110*sa,sy-110*ca],[X,sy],[X+100*Math.sin(e),sy-100*Math.cos(e)]],p)});
+tx("g'adir-budir sirt",cx,sy+30,'#8a909c');res=[["α",a+"°"],["γ","har xil"],["Qaytish","sochuvchi"]]}
+function mir2(){ln(mx,8,mx,H-8,'#b8bec9',7);for(let Y=14;Y<H-8;Y+=12)ln(mx+4,Y,mx+13,Y+8,'#8a909c',2);tx("ko'zgu",mx+26,18,'#8a909c')}}
+else if(c.mode==='refr'||c.mode==='tir'){
+if(MF[st.m]){x.fillStyle=MF[st.m];x.fillRect(0,cy,W,H-cy)}
+ln(0,cy,W,cy,fg,1.5);ln(cx,cy-L,cx,cy+L,nc,2,[5,5]);tx('normal',cx+26,cy-L+8,nc);tx('havo',26,16);tx(MN[st.m].split(' ')[0].toLowerCase(),30,H-10);
+if(c.mode==='refr'){const sb=sa/n,b=Math.asin(sb),bd=b/D2R;
+ray([[cx-L*sa,cy-L*ca],[cx,cy],[cx+L*sb,cy+L*Math.cos(b)]],p);
+ln(cx,cy,cx+L*sa,cy-L*ca,RAY,2,[4,4],.35);
+arc(34,-Math.PI/2-ar,-Math.PI/2);arc(40,Math.PI/2-b,Math.PI/2);
+if(a>8)lab('α',54,-Math.PI/2-ar/2);if(bd>8)lab('β',58,Math.PI/2-b/2);
+res=[["Tushish α",a+"°"],["Sinish β",fm(bd,1)+"°"],["n",fm(n,2)],["Qaytish γ",a+"°"]]}
+else{const s=n*sa,a0=n>1?Math.asin(1/n)/D2R:null;
+if(s<=1.0000001){const b=Math.asin(Math.min(1,s));ray([[cx-L*sa,cy+L*ca],[cx,cy],[cx+L*s,cy-L*Math.cos(b)]],p);
+arc(34,Math.PI/2,Math.PI/2+ar);arc(40,-Math.PI/2,-Math.PI/2+b);if(a>8)lab('α',54,Math.PI/2+ar/2);if(b/D2R>8)lab('β',58,-Math.PI/2+b/2);
+res=[["α",a+"°"],["β (havoda)",fm(b/D2R,1)+"°"],["n",fm(n,2)],["α₀",a0?fm(a0,1)+"°":"—"],["Holat","Sinadi"]]}
+else{ray([[cx-L*sa,cy+L*ca],[cx,cy],[cx+L*sa,cy+L*ca]],p);arc(34,Math.PI/2,Math.PI/2+ar);arc(40,Math.PI/2-ar,Math.PI/2);
+lab('α',54,Math.PI/2+ar/2);lab('γ',58,Math.PI/2-ar/2);tx("TO'LIQ ICHKI QAYTISH",cx,22,'#d83a3a');
+res=[["α",a+"°"],["γ",a+"°"],["n",fm(n,2)],["α₀",fm(a0,1)+"°"],["Holat","To'liq qaytish"]]}}}
+else if(c.mode==='prism'){const s=Math.min(78,W*.2),hg=s*1.732,A=[cx,cy-hg/2],B=[cx-s,cy+hg/2],C=[cx+s,cy+hg/2];
+x.fillStyle=MF[st.m]||'rgba(170,200,225,.25)';x.strokeStyle=fg;x.lineWidth=1.5;x.beginPath();x.moveTo(A[0],A[1]);x.lineTo(B[0],B[1]);x.lineTo(C[0],C[1]);x.closePath();x.fill();x.stroke();
+const E=[(A[0]+B[0])/2,(A[1]+B[1])/2],r1=Math.asin(sa/n)/D2R,d1=(30-a)*D2R,S0=[E[0]-110*Math.cos(d1),E[1]-110*Math.sin(d1)];
+ln(E[0]-42*.866,E[1]-42*.5,E[0]+42*.866,E[1]+42*.5,nc,1.5,[4,4]);
+const ph=(30-r1)*D2R,dx=Math.cos(ph),dy=Math.sin(ph),ex=C[0]-A[0],ey=C[1]-A[1],det=-dx*ey+ex*dy,bx=A[0]-E[0],by=A[1]-E[1];
+const t=(-bx*ey+ex*by)/det,u=(dx*by-dy*bx)/det;let pts=[S0,E],dev="—",hold="Chiqmaydi";
+if(Math.abs(det)<1e-6||t<=0||u<0||u>1){pts.push([E[0]+dx*110,E[1]+dy*110])}
+else{const F=[E[0]+dx*t,E[1]+dy*t];pts.push(F);ln(F[0]-42*.866,F[1]+42*.5,F[0]+42*.866,F[1]-42*.5,nc,1.5,[4,4]);
+const r2=60-r1,s2=n*Math.sin(r2*D2R);
+if(s2>1.0000001){const f=(90+r1)*D2R;pts.push([F[0]+110*Math.cos(f),F[1]+110*Math.sin(f)]);hold="To'liq qaytish"}
+else{const i2=Math.asin(s2)/D2R,o=(-30+i2)*D2R;pts.push([F[0]+130*Math.cos(o),F[1]+130*Math.sin(o)]);dev=fm(a+i2-60,1)+"°";hold="Chiqadi"}}
+ray(pts,p);tx('prizma',cx,H-10,'#8a909c');
+res=[["Tushish α",a+"°"],["Sinish β",fm(r1,1)+"°"],["n",fm(n,2)],["Og'ish δ",dev],["Holat",hold]]}
+$('#r'+i).innerHTML=res.map(r=>`<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}
+document.addEventListener('input',e=>{const id=e.target.id;if(id&&id[0]==='s'&&id.length==2){const i=+id[1];ST[i].a=+e.target.value;$('#v'+i).textContent=e.target.value+T[i].unit;render(i)}});
+document.addEventListener('change',e=>{const id=e.target.id;if(id&&id[0]==='m'&&id.length==2){const i=+id[1];ST[i].m=+e.target.value;render(i)}});
+const SC=[];let sc=0,ans=0;const SN=PR.map(()=>0);
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+if(b.dataset.t!==undefined)return show(+b.dataset.t);
+if(b.id==='th'){const d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark';b.textContent=d.dataset.theme==='dark'?'☀️':'🌙';try{localStorage.setItem('th',d.dataset.theme)}catch(_){}if(cur<6)render(cur);return}
+if(b.dataset.a){const st=ST[cur],a=b.dataset.a;if(a==='go'){if(st.p>=1)st.p=0;st.run=true}else if(a==='stop')st.run=false;else{st.p=0;st.run=true}return}
+if(b.dataset.k!==undefined){const i=+b.dataset.k,c=T[i].task,v=parseFloat($('#i'+i).value.replace(',','.')),o=$('#o'+i);
+if(isNaN(v))o.innerHTML='<span class="no">Son kiriting.</span>';else if(Math.abs(v-c.a)<=c.tol)o.innerHTML="<span class='ok'>✅ To'g'ri javob!</span>";else o.innerHTML="<span class='no'>❌ Noto'g'ri. Qayta urinib ko'ring.</span>";return}
+if(b.dataset.pr!==undefined){const k=+b.dataset.pr,s=PR[k].s;if(SN[k]<s.length){$('#st'+k).insertAdjacentHTML('beforeend',`<div class="step"><b>${SN[k]+1}-qadam.</b> ${s[SN[k]]}</div>`);SN[k]++;if(SN[k]==s.length){b.textContent='Yechim tugadi';b.disabled=true}}return}
+if(b.dataset.q!==undefined){const k=+b.dataset.q,j=+b.dataset.j;if(SC[k]!==undefined)return;SC[k]=j;ans++;const bs=document.querySelectorAll(`[data-q="${k}"]`);
+bs.forEach(x=>x.disabled=true);bs[Q[k].c].classList.add('ok2');if(j===Q[k].c)sc++;else bs[j].classList.add('no2');
+$('#sc').textContent='Ball: '+sc+' / 5'+(ans==5?(sc==5?' — Ajoyib! 🏆':sc>=3?' — Yaxshi 👍':' — Mavzuni takrorlang 📖'):'');return}
+if(b.id==='rst'){SC.length=0;sc=0;ans=0;document.querySelectorAll('.opt').forEach(x=>{x.disabled=false;x.classList.remove('ok2','no2')});$('#sc').textContent='Ball: 0 / 5'}});
+function loop(){if(cur<6){const st=ST[cur];if(st.run){st.p=Math.min(1,st.p+.012);if(st.p>=1)st.run=false;render(cur)}}requestAnimationFrame(loop)}
+addEventListener('resize',()=>{if(cur<6)render(cur)});
+(function(){let t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';try{t=localStorage.getItem('th')||t}catch(_){}document.documentElement.dataset.theme=t;$('#th').textContent=t==='dark'?'☀️':'🌙'})();
+show(0);loop();
+</script></body></html>

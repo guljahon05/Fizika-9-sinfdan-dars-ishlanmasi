@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ko'z va ko'rish — 9-sinf fizika, 55-mavzu</title>
+<style>
+:root{--ac:#2f6fed;--tx:#1d2b3a;--ok:#2e9e5b;--bad:#d64545}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,"Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#e8f2ff,#fafdff);color:var(--tx);font-size:17px;line-height:1.55}
+header{padding:20px 14px 8px;text-align:center}
+h1{margin:0;font-size:clamp(24px,5vw,38px);color:var(--ac)}
+header p{margin:4px 0 0;color:#5b6b7d}
+nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:10px;position:sticky;top:0;background:rgba(240,247,255,.96);z-index:10;border-bottom:1px solid #d3e1f4}
+nav button{border:2px solid #c7d9f3;background:#fff;color:var(--tx);padding:8px 14px;border-radius:999px;font-size:15px;cursor:pointer;font-weight:600}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+main{max-width:980px;margin:0 auto;padding:12px}
+.tab{display:none}.tab.on{display:block}
+h2{color:#1b4fb8;font-size:clamp(21px,4vw,28px);margin:10px 0}
+h3{margin:0 0 8px;font-size:20px}
+.card{background:#fff;border-radius:16px;padding:16px;margin:14px 0;box-shadow:0 3px 14px rgba(40,80,140,.12)}
+.cw{overflow-x:auto}
+canvas{display:block;width:100%;min-width:640px;height:auto;background:#fcfeff;border:1px solid #d7e3f2;border-radius:12px}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;align-items:center}
+button.b,.ctl button,.anim button{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:9px 14px;font-size:15px;cursor:pointer;font-weight:600}
+.ctl button.alt{background:#e8f0ff;color:#1b4fb8;border:2px solid #b9cff5}
+.ctl button:hover{filter:brightness(1.08)}
+.sl{margin:8px 0}.sl label{display:block;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--ac);height:28px}
+.info,.cap{background:#eef5ff;border-left:5px solid var(--ac);padding:10px 12px;border-radius:8px;margin-top:10px;min-height:44px}
+.cap{background:#fff8e6;border-color:#f5a623}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px 14px;margin-top:10px;font-size:16px}
+.out div{background:#f4f8ff;border-radius:8px;padding:6px 10px}
+details{background:#f4f8ff;border-radius:10px;padding:10px 12px;margin:8px 0}
+summary{cursor:pointer;font-weight:700}
+.formula{font-family:Consolas,monospace;background:#fff8d6;padding:2px 8px;border-radius:6px;font-weight:700}
+.q{border:2px solid #dbe6f6;border-radius:12px;padding:12px;margin:12px 0}
+.q p{margin:0 0 8px;font-weight:700}
+.opt{display:block;width:100%;text-align:left;background:#f4f8ff;border:2px solid #cfdcf0;border-radius:10px;padding:9px 12px;margin:6px 0;font-size:16px;cursor:pointer;color:var(--tx)}
+.opt.ok{background:#d9f5e3;border-color:var(--ok)}.opt.bad{background:#fde0e0;border-color:var(--bad)}
+.score{font-size:22px;font-weight:800;text-align:center;padding:12px;background:#eef5ff;border-radius:12px}
+ul{margin:6px 0 6px 20px;padding:0}
+.sub{margin:16px 0 6px;font-weight:700;color:#1b4fb8}
+</style>
+</head>
+<body>
+<header><h1>👁 Ko'z va ko'rish</h1><p>9-sinf fizika · 55-mavzu · Interaktiv dars materiali</p></header>
+<nav id="tabs"></nav>
+<main>
+
+<!-- ================= 1-REJA ================= -->
+<section class="tab" id="t1" data-name="1. Ko'z tuzilishi">
+<h2>1-reja. Ko'zning tuzilishi</h2>
+<div class="card"><h3>📘 Nazariy ma'lumot</h3>
+<p>Ko'z — murakkab optik tizim, shar shaklida (diametri taxminan 2,4 sm). Uning asosiy qismlari:</p>
+<ul>
+<li><b>Shox parda (kornea)</b> — old tomondagi tiniq parda; <b>ko'z old kamerasi</b> — suyuqlik bilan to'la bo'shliq.</li>
+<li><b>Rangdor parda (iris)</b> va undagi teshik — <b>qorachiq</b>.</li>
+<li><b>Ko'z gavhari (kristalik)</b> — tiniq elastik linza; uni <b>siliar (kiprik) mushak</b> boshqaradi.</li>
+<li><b>Shishasimon tana</b> — ko'z ichini to'ldiruvchi tiniq jele.</li>
+<li><b>To'r parda (retina)</b> — tasvir hosil bo'ladigan sezgir parda; <b>sariq dog'</b> — eng aniq ko'rish joyi; <b>ko'r dog'</b> — ko'rish nervi chiqish joyi.</li>
+<li><b>Sklera (oqsil parda)</b>, <b>tomirli parda</b>, <b>ko'rish nervi</b>.</li></ul>
+<p>Ko'z fotoapparatga o'xshaydi: kristalik + shox parda = <b>obyektiv</b>, qorachiq = <b>diafragma</b>, to'r parda = <b>plyonka (matritsa)</b>.</p></div>
+<div class="card"><h3>🔬 Simulyatsiya: ko'z kesimi</h3>
+<div class="ctl"><button id="camBtn">📷 Fotoapparat bilan solishtirish</button></div>
+<div class="cw"><canvas id="s1"></canvas></div>
+<div class="info" id="i1">Raqamli belgilar yoki ro'yxatdagi nomlar ustiga sichqoncha olib boring yoki bosing.</div></div>
+<div class="card"><h3>🎬 Animatsiya: nur yo'li</h3><div data-anim="a1"></div></div>
+<div class="card"><h3>✅ Mavzuni mustahkamlash</h3>
+<details><summary>1. Ko'zning qaysi qismlari fotoapparatning obyektiv, diafragma va plyonkasiga mos keladi?</summary><p>Obyektiv — kristalik va shox parda; diafragma — qorachiq (iris bilan); plyonka — to'r parda.</p></details>
+<details><summary>2. Eng aniq ko'rish joyi qaysi?</summary><p>To'r pardadagi sariq dog' (u yerda kolbachalar eng ko'p).</p></details></div>
+</section>
+
+<!-- ================= 2-REJA ================= -->
+<section class="tab" id="t2" data-name="2. Tasvir hosil bo'lishi">
+<h2>2-reja. Ko'zda tasvir hosil bo'lishi</h2>
+<div class="card"><h3>📘 Nazariy ma'lumot</h3>
+<p>Ko'zning optik tizimi <b>yig'uvchi linza</b> vazifasini bajaradi. Buyumdan chiqqan nurlar sinib, to'r pardada <b>haqiqiy, kichraygan va teskari</b> tasvir hosil qiladi. Miya bu tasvirni to'g'ri holatda qabul qilishga o'rgangan.</p>
+<p>Ko'zning umumiy optik kuchi taxminan <b>59 dptr</b>.</p>
+<p>Linza formulasi: <span class="formula">1/F = 1/d + 1/f</span> &nbsp; Optik kuch: <span class="formula">D = 1/F</span> (birligi — dioptriya, dptr).</p></div>
+<div class="card"><h3>🔬 Simulyatsiya</h3>
+<div class="sl"><label>Buyumgacha masofa d: <b id="d2V"></b></label><input type="range" id="d2" min="0.5" max="10" step="0.1" value="2"></div>
+<div class="sl"><label>Buyum balandligi h: <b id="h2V"></b></label><input type="range" id="h2" min="5" max="30" step="1" value="20"></div>
+<div class="cw"><canvas id="s2"></canvas></div>
+<div class="out" id="o2"></div>
+<div class="info">Chizma masshtabsiz. Hisob-kitob: f = 1 / (D − 1/d), tasvir balandligi h' = h · f / d.</div></div>
+<div class="card"><h3>🎬 Animatsiya</h3><div data-anim="a2"></div></div>
+<div class="card"><h3>✅ Mavzuni mustahkamlash</h3>
+<details><summary>1. Ko'zning optik kuchi taxminan qancha?</summary><p>Taxminan 59 dptr (F = 1/59 m ≈ 17 mm).</p></details>
+<details><summary>2. To'r pardadagi tasvir teskari bo'lsa, nega biz narsalarni to'g'ri ko'ramiz?</summary><p>Miya ko'rish signallarini qayta ishlab, tasvirni to'g'ri holatda qabul qilishga o'rgangan.</p></details></div>
+</section>
+
+<!-- ================= 3-REJA ================= -->
+<section class="tab" id="t3" data-name="3. Akkomodatsiya">
+<h2>3-reja. Akkomodatsiya va eng yaxshi ko'rish masofasi</h2>
+<div class="card"><h3>📘 Nazariy ma'lumot</h3>
+<p><b>Akkomodatsiya</b> — ko'zning turli masofadagi buyumlarni aniq ko'rishga moslashishi. U kristalik qavariqligini siliar mushak o'zgartirishi hisobiga ro'y beradi:</p>
+<ul><li>uzoqdagi buyumga qaraganda mushak <b>bo'shashadi</b>, kristalik <b>yassilashadi</b> (optik kuch kamayadi);</li>
+<li>yaqindagi buyumga qaraganda mushak <b>qisqaradi</b>, kristalik <b>qavariqlashadi</b> (optik kuch ortadi).</li></ul>
+<p>Normal ko'z uchun <b>eng yaxshi ko'rish masofasi d0 = 25 sm</b>. Yaqin ko'rish nuqtasi taxminan 10–12 sm, uzoq nuqta — cheksizlik.</p></div>
+<div class="card"><h3>🔬 Simulyatsiya</h3>
+<div class="sl"><label>Buyum masofasi d: <b id="d3V"></b></label><input type="range" id="d3" min="0" max="100" step="1" value="60"></div>
+<div class="cw"><canvas id="s3"></canvas></div>
+<div class="out" id="o3"></div></div>
+<div class="card"><h3>🎬 Animatsiya</h3><div data-anim="a3"></div></div>
+<div class="card"><h3>✅ Mavzuni mustahkamlash</h3>
+<details><summary>1. Uzoqqa qaraganda siliar mushak va kristalik qanday bo'ladi?</summary><p>Mushak bo'shashadi, kristalik yassilashadi, optik kuch kamayadi.</p></details>
+<details><summary>2. Normal ko'zning eng yaxshi ko'rish masofasi qancha?</summary><p>d0 = 25 sm.</p></details></div>
+</section>
+
+<!-- ================= 4-REJA ================= -->
+<section class="tab" id="t4" data-name="4. Qorachiq va adaptatsiya">
+<h2>4-reja. Qorachiq va yorug'likka moslashish (adaptatsiya)</h2>
+<div class="card"><h3>📘 Nazariy ma'lumot</h3>
+<p>Qorachiq diametri yorug'likka qarab taxminan <b>2 mm dan 8 mm gacha</b> o'zgaradi: yorug' joyda <b>toraydi</b>, qorong'ida <b>kengayadi</b>. Shunday qilib to'r pardaga tushayotgan yorug'lik miqdori tartibga solinadi.</p>
+<p>To'r pardada ikki xil retseptor bor:</p>
+<ul><li><b>Tayoqchalar</b> (taxminan 120 mln) — qorong'ida ko'rish, oq-qora;</li>
+<li><b>Kolbachalar</b> (taxminan 6–7 mln) — kunduzgi, rangli ko'rish; uch xil: qizil, yashil, ko'k.</li></ul>
+<p>Qorong'iga o'rganish bir necha o'n daqiqa vaqt oladi.</p></div>
+<div class="card"><h3>🔬 Simulyatsiya</h3>
+<div class="sl"><label>Yoritilganlik (qorong'idan juda yorug'gacha): <b id="l4V"></b></label><input type="range" id="l4" min="0" max="100" step="1" value="60"></div>
+<div class="cw"><canvas id="s4"></canvas></div>
+<div class="out" id="o4"></div></div>
+<div class="card"><h3>🎬 Animatsiya</h3><div data-anim="a4"></div></div>
+<div class="card"><h3>✅ Mavzuni mustahkamlash</h3>
+<details><summary>1. Yorug' joyda qorachiq qanday o'zgaradi va nima uchun?</summary><p>Qorachiq toraydi (taxminan 2 mm), shunda to'r pardaga ortiqcha yorug'lik tushmaydi.</p></details>
+<details><summary>2. Tayoqchalar va kolbachalar qanday vazifa bajaradi?</summary><p>Tayoqchalar — qorong'ida oq-qora ko'rish; kolbachalar — kunduzgi rangli ko'rish.</p></details></div>
+</section>
+
+<!-- ================= 5-REJA ================= -->
+<section class="tab" id="t5" data-name="5. Ko'rish kamchiliklari">
+<h2>5-reja. Ko'rish kamchiliklari va ularni tuzatish</h2>
+<div class="card"><h3>📘 Nazariy ma'lumot</h3>
+<ul>
+<li><b>a) Yaqindan ko'rish (miopiya):</b> tasvir to'r pardadan <b>OLDINDA</b> hosil bo'ladi, uzoqdagi buyumlar xira ko'rinadi. Tuzatish — <b>sochuvchi (botiq)</b> linzali ko'zoynak, optik kuchi manfiy.</li>
+<li><b>b) Uzoqdan ko'rish (gipermetropiya):</b> tasvir to'r pardadan <b>KEYINDA</b> hosil bo'ladi, yaqindagi buyumlar xira ko'rinadi. Tuzatish — <b>yig'uvchi (qavariq)</b> linzali ko'zoynak, optik kuchi musbat.</li>
+<li><b>c) Astigmatizm:</b> shox parda shakli bir tekis emas.</li></ul>
+<p>Ko'zoynak optik kuchi: <span class="formula">D = 1/F</span> (dptr).<br>Misol: uzoq nuqtasi 50 sm bo'lgan yaqindan ko'ruvchi odamga D = −1/0,5 = −2 dptr li linza kerak.</p></div>
+<div class="card"><h3>🔬 Simulyatsiya</h3>
+<div class="ctl"><button class="alt" id="ty0">Normal ko'z</button><button class="alt" id="ty1">Yaqindan ko'ruvchi</button><button class="alt" id="ty2">Uzoqdan ko'ruvchi</button></div>
+<div class="sl"><label>Kristalikdan to'r pardagacha masofa: <b id="L5V"></b></label><input type="range" id="L5" min="14.5" max="20" step="0.05" value="16.95"></div>
+<div class="ctl"><button id="gBtn">🕶 Ko'zoynak qo'yish</button></div>
+<div class="sl"><label>Ko'zoynak optik kuchi: <b id="G5V"></b></label><input type="range" id="G5" min="-8" max="8" step="0.25" value="0" disabled></div>
+<div class="cw"><canvas id="s5"></canvas></div>
+<div class="info" id="i5"></div></div>
+<div class="card"><h3>🎬 Animatsiya</h3><div data-anim="a5"></div></div>
+<div class="card"><h3>✅ Mavzuni mustahkamlash (masalalar)</h3>
+<details><summary>1. Uzoq nuqtasi 50 sm bo'lgan odamga qanday ko'zoynak kerak?</summary><p>Linza cheksizlikdagi buyumning mavhum tasvirini 50 sm da hosil qilishi kerak: D = 1/F = −1/0,5 = <b>−2 dptr</b> (sochuvchi linza).</p></details>
+<details><summary>2. Yaqin nuqtasi 50 sm bo'lgan odam 25 sm da o'qishi uchun ko'zoynak optik kuchi qancha bo'lishi kerak?</summary><p>d = 0,25 m, mavhum tasvir f = −0,5 m da: D = 1/d + 1/f = 4 − 2 = <b>+2 dptr</b> (yig'uvchi linza).</p></details></div>
+</section>
+
+<!-- ================= 6-REJA ================= -->
+<section class="tab" id="t6" data-name="6. Ko'rish hodisalari">
+<h2>6-reja. Ko'rish hodisalari va ko'z gigiyenasi</h2>
+<div class="card"><h3>📘 Nazariy ma'lumot</h3>
+<ul>
+<li><b>Ikki ko'zli ko'rish</b> buyumni hajmli (stereoskopik) ko'rishga va masofasini aniq baholashga yordam beradi.</li>
+<li><b>Ko'rish burchagi</b> — buyum chetlaridan ko'z markaziga o'tkazilgan nurlar orasidagi burchak; buyum uzoqlashgani sari kichrayadi.</li>
+<li><b>Ko'rish inertsiyasi:</b> tasvir to'r pardada taxminan 0,1 s saqlanadi (kino 24 kadr/s shu sababli uzluksiz ko'rinadi).</li>
+<li><b>Optik illyuziyalar</b> va <b>ko'r dog' tajribasi</b>.</li></ul>
+<p class="sub">Ko'z gigiyenasi</p>
+<ul><li>O'qishda ko'zdan kitobgacha 30–35 sm; yorug'lik chap tomondan tushsin.</li>
+<li>Ekran ishlatganda <b>20-20-20 qoidasi</b>: har 20 daqiqada 20 soniya 6 m uzoqqa qarang.</li>
+<li>Yetarli uxlash, A vitaminli oziq-ovqat, quyosh nuriga to'g'ridan-to'g'ri qaramaslik.</li></ul></div>
+
+<div class="card"><h3>🔬 Simulyatsiya (a): ko'r dog' tajribasi</h3>
+<p>Chap ko'zni yuming, o'ng ko'z bilan "+" ga qarang. Ekranga yaqinlashing yoki uzoqlashing — "●" yo'qolishi kerak. (Slayder masofani sinaydi.)</p>
+<div class="sl"><label>Ko'zdan ekrangacha masofa: <b id="m6V"></b></label><input type="range" id="m6" min="10" max="60" step="0.5" value="40"></div>
+<div class="cw"><canvas id="sa"></canvas></div><div class="info" id="i6a"></div></div>
+
+<div class="card"><h3>🔬 Simulyatsiya (b): ko'rish burchagi</h3>
+<div class="sl"><label>Buyum balandligi h: <b id="h6V"></b></label><input type="range" id="h6" min="10" max="200" step="5" value="170"></div>
+<div class="sl"><label>Masofa d: <b id="d6V"></b></label><input type="range" id="d6" min="1" max="100" step="1" value="10"></div>
+<div class="cw"><canvas id="sb"></canvas></div><div class="info" id="i6b"></div></div>
+
+<div class="card"><h3>🎬 Animatsiya (a): ko'rish inertsiyasi</h3>
+<div class="ctl"><span>Kadr chastotasi:</span><button class="alt" data-fps="4">4 kadr/s</button><button class="alt" data-fps="10">10 kadr/s</button><button class="alt" data-fps="24">24 kadr/s</button></div>
+<div data-anim="a6a"></div></div>
+
+<div class="card"><h3>🎬 Animatsiya (b): 20-20-20 qoidasi taymeri</h3><div data-anim="a6b"></div></div>
+
+<div class="card"><h3>🎬 Animatsiya (c): optik illyuziyalar</h3>
+<div class="anim"><div class="cw"><canvas id="il"></canvas></div>
+<div class="ctl"><button data-act="restart">📏 O'lchash</button><button data-act="reset">↺ Tiklash</button></div>
+<div class="cap" id="ilc">Chiziqlar va doiralar qaysi biri kattaroq ko'rinadi? Keyin "O'lchash" tugmasini bosing.</div></div></div>
+
+<div class="card"><h3>✅ Mavzuni mustahkamlash</h3>
+<details><summary>1. Ko'rish inertsiyasi nima va u qancha davom etadi?</summary><p>Tasvir to'r pardada yo'qolgandan keyin ham taxminan 0,1 s saqlanadi; shu sababli 24 kadr/s li kino uzluksiz ko'rinadi.</p></details>
+<details><summary>2. 20-20-20 qoidasi nimani anglatadi?</summary><p>Har 20 daqiqada 20 soniya davomida 6 m (taxminan 20 fut) uzoqlikka qarash — ko'z mushaklari dam oladi.</p></details></div>
+</section>
+
+<!-- ================= TEST ================= -->
+<section class="tab" id="t7" data-name="Test">
+<h2>📝 Test: Ko'z va ko'rish</h2>
+<div class="card"><div class="score" id="score">Natija: 0 / 10</div><div id="quiz"></div>
+<div class="ctl"><button id="resetQ">↺ Testni qayta boshlash</button></div></div>
+</section>
+</main>
+
+<script>
+'use strict';
+/* ===================== UMUMIY SOZLAMALAR ===================== */
+const W=800,H=380,CY=190,LX=300,RX=480,PX=10.62; // PX: 1 mm necha piksel (F=16.95 mm -> 180 px)
+const $=id=>document.getElementById(id);
+const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+const smooth=t=>{t=clamp(t);return t*t*(3-2*t);};
+const lerp=(a,b,t)=>a+(b-a)*t;
+function mk(id){const cv=$(id);cv.width=W*2;cv.height=H*2;const c=cv.getContext('2d');c.setTransform(2,0,0,2,0,0);return c;}
+
+/* ===================== CHIZISH YORDAMCHILARI ===================== */
+function ln(c,x1,y1,x2,y2,col,w,dash){c.save();c.strokeStyle=col||'#333';c.lineWidth=w||2;if(dash)c.setLineDash(dash);c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.restore();}
+function tx(c,s,x,y,col,size,al,bold){c.save();c.fillStyle=col||'#223';c.font=(bold?'bold ':'')+(size||14)+'px system-ui,Arial,sans-serif';c.textAlign=al||'left';c.textBaseline='middle';c.fillText(s,x,y);c.restore();}
+function circ(c,x,y,r,fill,stroke,w){c.beginPath();c.arc(x,y,r,0,Math.PI*2);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=w||1;c.stroke();}}
+function ell(c,x,y,rx,ry,fill,stroke,w){c.beginPath();c.ellipse(x,y,rx,ry,0,0,Math.PI*2);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=w||1;c.stroke();}}
+function arrow(c,x1,y1,x2,y2,col,w,hs){
+  hs=hs||9;ln(c,x1,y1,x2,y2,col,w||3);const a=Math.atan2(y2-y1,x2-x1);
+  c.save();c.fillStyle=col;c.beginPath();c.moveTo(x2,y2);
+  c.lineTo(x2-hs*Math.cos(a-0.45),y2-hs*Math.sin(a-0.45));
+  c.lineTo(x2-hs*Math.cos(a+0.45),y2-hs*Math.sin(a+0.45));c.closePath();c.fill();c.restore();
+}
+// Ko'p nuqtali siniq chiziqni prog (0..1) qismigacha chizadi
+function poly(c,pts,prog,col,w,dash){
+  const L=[];let tot=0;
+  for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);L.push(l);tot+=l;}
+  let rem=tot*clamp(prog),end=pts[0],idx=0;
+  c.save();c.strokeStyle=col||'#e67e22';c.lineWidth=w||2;if(dash)c.setLineDash(dash);
+  c.beginPath();c.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length&&rem>0;i++){
+    const f=Math.min(1,rem/(L[i-1]||1));
+    end=[pts[i-1][0]+(pts[i][0]-pts[i-1][0])*f,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*f];
+    c.lineTo(end[0],end[1]);rem-=L[i-1];idx=i-1;
+  }
+  c.stroke();c.restore();return {end:end,seg:idx};
+}
+// Qavariq (yig'uvchi) linza
+function lens(c,x,y,b,ry,fill){
+  c.beginPath();c.moveTo(x,y-ry);c.quadraticCurveTo(x+2*b,y,x,y+ry);c.quadraticCurveTo(x-2*b,y,x,y-ry);
+  c.fillStyle=fill||'#ffd36b';c.fill();c.strokeStyle='#c98a00';c.lineWidth=2;c.stroke();
+}
+// Botiq (sochuvchi) linza
+function lensConcave(c,x,y,ry){
+  c.beginPath();c.moveTo(x-9,y-ry);c.lineTo(x+9,y-ry);c.quadraticCurveTo(x-3,y,x+9,y+ry);c.lineTo(x-9,y+ry);c.quadraticCurveTo(x+3,y,x-9,y-ry);
+  c.fillStyle='#bfe9ff';c.fill();c.strokeStyle='#2a7fb8';c.lineWidth=2;c.stroke();
+}
+// Ko'z qobig'i (ellips): retina (pushti) va shox parda (ko'k)
+function shell(c,cx,cy,rx,ry){
+  c.beginPath();c.ellipse(cx,cy,rx,ry,0,0,7);c.fillStyle='#f4faff';c.fill();c.strokeStyle='#8fa9c4';c.lineWidth=4;c.stroke();
+  c.beginPath();c.ellipse(cx,cy,rx-3,ry-3,0,-1,1);c.strokeStyle='#ec6a8c';c.lineWidth=6;c.stroke();
+  c.beginPath();c.ellipse(cx,cy,rx,ry,0,Math.PI-0.55,Math.PI+0.55);c.strokeStyle='#74c0ff';c.lineWidth=7;c.stroke();
+}
+
+/* ===================== ANIMATSIYA DVIGATELI ===================== */
+const ANIMS=[];
+function Anim(id,dur,draw,loop){
+  const c=mk(id),root=$(id).closest('.anim');let t=0,playing=false,last=0;
+  function render(){c.clearRect(0,0,W,H);draw(c,t,t/dur,$(id+'c'));}
+  function frame(ts){
+    if(!playing)return;
+    t+=Math.max(0,(ts-last)/1000);last=ts;
+    if(t>=dur){if(loop)t=t%dur;else{t=dur;playing=false;}}
+    render();if(playing)requestAnimationFrame(frame);
+  }
+  const o={render:render,
+    play(){if(playing)return;if(t>=dur)t=0;playing=true;last=performance.now();requestAnimationFrame(frame);},
+    pause(){playing=false;},
+    restart(){const was=playing;t=0;playing=true;last=performance.now();if(!was)requestAnimationFrame(frame);},
+    reset(){playing=false;t=0;render();}};
+  root.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>o[b.dataset.act]());
+  ANIMS.push(o);render();return o;
+}
+// Animatsiya bloklari (Play/Pause/Qayta boshlash) ni joylashtirish
+document.querySelectorAll('[data-anim]').forEach(el=>{
+  const id=el.dataset.anim;
+  el.outerHTML='<div class="anim"><div class="cw"><canvas id="'+id+'"></canvas></div><div class="ctl"><button data-act="play">▶ Play</button><button data-act="pause">⏸ Pause</button><button data-act="restart">⟲ Qayta boshlash</button></div><div class="cap" id="'+id+'c">Play tugmasini bosing.</div></div>';
+});
+
+/* ===================== TABLAR ===================== */
+const tabs=[...document.querySelectorAll('.tab')],nav=$('tabs');
+tabs.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s.dataset.name;b.onclick=()=>show(i);nav.appendChild(b);});
+function show(i){
+  tabs.forEach((s,j)=>{s.classList.toggle('on',i===j);nav.children[j].classList.toggle('on',i===j);});
+  ANIMS.forEach(a=>a.pause());window.scrollTo({top:0});
+}
+
+/* =====================================================================
+   1-REJA: KO'Z TUZILISHI
+   ===================================================================== */
+const EC={x:300,y:190,R:140};
+const P1=[
+ {n:"Shox parda (kornea)",d:"Ko'zning old tomonidagi tiniq, qavariq parda. Nurni birinchi bo'lib sindiradi va ko'zni himoya qiladi.",x:164,y:137,cam:'ob'},
+ {n:"Ko'z old kamerasi",d:"Shox parda va rangdor parda orasidagi suyuqlik bilan to'la bo'shliq.",x:190,y:190},
+ {n:"Rangdor parda (iris)",d:"Ko'z rangini belgilaydi; mushaklari qorachiq o'lchamini o'zgartiradi.",x:218,y:128,cam:'di'},
+ {n:"Qorachiq",d:"Rangdor pardadagi teshik: nur shu orqali o'tadi. Yorug'likka qarab kengayadi yoki torayadi.",x:218,y:190,cam:'di'},
+ {n:"Ko'z gavhari (kristalik)",d:"Tiniq, elastik linza. Qavariqligini o'zgartirib, tasvirni to'r pardaga fokuslaydi.",x:250,y:190,cam:'ob'},
+ {n:"Siliar (kiprik) mushak",d:"Kristalik qavariqligini o'zgartiradi (akkomodatsiya).",x:236,y:92},
+ {n:"Shishasimon tana",d:"Ko'z ichini to'ldiruvchi tiniq jele; ko'z shaklini saqlaydi va nurni o'tkazadi.",x:330,y:190},
+ {n:"To'r parda (retina)",d:"Yorug'likka sezgir retseptorlar (tayoqcha va kolbachalar) joylashgan; tasvir shu yerda hosil bo'ladi.",x:346,y:71,cam:'pl'},
+ {n:"Sariq dog'",d:"To'r pardaning eng aniq ko'rish joyi: kolbachalar eng ko'p.",x:428,y:190},
+ {n:"Ko'r dog'",d:"Ko'rish nervi ko'zdan chiqadigan joy; retseptorlari yo'q, shuning uchun bu yerda tasvir ko'rinmaydi.",x:420,y:234},
+ {n:"Ko'rish nervi",d:"Elektr signallarni to'r pardadan miyaga uzatadi.",x:460,y:252},
+ {n:"Sklera (oqsil parda)",d:"Ko'zning zich, oq tashqi himoya pardasi; ko'zga shakl beradi.",x:206,y:86},
+ {n:"Tomirli parda",d:"Qon tomirlariga boy parda; to'r pardani oziq moddalar va kislorod bilan ta'minlaydi.",x:348,y:315}
+];
+const CAMN={ob:"Fotoapparatda: OBYEKTIV (kristalik + shox parda)",di:"Fotoapparatda: DIAFRAGMA (qorachiq va iris)",pl:"Fotoapparatda: PLYONKA / MATRITSA"};
+const CAMC={ob:'#1e88e5',di:'#fb8c00',pl:'#43a047'};
+function eyeBody(c){
+  const E=EC;
+  circ(c,E.x,E.y,E.R,'#fffef6','#d9d4c7',8);        // sklera
+  circ(c,E.x,E.y,E.R-6,'#e8f4ff');                   // old kamera suyuqligi
+  circ(c,320,190,105,'#c5e3ff');                     // shishasimon tana
+  c.beginPath();c.arc(E.x,E.y,134,-2.2,2.2);c.strokeStyle='#8b2e2e';c.lineWidth=5;c.stroke();   // tomirli parda
+  c.beginPath();c.arc(E.x,E.y,128,-1.9,1.9);c.strokeStyle='#f08aa0';c.lineWidth=6;c.stroke();   // to'r parda
+  ell(c,428,190,4,10,'#ffd600');                     // sariq dog'
+  ln(c,420,234,480,262,'#e6c27a',12);circ(c,420,234,5,'#555'); // ko'rish nervi, ko'r dog'
+  ln(c,218,95,218,160,'#6b4a2b',9);ln(c,218,220,218,285,'#6b4a2b',9); // iris
+  ln(c,236,100,243,152,'#999',1.5);ln(c,236,280,243,228,'#999',1.5);
+  ell(c,236,92,13,8,'#d9534f','#8b1a1a',2);ell(c,236,288,13,8,'#d9534f','#8b1a1a',2); // siliar mushak
+  ell(c,245,190,15,40,'#ffd36b','#c98a00',2);       // kristalik
+  c.beginPath();c.arc(260,190,110,Math.PI-0.85,Math.PI+0.85);c.strokeStyle='#7ec8ff';c.lineWidth=7;c.stroke(); // shox parda
+}
+const c1=mk('s1');let sel1=-1,hov1=-1,cam1=false;
+function r1(){
+  c1.clearRect(0,0,W,H);eyeBody(c1);
+  P1.forEach((p,i)=>{
+    const col=cam1?(CAMC[p.cam]||'#9aa5b1'):'#2f6fed';
+    const ly=28+i*26,act=(i===sel1||i===hov1);
+    if(act){c1.fillStyle='#fff3cd';c1.fillRect(508,ly-13,288,26);}
+    if(cam1&&p.cam)circ(c1,p.x,p.y,15,null,col,3);
+    if(act)circ(c1,p.x,p.y,19,'rgba(255,193,7,.35)','#ffb300',3);
+    circ(c1,p.x,p.y,9,col,'#fff',2);tx(c1,String(i+1),p.x,p.y+.5,'#fff',11,'center',true);
+    circ(c1,522,ly,9,col);tx(c1,String(i+1),522,ly+.5,'#fff',11,'center',true);
+    tx(c1,p.n,538,ly,'#1d2b3a',14);
+  });
+  if(cam1){
+    tx(c1,"Obyektiv: shox parda + kristalik",8,18,CAMC.ob,13,'left',true);
+    tx(c1,"Diafragma: qorachiq (iris)",8,36,CAMC.di,13,'left',true);
+    tx(c1,"Plyonka: to'r parda",8,54,CAMC.pl,13,'left',true);
+  }
+}
+function info1(i){
+  const p=P1[i];$('i1').innerHTML='<b>'+(i+1)+'. '+p.n+'</b> — '+p.d+(cam1&&p.cam?'<br><b style="color:'+CAMC[p.cam]+'">'+CAMN[p.cam]+'</b>':'');
+}
+function pos1(e){const r=$('s1').getBoundingClientRect();return [(e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height];}
+function hit1(x,y){
+  let b=-1,bd=1e9;
+  P1.forEach((p,i)=>{const d=Math.hypot(p.x-x,p.y-y);if(d<16&&d<bd){bd=d;b=i;}});
+  if(b<0&&x>505){const i=Math.round((y-28)/26);if(i>=0&&i<P1.length&&Math.abs(y-(28+i*26))<13)b=i;}
+  return b;
+}
+$('s1').addEventListener('mousemove',e=>{const q=pos1(e),h=hit1(q[0],q[1]);if(h!==hov1){hov1=h;if(h>=0)info1(h);r1();}});
+$('s1').addEventListener('mouseleave',()=>{hov1=-1;r1();});
+$('s1').addEventListener('click',e=>{const q=pos1(e),h=hit1(q[0],q[1]);if(h>=0){sel1=h;info1(h);r1();}});
+$('camBtn').onclick=()=>{cam1=!cam1;$('camBtn').textContent=cam1?"↩ Oddiy ko'rinish":"📷 Fotoapparat bilan solishtirish";if(sel1>=0)info1(sel1);r1();};
+r1();
+
+// 1-animatsiya: nur yo'li
+const PATH1=[[40,190],[152,190],[218,190],[265,190],[428,190],[420,234],[480,262],[650,262]];
+const ST1=["Nur manbaidan chiqadi","Shox parda va ko'z old kamerasi","Qorachiq","Kristalik","Shishasimon tana → to'r parda","To'r pardada tasvir hosil bo'ladi","Ko'rish nervi","Miyaga signal yetib keldi"];
+const CAP1=[
+ "1. Yorug'lik nuri ko'z tomon yo'naladi.",
+ "2. Nur shox pardadan kirib, ko'z old kamerasi orqali qorachiq tomon boradi.",
+ "3. Qorachiq orqali o'tadi (iris nur miqdorini tartibga soladi).",
+ "4. Kristalik nurni sindirib, to'r pardaga fokuslaydi.",
+ "5. Nur shishasimon tana orqali to'r pardaga yetadi.",
+ "6. To'r pardada tasvir hosil bo'ladi: tayoqcha va kolbachalar qo'zg'aladi.",
+ "7. Signal ko'rish nervi orqali ketadi.",
+ "8. Signal miyaga yetdi — biz ko'ramiz!"];
+Anim('a1',14,(c,t,p,cap)=>{
+  eyeBody(c);
+  circ(c,40,190,13,'#ffd600','#f5a000',2);for(let i=0;i<8;i++){const a=i*Math.PI/4;ln(c,40+Math.cos(a)*18,190+Math.sin(a)*18,40+Math.cos(a)*26,190+Math.sin(a)*26,'#f5a000',2);}
+  ell(c,700,262,55,38,p>=0.99?'#f7a6b8':'#f7c6d0','#c75b7a',3);tx(c,"Miya",700,262,'#8a2a4a',16,'center',true);
+  const r=poly(c,PATH1,p,'#ff9800',4);
+  circ(c,r.end[0],r.end[1],11,'rgba(255,200,0,.35)');circ(c,r.end[0],r.end[1],6,'#ff6f00');
+  const i=Math.min(r.seg+(p>=0.99?1:0),7);
+  tx(c,ST1[i],clamp(r.end[0],110,690),r.end[1]-24,'#b34700',15,'center',true);
+  if(p>0.5)ell(c,428,190,6,14,'rgba(255,214,0,.7)');
+  cap.textContent=CAP1[i];
+},false);
+
+/* =====================================================================
+   2-REJA: KO'ZDA TASVIR HOSIL BO'LISHI
+   ===================================================================== */
+function imaging(c,d,h,prog){
+  shell(c,375,CY,105,105);lens(c,LX,CY,16,42);
+  ln(c,10,CY,540,CY,'#c9d3df',1,[6,6]);
+  const t=(Math.log(d)-Math.log(0.5))/(Math.log(10)-Math.log(0.5));
+  const xo=90-80*t,hp=h*2,yo=CY-hp,dpx=LX-xo;
+  let xi=470,yi=CY;
+  for(let i=0;i<4;i++){yi=CY+(CY-yo)*(xi-LX)/dpx;xi=375+Math.sqrt(Math.max(0,105*105-(yi-CY)*(yi-CY)));}
+  arrow(c,xo,CY,xo,yo,'#2e7d32',4);tx(c,"Buyum",xo,yo-14,'#2e7d32',14,'center',true);
+  ln(c,xo,CY+34,LX,CY+34,'#888',1);tx(c,"d = "+d.toFixed(1)+" m",(xo+LX)/2,CY+50,'#555',13,'center');
+  const y1=clamp(yo,CY-40,CY+40),y3=CY+30;
+  const rays=[[[xo,yo],[LX,y1],[xi,yi]],[[xo,yo],[LX,CY],[xi,yi]],[[xo,yo],[LX,y3],[xi,yi]]],cols=['#e67e22','#c0392b','#8e44ad'];
+  rays.forEach((r,i)=>poly(c,r,prog,cols[i],2));
+  tx(c,"Kristalik",LX,CY+70,'#a56d00',13,'center',true);
+  tx(c,"To'r parda",RX+12,CY-82,'#c2275a',13,'left',true);
+  c.save();c.globalAlpha=clamp((prog-0.85)/0.15);
+  arrow(c,xi,CY,xi,yi,'#d35400',4);tx(c,"Tasvir (teskari)",xi+10,yi+(yi>CY?10:-10),'#d35400',13,'left',true);
+  c.restore();
+  return {xi:xi,yi:yi};
+}
+const c2=mk('s2');
+function r2(){
+  const d=+$('d2').value,h=+$('h2').value;
+  $('d2V').textContent=d.toFixed(1)+' m';$('h2V').textContent=h+' sm';
+  c2.clearRect(0,0,W,H);imaging(c2,d,h,1);
+  const f=1000/(59-1/d),G=f/(1000*d),hi=h*10*G;
+  tx(c2,"Tasvir: haqiqiy · kichraygan · teskari",20,24,'#1b4fb8',17,'left',true);
+  $('o2').innerHTML='<div>Optik kuch: D = 59 dptr</div><div>Fokus masofasi: F = 1/D = '+(1000/59).toFixed(2)+' mm</div><div>Tasvir masofasi: f = '+f.toFixed(2)+' mm</div><div>Kattalashtirish: Γ = f/d = '+G.toExponential(2).replace('e-','·10⁻')+'</div><div>Tasvir balandligi: h\' = '+hi.toFixed(2)+' mm</div><div>Tasvir turi: haqiqiy, kichraygan, teskari</div>';
+}
+['d2','h2'].forEach(i=>$(i).addEventListener('input',r2));r2();
+Anim('a2',9,(c,t,p,cap)=>{
+  imaging(c,3,25,clamp(p/0.5));
+  ell(c,705,190,85,95,'#fff0f3','#c75b7a',3);tx(c,"Miya",705,110,'#8a2a4a',16,'center',true);
+  if(p>0.52){
+    const s=smooth((p-0.62)/0.3);
+    c.save();c.translate(705,200);c.rotate(Math.PI*(1-s));arrow(c,0,35,0,-35,'#d35400',5,12);c.restore();
+    tx(c,s<1?"Miya tasvirni to'g'rilamoqda":"Biz buyumni to'g'ri ko'ramiz",705,282,'#8a2a4a',13,'center',true);
+  }
+  cap.textContent=p<0.5?"Buyumning uchlamchi nuri ko'z ichida sinib, to'r pardada birlashadi.":p<0.62?"To'r pardada haqiqiy, kichraygan, TESKARI tasvir hosil bo'ldi.":"Miya teskari tasvirni to'g'ri holatga o'giradi (aylanish).";
+},false);
+
+/* =====================================================================
+   3-REJA: AKKOMODATSIYA
+   ===================================================================== */
+function accEye(c,D,dinv){
+  shell(c,375,CY,105,105);ln(c,10,CY,540,CY,'#c9d3df',1,[6,6]);
+  const x=D-59,acc=clamp(x/10,0,1.2);
+  for(const sg of [-1,1]){
+    const y=CY+sg*(66-8*acc),rx=18-6*acc,ry=4+5*acc;
+    ln(c,LX-rx*.7,y-sg*ry,LX,CY+sg*42,'#999',1.5);ln(c,LX+rx*.7,y-sg*ry,LX,CY+sg*42,'#999',1.5);
+    ell(c,LX,y,rx,ry,'#e06666','#8b1a1a',2);
+  }
+  lens(c,LX,CY,6+x*1.6,42);
+  const v=1000/(D-dinv),xf=LX+v*PX;
+  [-36,36].forEach(dy=>{
+    const y0=CY+dy,yh=y0+(CY-y0)*(RX-LX)/(xf-LX),st=dinv>0?[70,CY]:[30,y0];
+    poly(c,[st,[LX,y0],[RX,yh]],1,'#e67e22',2);
+    if(xf>RX+1)poly(c,[[RX,yh],[xf,CY]],1,'#e67e22',2,[4,4]);
+  });
+  if(dinv>0){circ(c,70,CY,6,'#2e7d32');tx(c,"Buyum",70,CY-16,'#2e7d32',13,'center',true);}
+  else tx(c,"∞ dan parallel nurlar",30,CY-60,'#2e7d32',13,'left',true);
+  tx(c,"Siliar mushak",LX,CY-84,'#a33',13,'center',true);tx(c,"Kristalik",LX,CY+90,'#a56d00',13,'center',true);
+  tx(c,"To'r parda",RX+12,CY-82,'#c2275a',13,'left',true);
+  const ms=x<1?"bo'shashgan":x<4?"qisman qisqargan":"qisqargan",ls=x<1?"yassi":x<4?"o'rtacha qavariq":"qavariq";
+  tx(c,"Kristalik optik kuchi: "+D.toFixed(1)+" dptr",20,300,'#1b4fb8',14,'left',true);
+  tx(c,"Siliar mushak: "+ms,20,322,'#a33',14,'left',true);
+  tx(c,"Kristalik shakli: "+ls,20,344,'#a56d00',14,'left',true);
+  return {xf:xf};
+}
+function dist3(){const s=+$('d3').value;return s>=100?Infinity:3*Math.pow(1000/3,s/99);}
+const c3=mk('s3');
+function r3(){
+  const d=dist3(),dinv=isFinite(d)?100/d:0,Dreq=59+dinv,D=Math.min(Dreq,69),ok=Dreq<=69.0001;
+  $('d3V').textContent=isFinite(d)?d.toFixed(d<10?1:0)+' sm':'∞ (cheksizlik)';
+  c3.clearRect(0,0,W,H);const r=accEye(c3,D,dinv);
+  tx(c3,ok?"Aniq ko'rinadi ✔":"Ko'z moslasha olmaydi ✖",20,26,ok?'#2e9e5b':'#d64545',22,'left',true);
+  $('o3').innerHTML='<div>Buyum masofasi: '+(isFinite(d)?d.toFixed(1)+' sm':'∞')+'</div><div>Kerakli optik kuch: D = 59 + 1/d = '+Dreq.toFixed(1)+' dptr</div><div>Kristalikning optik kuchi: '+D.toFixed(1)+' dptr</div><div>Fokus: to\'r pardadan '+(Math.abs(r.xf-RX)<3?'aniq':'keyinda')+' (yaqin nuqta ≈ 10 sm)</div>';
+}
+$('d3').addEventListener('input',r3);r3();
+Anim('a3',10,(c,t,p,cap)=>{
+  let q=0;
+  if(t<2.5)q=0;else if(t<4.5)q=smooth((t-2.5)/2);else if(t<7)q=1;else if(t<9)q=1-smooth((t-7)/2);
+  accEye(c,59+5*q,5*q);
+  const far=q<0.5;
+  tx(c,"🌳",40,90,'#000',34,'center');tx(c,"daraxt (uzoqda)",40,125,'#2e7d32',12,'center',true);
+  tx(c,"📖",215,90,'#000',30,'center');tx(c,"kitob (yaqinda)",215,125,'#2e7d32',12,'center',true);
+  c.save();c.strokeStyle='#ff9800';c.lineWidth=3;c.strokeRect(far?8:180,62,far?64:70,80);c.restore();
+  cap.textContent=far?"Uzoqdagi daraxtga qaraydi: mushak bo'shashgan, kristalik yassi (≈59 dptr).":"Kitobga qaraydi: mushak qisqargan, kristalik qavariq (≈64 dptr).";
+  if(t>2.5&&t<4.5)cap.textContent="Moslashish: mushak qisqarib, kristalik asta-sekin qavariqlashmoqda.";
+  if(t>7&&t<9)cap.textContent="Moslashish: mushak bo'shashib, kristalik yassilashmoqda.";
+},true);
+
+/* =====================================================================
+   4-REJA: QORACHIQ VA ADAPTATSIYA
+   ===================================================================== */
+function frontEye(c,cx,cy,R,dp){
+  const ry=R*0.62;
+  c.save();c.beginPath();c.ellipse(cx,cy,R,ry,0,0,7);c.fillStyle='#fffdf8';c.fill();c.strokeStyle='#8a6d5a';c.lineWidth=4;c.stroke();c.clip();
+  const ri=R*0.52,g=c.createRadialGradient(cx,cy,ri*0.2,cx,cy,ri);g.addColorStop(0,'#c58f4e');g.addColorStop(1,'#5a3a1c');
+  circ(c,cx,cy,ri,g);
+  for(let i=0;i<36;i++){const a=i/36*Math.PI*2;ln(c,cx+Math.cos(a)*ri*0.45,cy+Math.sin(a)*ri*0.45,cx+Math.cos(a)*ri*0.98,cy+Math.sin(a)*ri*0.98,'rgba(255,230,180,.25)',1);}
+  circ(c,cx,cy,ri,null,'#3b2410',3);circ(c,cx,cy,ri*(dp/8)*0.85,'#050505');
+  circ(c,cx-ri*0.25,cy-ri*0.25,ri*0.1,'rgba(255,255,255,.8)');
+  c.restore();
+}
+function sceneCol(rgb,s){
+  const b=0.15+0.85*s/100,gr=.3*rgb[0]+.59*rgb[1]+.11*rgb[2],sat=clamp((s-10)/30);
+  return 'rgb('+rgb.map(v=>Math.round(lerp(gr,v,sat)*b)).join(',')+')';
+}
+const c4=mk('s4');
+function r4(){
+  const s=+$('l4').value,dp=2+6*Math.pow(1-s/100,1.5),light=(s/100)*Math.pow(dp/8,2)*100;
+  const rec=s<10?"Tayoqchalar (oq-qora, qorong'ida ko'rish)":s<40?"Tayoqcha + kolbacha (alacakaranglik)":"Kolbachalar (rangli, kunduzgi ko'rish)";
+  const lvl=s<10?"qorong'i":s<40?"xira":s<75?"yorug'":"juda yorug'";
+  $('l4V').textContent=s+' % ('+lvl+')';
+  c4.clearRect(0,0,W,H);
+  const g=Math.round(12+240*Math.pow(s/100,0.8));
+  c4.fillStyle='rgb('+g+','+g+','+Math.round(g*0.93)+')';c4.fillRect(400,20,380,340);
+  frontEye(c4,200,190,170,dp);
+  const rp=88*(dp/8)*0.85;
+  ln(c4,200,300,200,190+rp,'#555',1.5);tx(c4,"Qorachiq",200,314,'#222',14,'center',true);
+  ln(c4,85,330,143,247,'#555',1.5);tx(c4,"Rangdor parda (iris)",85,344,'#222',13,'center',true);
+  tx(c4,"Sklera",52,125,'#555',13,'left',true);
+  const pc=g<110?'#fff':'#223';
+  tx(c4,"Sahna (ko'z ko'radigan manzara)",590,38,pc,15,'center',true);
+  tx(c4,"💡",590,95,'#000',Math.round(24+s*0.4),'center');
+  c4.fillStyle=sceneCol([220,50,50],s);c4.fillRect(430,200,80,80);
+  circ(c4,590,240,38,sceneCol([40,170,70],s));
+  c4.fillStyle=sceneCol([50,90,220],s);c4.beginPath();c4.moveTo(700,280);c4.lineTo(740,200);c4.lineTo(770,280);c4.fill();
+  tx(c4,"Faol retseptor: "+rec.split(' (')[0],590,325,pc,14,'center',true);
+  $('o4').innerHTML='<div>Qorachiq diametri: <b>'+dp.toFixed(1)+' mm</b></div><div>To\'r pardaga tushayotgan yorug\'lik: <b>'+light.toFixed(1)+' %</b></div><div>Faol retseptorlar: <b>'+rec+'</b></div><div>Qorachiq tartibga solmasa: '+s+' % bo\'lardi</div>';
+}
+$('l4').addEventListener('input',r4);r4();
+const OFF=3,ON=19;
+function st4(t){
+  const dpOn=2.2,dpOff=dpOn+5.8*(1-Math.exp(-(ON-OFF)/1)),Smax=4+96*(1-Math.exp(-(2*(ON-OFF))/9));
+  let dp,S,min=0;
+  if(t<OFF){dp=dpOn;S=4;}
+  else if(t<ON){dp=dpOn+5.8*(1-Math.exp(-(t-OFF)/1));min=2*(t-OFF);S=4+96*(1-Math.exp(-min/9));}
+  else{dp=dpOn+(dpOff-dpOn)*Math.exp(-(t-ON)/0.25);S=4+(Smax-4)*Math.exp(-(t-ON)/0.8);min=2*(ON-OFF);}
+  return {lamp:(t<OFF||t>=ON),dp:dp,S:S,min:min};
+}
+Anim('a4',26,(c,t,p,cap)=>{
+  const s=st4(t),tc=s.lamp?'#223':'#fff';
+  c.fillStyle=s.lamp?'#fff6d6':'#0e1230';c.fillRect(0,0,470,H);
+  if(s.lamp)circ(c,350,90,62,'rgba(255,220,80,.35)');
+  tx(c,"💡",350,90,'#000',60,'center');tx(c,"Chiroq",350,150,tc,14,'center',true);
+  frontEye(c,130,215,100,s.dp);tx(c,"Ko'z (qorachiq)",130,300,tc,14,'center',true);
+  const rec=s.lamp?"kolbacha":(s.min<7?"kolbacha→tayoqcha":"tayoqchalar");
+  tx(c,"Chiroq: "+(s.lamp?"yoqilgan":"o'chirilgan"),250,195,tc,14,'left',true);
+  tx(c,"Qorachiq: "+s.dp.toFixed(1)+" mm",250,220,tc,14,'left',true);
+  tx(c,"Sezgirlik: "+s.S.toFixed(0)+" %",250,245,tc,14,'left',true);
+  tx(c,"Retseptor: "+rec,250,270,tc,14,'left',true);
+  tx(c,"Vaqt: ≈"+s.min.toFixed(0)+" daqiqa",250,295,tc,14,'left',true);
+  const x0=500,x1=770,y0=300,y1=70;
+  ln(c,x0,y0,x1,y0,'#333',2);ln(c,x0,y0,x0,y1,'#333',2);
+  tx(c,"Ko'z sezgirligi (%)",x0,y1-18,'#223',14,'left',true);tx(c,"vaqt →",x1,y0+18,'#223',13,'right');
+  [OFF,ON].forEach((tt,i)=>{const x=x0+(x1-x0)*tt/26;ln(c,x,y0,x,y1,i?'#f5a623':'#7a4cff',1.5,[5,4]);tx(c,i?"Chiroq yondi":"Chiroq o'chdi",x,y0+34,i?'#b36b00':'#5a35c8',12,'center',true);});
+  tx(c,"0",x0-8,y0,'#555',12,'right');tx(c,"100",x0-6,y1,'#555',12,'right');
+  c.beginPath();for(let tt=0;tt<=t;tt+=0.2){const q=st4(tt),x=x0+(x1-x0)*tt/26,y=y0-(y0-y1)*q.S/100;if(tt===0)c.moveTo(x,y);else c.lineTo(x,y);}
+  c.strokeStyle='#e53935';c.lineWidth=3;c.stroke();
+  cap.textContent=t<OFF?"Yorug' xona: qorachiq tor (≈2 mm), kolbachalar ishlaydi.":t<ON?"Chiroq o'chdi: qorachiq tez kengayadi (≈8 mm); tayoqchalarga o'tish va qorong'iga ko'nikish ~30 daqiqa davom etadi (animatsiyada tezlatilgan).":"Chiroq yondi: qorachiq darhol toraydi, sezgirlik keskin pasayadi.";
+},true);
+
+/* =====================================================================
+   5-REJA: KO'RISH KAMCHILIKLARI
+   ===================================================================== */
+function defect(c,Lr,Dg,glass,prog){
+  const xr=LX+Lr*PX,cx=(270+xr)/2,rx=(xr-270)/2;
+  shell(c,cx,CY,rx,95);lens(c,LX,CY,15,40);ln(c,10,CY,600,CY,'#c9d3df',1,[6,6]);
+  const P=59+(glass?Dg:0),f=1000/P,xf=LX+f*PX;
+  if(glass){if(Dg<0)lensConcave(c,170,CY,48);else lens(c,170,CY,10,48,'#bfe9ff');
+    tx(c,"Ko'zoynak",170,CY+70,'#2a7fb8',13,'center',true);tx(c,(Dg>0?"+":"")+Dg.toFixed(2)+" dptr",170,CY+88,'#2a7fb8',13,'center',true);}
+  [-45,-22,22,45].forEach(dy=>{
+    const y0=CY+dy,yh=y0+(CY-y0)*(xr-LX)/(xf-LX);
+    poly(c,[[30,y0],[LX,y0],[xr,yh]],prog,'#e67e22',2);
+    if(xf>xr+1&&prog>0.97)poly(c,[[xr,yh],[xf,CY]],1,'#e67e22',1.5,[4,4]);
+  });
+  if(prog>0.97){circ(c,xf,CY,5,'#d63031');tx(c,"fokus",xf,CY-14,'#d63031',12,'center',true);}
+  tx(c,"Kristalik",LX,CY+62,'#a56d00',12,'center',true);tx(c,"To'r parda",xr+8,CY-100,'#c2275a',13,'left',true);
+  return {diff:f-Lr,f:f};
+}
+function stat5(diff,glass){
+  if(Math.abs(diff)<=0.12)return glass?{t:"Tuzatildi ✔ — tasvir to'r pardada",c:'#2e9e5b'}:{t:"Tasvir to'r pardada — normal ko'rish",c:'#2e9e5b'};
+  return diff<0?{t:"Tasvir to'r pardadan OLDINDA (yaqindan ko'rish)",c:'#d64545'}:{t:"Tasvir to'r pardadan KEYINDA (uzoqdan ko'rish)",c:'#d64545'};
+}
+const c5=mk('s5');let glass5=false;
+function r5(){
+  const Lr=+$('L5').value,G=+$('G5').value,Dg=glass5?G:0;
+  $('L5V').textContent=Lr.toFixed(2)+' mm';$('G5V').textContent=(G>0?'+':'')+G.toFixed(2)+' dptr';
+  c5.clearRect(0,0,W,H);const r=defect(c5,Lr,Dg,glass5,1),s=stat5(r.diff,glass5);
+  tx(c5,s.t,20,24,s.c,18,'left',true);
+  const need=1000/Lr-59;
+  $('i5').innerHTML=(glass5?(G<0?"Linza: <b>sochuvchi (botiq)</b>, optik kuchi manfiy.":G>0?"Linza: <b>yig'uvchi (qavariq)</b>, optik kuchi musbat.":"Ko'zoynak optik kuchi 0 dptr."):"Ko'zoynak qo'yilmagan.")+" Ko'zning umumiy optik kuchi: "+(59+Dg).toFixed(2)+" dptr. <i>(Tuzatish uchun kerakli qiymat ≈ "+(need>0?'+':'')+need.toFixed(2)+" dptr)</i>";
+}
+['L5','G5'].forEach(i=>$(i).addEventListener('input',r5));
+$('gBtn').onclick=()=>{glass5=!glass5;$('G5').disabled=!glass5;$('gBtn').textContent=glass5?"🕶 Ko'zoynakni olish":"🕶 Ko'zoynak qo'yish";r5();};
+[[16.95],[18.5],[15.8]].forEach((v,i)=>$('ty'+i).onclick=()=>{$('L5').value=v[0];glass5=false;$('G5').value=0;$('G5').disabled=true;$('gBtn').textContent="🕶 Ko'zoynak qo'yish";r5();});
+r5();
+const C5=[{n:"Yaqindan ko'rish (miopiya)",Lr:18.5,Dg:-5,a:0,b:3.5},{n:"Uzoqdan ko'rish (gipermetropiya)",Lr:15.8,Dg:4.25,a:7,b:10.5},{n:"Normal ko'z",Lr:16.95,Dg:0,a:14,b:14}];
+Anim('a5',17,(c,t,p,cap)=>{
+  const k=t<7?0:t<14?1:2,cs=C5[k];let glass=false,tl;
+  if(k<2){if(t<cs.b)tl=t-cs.a;else{glass=true;tl=t-cs.b;}}else tl=t-14;
+  const prog=clamp(tl/2.2),r=defect(c,cs.Lr,glass?cs.Dg:0,glass,prog);
+  tx(c,cs.n+(k<2?(glass?" — ko'zoynak bilan ("+cs.Dg+" dptr, "+(cs.Dg<0?"sochuvchi":"yig'uvchi")+" linza)":" — ko'zoynaksiz"):""),20,24,'#1d2b3a',17,'left',true);
+  if(prog>0.97){const s=stat5(r.diff,glass);tx(c,s.t,20,50,s.c,16,'left',true);}
+  cap.textContent=k===2?"Normal ko'zda nurlar to'r pardada yig'iladi.":glass?"Ko'zoynak qo'yilgach, nurlar to'r pardada yig'iladi — kamchilik tuzatildi.":"Avval kamchilikli ko'z: nurlar to'r pardada yig'ilmaydi.";
+},true);
+
+/* =====================================================================
+   6-REJA: KO'RISH HODISALARI
+   ===================================================================== */
+// (a) Ko'r dog' tajribasi
+const ca=mk('sa');
+function r6a(){
+  const dist=+$('m6').value,ang=Math.atan(7/dist)*180/Math.PI,al=clamp(Math.abs(ang-15)/2.2);
+  $('m6V').textContent=dist.toFixed(1)+' sm';
+  ca.clearRect(0,0,W,H);
+  tx(ca,"O'ng ko'z bilan '+' ga qarang, chap ko'zni yuming",400,28,'#1b4fb8',17,'center',true);
+  tx(ca,"+",150,130,'#000',56,'center',true);
+  ca.save();ca.globalAlpha=al;circ(ca,570,130,22,'#111');ca.restore();
+  if(al<0.05)tx(ca,"● yo'qoldi!",570,185,'#d64545',16,'center',true);
+  tx(ca,"Ko'rish burchagi (+ va ● orasida): "+ang.toFixed(1)+"°",400,235,'#223',16,'center',true);
+  const x0=100,x1=700,y=300,sc=(x1-x0)/30;
+  ln(ca,x0,y,x1,y,'#333',2);ca.fillStyle='rgba(214,69,69,.35)';ca.fillRect(x0+12.8*sc,y-14,4.4*sc,28);
+  for(let a=0;a<=30;a+=5){ln(ca,x0+a*sc,y-5,x0+a*sc,y+5,'#333',1);tx(ca,a+"°",x0+a*sc,y+20,'#555',12,'center');}
+  tx(ca,"Ko'r dog' zonasi (≈15°)",x0+15*sc,y-28,'#b02a2a',13,'center',true);
+  circ(ca,x0+clamp(ang,0,30)*sc,y,8,'#2f6fed','#fff',2);
+  $('i6a').textContent=al<0.05?"Nur ko'r dog'ga tushdi — retseptorlar yo'q, shuning uchun ● ko'rinmaydi!":"● hali ko'rinadi. Masofani taxminan 23–31 sm ga keltiring.";
+}
+$('m6').addEventListener('input',r6a);r6a();
+// (b) Ko'rish burchagi
+const cb=mk('sb');
+function r6b(){
+  const h=+$('h6').value,d=+$('d6').value,phi=2*Math.atan(h/100/(2*d))*180/Math.PI;
+  $('h6V').textContent=h+' sm';$('d6V').textContent=d+' m';
+  cb.clearRect(0,0,W,H);
+  const xo=200+480*Math.log(d)/Math.log(100),hp=h*0.5,ex=90;
+  circ(cb,ex,CY,26,'#fff','#555',3);circ(cb,ex+6,CY,10,'#222');tx(cb,"Ko'z",ex,CY+45,'#444',13,'center',true);
+  ln(cb,ex,CY,xo,CY,'#c9d3df',1,[5,5]);
+  ln(cb,ex,CY,xo,CY-hp/2,'#e67e22',2);ln(cb,ex,CY,xo,CY+hp/2,'#e67e22',2);
+  const a=Math.atan2(hp/2,xo-ex);cb.beginPath();cb.arc(ex,CY,60,-a,a);cb.strokeStyle='#d63031';cb.lineWidth=3;cb.stroke();
+  arrow(cb,xo,CY+hp/2,xo,CY-hp/2,'#2e7d32',4);arrow(cb,xo,CY-hp/2,xo,CY+hp/2,'#2e7d32',4);
+  tx(cb,"Buyum h = "+h+" sm",xo,CY-hp/2-16,'#2e7d32',14,'center',true);
+  tx(cb,"φ = "+phi.toFixed(2)+"°",20,28,'#d63031',24,'left',true);
+  tx(cb,"φ = 2·arctg(h / 2d)  (chizma masshtabsiz)",20,58,'#555',14,'left');
+  $('i6b').textContent="Buyum uzoqlashgani sari (d ortgani sari) ko'rish burchagi kichrayadi; buyum kattaroq bo'lsa, burchak ortadi.";
+}
+['h6','d6'].forEach(i=>$(i).addEventListener('input',r6b));r6b();
+// (a) animatsiya: ko'rish inertsiyasi
+let fps=24;
+document.querySelectorAll('[data-fps]').forEach(b=>b.onclick=()=>{fps=+b.dataset.fps;an6a.render();});
+const an6a=Anim('a6a',6,(c,t,p,cap)=>{
+  const N=8,k=Math.floor(t*fps);
+  ln(c,40,300,760,300,'#bbb',2);
+  for(let j=k;j>=Math.max(0,k-6);j--){
+    const age=t-j/fps;if(age>=0.1)continue;
+    const m=j%N,x=80+m*(640/(N-1)),y=250-110*Math.sin(Math.PI*m/(N-1));
+    c.save();c.globalAlpha=1-age/0.1*0.8;circ(c,x,y,22,'#e53935','#7a1010',2);c.restore();
+  }
+  tx(c,"Kadr chastotasi: "+fps+" kadr/s (oraliq "+(1/fps).toFixed(2)+" s)",20,24,'#1b4fb8',16,'left',true);
+  tx(c,"Ko'zda tasvir saqlanishi: ≈0,1 s",20,50,'#555',14,'left');
+  const smoothMove=1/fps<0.1;
+  tx(c,smoothMove?"Harakat uzluksiz ko'rinadi":"Alohida yaltirashlar ko'rinadi",400,340,smoothMove?'#2e9e5b':'#d64545',18,'center',true);
+  cap.textContent="Kadrlar oralig'i 0,1 s dan kichik bo'lsa, oldingi tasvir hali ko'zda saqlanib turadi va harakat uzluksiz ko'rinadi (kino: 24 kadr/s).";
+},true);
+// (b) 20-20-20 taymeri
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0');
+Anim('a6b',15,(c,t,p,cap)=>{
+  const screen=t<10,rem=screen?1200-t*120:20-(t-10)*4,frac=screen?rem/1200:rem/20,col=screen?'#2f6fed':'#f5a623';
+  circ(c,400,190,110,'#f4f8ff','#dbe6f6',16);
+  c.beginPath();c.arc(400,190,110,-Math.PI/2,-Math.PI/2+Math.PI*2*frac);c.strokeStyle=col;c.lineWidth=16;c.stroke();
+  tx(c,fmt(rem),400,185,'#1d2b3a',44,'center',true);
+  tx(c,screen?"daqiqa : soniya":"soniya",400,225,'#555',14,'center');
+  tx(c,screen?"📱":"⛰️",140,190,'#000',64,'center');
+  tx(c,screen?"Ekranga qarayapsiz (20 daqiqa)":"6 m uzoqqa qarang! (20 soniya)",400,340,col,20,'center',true);
+  tx(c,screen?"Ekran masofasi: 30–35 sm":"≈ 6 m (20 fut) uzoqlik",660,190,'#555',15,'center',true);
+  cap.textContent="20-20-20 qoidasi: har 20 daqiqada 20 soniya 6 m uzoqqa qarang. (Tezlatilgan rejim: ekran 2 daqiqa/s, tanaffus 4 soniya/s tezlikda.)";
+},true);
+// (c) optik illyuziyalar
+function illusion(c,t,p,cap){
+  const m=smooth(p);
+  tx(c,"Myuller-Layer: qaysi chiziq uzunroq?",20,16,'#1b4fb8',15,'left',true);
+  [[60,true],[140,false]].forEach(a=>{
+    const y=a[1]?a[0]:a[0],inward=a[1];
+    ln(c,200,y,500,y,'#222',3);
+    const s=inward?1:-1;
+    [[200,1],[500,-1]].forEach(e=>{ln(c,e[0],y,e[0]+s*e[1]*22,y-22,'#222',3);ln(c,e[0],y,e[0]+s*e[1]*22,y+22,'#222',3);});
+  });
+  tx(c,"Ebbinghaus: qaysi markaziy doira kattaroq?",400,185,'#1b4fb8',15,'center',true);
+  for(let k=0;k<6;k++){const a=k*Math.PI/3;circ(c,230+58*Math.cos(a),285+58*Math.sin(a),26,'#cfd8e6','#8da0bb',2);}
+  for(let k=0;k<8;k++){const a=k*Math.PI/4;circ(c,570+30*Math.cos(a),285+30*Math.sin(a),8,'#cfd8e6','#8da0bb',2);}
+  circ(c,230,285,16,'#f57c00');circ(c,570,285,16,'#f57c00');
+  if(m>0){
+    c.save();c.globalAlpha=m;
+    [200,500].forEach(x=>ln(c,x,25,x,175,'#d63031',2,[6,4]));
+    tx(c,"Ikkala chiziq teng: 300 px",600,100,'#d63031',15,'left',true);
+    [230,570].forEach(x=>{ln(c,x-16,285,x+16,285,'#d63031',2);ln(c,x-16,275,x-16,295,'#d63031',2);ln(c,x+16,275,x+16,295,'#d63031',2);});
+    tx(c,"d = 32 px (ikkalasi teng)",400,285,'#d63031',15,'center',true);
+    c.restore();
+  }
+  cap.textContent=m>0.5?"O'lchash natijasi: chiziqlar ham, markaziy doiralar ham teng! Bu — optik illyuziya: miya o'lchamni atrofga qarab baholaydi.":"Qaysi biri kattaroq ko'rinadi? So'ng \"O'lchash\" tugmasini bosing.";
+}
+Anim('il',1.5,illusion,false);
+
+/* =====================================================================
+   TEST
+   ===================================================================== */
+const Q=[
+ {q:"Ko'zning qaysi qismi fotoapparatdagi plyonka (matritsa) vazifasini bajaradi?",o:["Qorachiq","Shox parda","To'r parda","Sklera"],a:2},
+ {q:"Ko'zda buyumning tasviri qanday hosil bo'ladi?",o:["Mavhum, kattalashgan, to'g'ri","Haqiqiy, kichraygan, teskari","Mavhum, kichraygan, to'g'ri","Haqiqiy, kattalashgan, to'g'ri"],a:1},
+ {q:"Akkomodatsiya nima hisobiga ro'y beradi?",o:["Kristalik qavariqligining o'zgarishi","Qorachiq o'lchamining o'zgarishi","Ko'z olmasi uzunligining o'zgarishi","Shox parda yupqalashishi"],a:0},
+ {q:"Yaqindagi buyumga qaraganda siliar mushak va kristalik qanday holatda bo'ladi?",o:["Mushak bo'shashadi, kristalik yassilashadi","Mushak qisqaradi, kristalik yassilashadi","Mushak bo'shashadi, kristalik qavariqlashadi","Mushak qisqaradi, kristalik qavariqlashadi"],a:3},
+ {q:"Normal ko'z uchun eng yaxshi ko'rish masofasi qancha?",o:["10 sm","15 sm","25 sm","50 sm"],a:2},
+ {q:"Qorong'ida ko'rishni qaysi retseptorlar ta'minlaydi?",o:["Kolbachalar","Tayoqchalar","Ikkalasi baravar","Hech qaysi"],a:1},
+ {q:"Yaqindan ko'rishda tasvir qayerda hosil bo'ladi va qanday linza kerak?",o:["To'r pardadan keyin; yig'uvchi","To'r pardada; sochuvchi","To'r pardadan oldin; sochuvchi","To'r pardadan oldin; yig'uvchi"],a:2},
+ {q:"Uzoq nuqtasi 50 sm bo'lgan odamga qanday optik kuchli ko'zoynak kerak?",o:["+2 dptr","−0,5 dptr","+0,5 dptr","−2 dptr"],a:3},
+ {q:"Ko'r dog' nima?",o:["Eng aniq ko'rish joyi","Ko'rish nervi chiqadigan, retseptorsiz joy","Qorachiq markazi","Kristalikning chekkasi"],a:1},
+ {q:"20-20-20 qoidasi nimani anglatadi?",o:["Har 20 daqiqada 20 soniya 6 m uzoqqa qarash","Har 20 soatda 20 daqiqa dam olish","20 sm dan 20 daqiqa o'qish","Kuniga 20 marta ko'zni yuvish"],a:0}
+];
+let score=0,answered=0;
+function buildQuiz(){
+  score=0;answered=0;const box=$('quiz');box.innerHTML='';$('score').textContent='Natija: 0 / 10';
+  Q.forEach((it,qi)=>{
+    const d=document.createElement('div');d.className='q';
+    d.innerHTML='<p>'+(qi+1)+'. '+it.q+'</p>';
+    it.o.forEach((o,oi)=>{
+      const b=document.createElement('button');b.className='opt';b.textContent=String.fromCharCode(65+oi)+') '+o;
+      b.onclick=()=>{
+        const bs=d.querySelectorAll('.opt');bs.forEach(x=>x.disabled=true);
+        bs[it.a].classList.add('ok');
+        if(oi===it.a)score++;else b.classList.add('bad');
+        answered++;
+        $('score').textContent='Natija: '+score+' / 10'+(answered===10?' — '+(score>=9?"A'lo! 🏆":score>=7?"Yaxshi 👍":score>=5?"Qoniqarli 🙂":"Mavzuni qayta o'qing 📖"):'');
+      };
+      d.appendChild(b);
+    });
+    box.appendChild(d);
+  });
+}
+$('resetQ').onclick=buildQuiz;buildQuiz();
+show(0);
+</script>
+</body>
+</html>

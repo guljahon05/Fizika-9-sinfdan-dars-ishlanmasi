@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>53-mavzu. Laboratoriya ishi: Linzaning optik kuchini aniqlash</title>
+<style>
+/* Umumiy uslublar */
+:root{--bg:#f4f8ff;--card:#fff;--p:#2563eb;--g:#16a34a;--r:#dc2626;--o:#f59e0b;--t:#1e293b}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.5;background:var(--bg);color:var(--t)}
+header{background:linear-gradient(90deg,#2563eb,#06b6d4);color:#fff;padding:14px 16px;text-align:center}
+header h1{margin:0;font-size:22px}
+header p{margin:4px 0 0;font-size:15px;opacity:.9}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:#fff;position:sticky;top:0;z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.08);justify-content:center}
+.tab{border:2px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:12px;padding:8px 12px;font-size:16px;cursor:pointer;font-weight:600}
+.tab.active{background:var(--p);color:#fff;border-color:var(--p)}
+.panel{display:none;max-width:980px;margin:0 auto;padding:12px}
+.panel.active{display:block}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 3px 12px rgba(30,64,175,.1)}
+.card h2{margin:0 0 8px;font-size:22px;color:#1d4ed8}
+.card h3{margin:0 0 8px;font-size:19px;color:#0f766e}
+canvas{width:100%;height:auto;background:#fff;border:2px solid #dbeafe;border-radius:12px;touch-action:none;display:block}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+.ctl label{font-weight:600}
+input[type=range]{flex:1;min-width:150px}
+input[type=number],select{font-size:17px;padding:6px 8px;border:2px solid #bfdbfe;border-radius:8px;width:110px}
+select{width:auto}
+.b{border:none;border-radius:10px;padding:9px 14px;font-size:16px;font-weight:700;color:#fff;background:var(--p);cursor:pointer}
+.b.g{background:var(--g)}.b.o{background:var(--o)}.b.r{background:var(--r)}
+.out{background:#eff6ff;border-left:5px solid var(--p);padding:8px 12px;border-radius:8px;margin-top:8px}
+.formula{background:#fef9c3;border-radius:10px;padding:8px 12px;font-weight:700;display:inline-block;margin:4px 0}
+table{border-collapse:collapse;width:100%;font-size:16px;display:block;overflow-x:auto}
+th,td{border:1px solid #cbd5e1;padding:6px 10px;text-align:center}
+th{background:#dbeafe}
+tr.sum td{background:#dcfce7;font-weight:700}
+.ok{color:var(--g);font-weight:700}.bad{color:var(--r);font-weight:700}.warn{color:#b45309;font-weight:700}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px;border:2px solid #bfdbfe;background:#fff;border-radius:12px;font-size:17px;cursor:pointer}
+.opt.right{background:#dcfce7;border-color:var(--g)}
+.opt.wrong{background:#fee2e2;border-color:var(--r)}
+.exp{margin-top:10px;padding:10px;border-radius:10px;background:#f1f5f9}
+@media(max-width:600px){body{font-size:17px}.tab{padding:7px 9px;font-size:14px}header h1{font-size:18px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Laboratoriya ishi: Linzaning optik kuchini aniqlash</h1>
+  <p>9-sinf fizika · 53-mavzu</p>
+</header>
+<div class="tabs" id="tabs"></div>
+
+<!-- 1-REJA -->
+<section class="panel" id="p0">
+  <div class="card">
+    <h2>1-reja. Ishning maqsadi, asboblar va nazariy asos</h2>
+    <p><b>Maqsad:</b> yig'uvchi linzaning fokus masofasini o'lchab, uning optik kuchini aniqlash.</p>
+    <p><b>Asboblar:</b> yig'uvchi linza, yorug'lik manbai (yonib turgan sham yoki LED strelka), ekran, millimetrli shkalali optik skameyka (o'lchov chizg'ichi).</p>
+    <p><b>Nazariy asos:</b> yupqa linza formulasi</p>
+    <div class="formula">1/F = 1/d + 1/f</div>
+    <p>bu yerda <b>d</b> — buyumdan linzagacha, <b>f</b> — linzadan tasvirgacha, <b>F</b> — fokus masofa.</p>
+  </div>
+  <div class="card">
+    <h3>Simulyatsiya: asboblar to'plami</h3>
+    <p>Asbob ustiga bosing — nomi va vazifasi chiqadi.</p>
+    <canvas id="s1" width="700" height="300"></canvas>
+    <div class="out" id="o1">Asbobni tanlang.</div>
+  </div>
+  <div class="card">
+    <h3>Animatsiya: asboblar skameykaga joylashadi</h3>
+    <canvas id="a1" width="700" height="300"></canvas>
+    <div class="ctl" id="a1-ctl"></div>
+  </div>
+</section>
+
+<!-- 2-REJA -->
+<section class="panel" id="p1">
+  <div class="card">
+    <h2>2-reja. Optik kuch tushunchasi</h2>
+    <p>Linzaning optik kuchi:</p>
+    <div class="formula">D = 1/F</div>
+    <p>Birligi — <b>dioptriya (dptr)</b>: 1 dptr = 1/m (fokus masofasi 1 m bo'lgan linzaning optik kuchi).</p>
+    <p>Fokus masofa qancha kichik bo'lsa, optik kuch shuncha katta, linza nurlarni shuncha kuchli sindiradi. Yig'uvchi linzada <b>D &gt; 0</b>, sochuvchi linzada <b>D &lt; 0</b>. Ko'zoynak linzalari optik kuch bilan belgilanadi.</p>
+  </div>
+  <div class="card">
+    <h3>Simulyatsiya: F ni o'zgartiring</h3>
+    <div class="ctl"><label>F = <span id="v2">20</span> sm</label><input type="range" id="r2" min="5" max="100" step="1" value="20"></div>
+    <canvas id="s2" width="700" height="280"></canvas>
+    <div class="out" id="o2"></div>
+  </div>
+  <div class="card">
+    <h3>Animatsiya: F kamayganda D ortadi</h3>
+    <canvas id="a2" width="700" height="300"></canvas>
+    <div class="ctl" id="a2-ctl"></div>
+  </div>
+</section>
+
+<!-- 3-REJA -->
+<section class="panel" id="p2">
+  <div class="card">
+    <h2>3-reja. Tajribani tayyorlash</h2>
+    <p>Skameykada sham, linza va ekran bir chiziqda (bitta optik o'qda) o'rnatiladi. Linzaning markazi, shamning alangasi va ekranning markazi <b>bir balandlikda</b> bo'lishi shart.</p>
+    <p>Shamdan ekrangacha masofa linzaning <b>4F</b> dan katta bo'lishi kerak, aks holda aniq tasvir hosil bo'lmaydi.</p>
+    <p><b>Linza modeli:</b> F = 20 sm (0,20 m), demak 4F = 80 sm.</p>
+  </div>
+  <div class="card">
+    <h3>Simulyatsiya: asboblarni sudrab joylashtiring</h3>
+    <p>Sham, linza va ekranni sichqoncha yoki barmoq bilan siljiting (chapga-o'ngga va yuqoriga-pastga).</p>
+    <canvas id="s3" width="700" height="300"></canvas>
+    <div class="out" id="o3"></div>
+  </div>
+  <div class="card">
+    <h3>Animatsiya: to'g'ri va noto'g'ri joylashtirish</h3>
+    <canvas id="a3" width="700" height="300"></canvas>
+    <div class="ctl" id="a3-ctl"></div>
+  </div>
+</section>
+
+<!-- 4-REJA -->
+<section class="panel" id="p3">
+  <div class="card">
+    <h2>4-reja. Tajribani bajarish: d va f ni o'lchash</h2>
+    <p>Buyumning o'rni (d) tanlanadi, so'ng ekran surilib, ekranda aniq (keskin) tasvir hosil qilinadi va f o'lchanadi. Tajriba kamida 3 marta, d ning turli qiymatlarida takrorlanadi:</p>
+    <p>1-tajriba: d = 30 sm; 2-tajriba: d = 40 sm; 3-tajriba: d = 25 sm.</p>
+    <p>d &gt; 2F da tasvir kichraygan; 2F &gt; d &gt; F da kattalashgan, teskari va haqiqiy bo'ladi.</p>
+  </div>
+  <div class="card">
+    <h3>Simulyatsiya: ekranni suring va keskin tasvirni toping</h3>
+    <div class="ctl">
+      <label>d = <span id="vd4">30</span> sm</label><input type="range" id="rd4" min="25" max="60" step="1" value="30">
+    </div>
+    <div class="ctl">
+      <label>Ekran: <span id="vs4">30</span> sm</label><input type="range" id="rs4" min="10" max="110" step="0.5" value="30">
+    </div>
+    <div class="ctl">
+      <button class="b" id="e41">1-tajriba (d = 30)</button>
+      <button class="b" id="e42">2-tajriba (d = 40)</button>
+      <button class="b" id="e43">3-tajriba (d = 25)</button>
+    </div>
+    <canvas id="s4" width="700" height="300"></canvas>
+    <div class="out" id="o4"></div>
+  </div>
+  <div class="card">
+    <h3>Animatsiya: nurlar yurishi va tasvirning keskinlashishi (d = 30 sm)</h3>
+    <canvas id="a4" width="700" height="300"></canvas>
+    <div class="ctl" id="a4-ctl"></div>
+  </div>
+</section>
+
+<!-- 5-REJA -->
+<section class="panel" id="p4">
+  <div class="card">
+    <h2>5-reja. Hisoblash, natijalar jadvali va xatolik</h2>
+    <p>Formulalar:</p>
+    <div class="formula">F = d·f / (d + f)</div> <div class="formula">D = 1/F = 1/d + 1/f</div>
+    <p>Haqiqiy o'lchovlarda kichik xatolik bo'ladi, shu sababli D o'rtacha qiymat sifatida olinadi. Nisbiy xatolik:</p>
+    <div class="formula">ε = |D<sub>o'rt</sub> − D<sub>haqiqiy</sub>| / D<sub>haqiqiy</sub> · 100 %</div>
+  </div>
+  <div class="card">
+    <h3>Simulyatsiya: natijalar jadvali</h3>
+    <div id="t5"></div>
+    <div class="ctl">
+      <button class="b o" id="err5">Tasodifiy o'lchov xatosi (f ± 1–2 sm)</button>
+      <button class="b g" id="ideal5">Ideal qiymatlar</button>
+    </div>
+    <div class="out" id="o5"></div>
+    <h3 style="margin-top:14px">O'z qiymatingizni kiriting</h3>
+    <div class="ctl">
+      <label>d (sm):</label><input type="number" id="d5" value="30" min="1" step="0.5">
+      <label>f (sm):</label><input type="number" id="f5" value="60" min="1" step="0.5">
+      <button class="b" id="c5">Hisobla</button>
+    </div>
+    <div class="out" id="oc5">Qiymatlarni kiriting va "Hisobla" tugmasini bosing.</div>
+  </div>
+  <div class="card">
+    <h3>Animatsiya: formulaga qiymatlarni qadamma-qadam qo'yish</h3>
+    <canvas id="a5" width="700" height="320"></canvas>
+    <div class="ctl" id="a5-ctl"></div>
+  </div>
+</section>
+
+<!-- 6-REJA -->
+<section class="panel" id="p5">
+  <div class="card">
+    <h2>6-reja. Xulosa va qo'llanilishi</h2>
+    <p><b>Xulosa:</b> tajriba natijasida linzaning optik kuchi <b>D = 5 dptr</b> (F = 20 sm) ekanligi aniqlandi; optik kuch fokus masofaga teskari proporsional.</p>
+    <p><b>Qo'llanilishi:</b> ko'zoynak (yaqindan ko'ra olmaslikda yig'uvchi, uzoqni ko'ra olmaslikda sochuvchi linza), lupa, mikroskop, teleskop, fotoapparat.</p>
+    <p>Ko'zoynak linzalari optik kuchi dioptriyada yoziladi (masalan, +2,5 dptr; −1,5 dptr).</p>
+  </div>
+  <div class="card">
+    <h3>Simulyatsiya: ko'z modeli</h3>
+    <div class="ctl">
+      <label>Ko'z holati:</label>
+      <select id="t6">
+        <option value="60">Normal ko'z</option>
+        <option value="63">Uzoqni ko'ra olmaslik (sochuvchi linza kerak)</option>
+        <option value="57">Yaqinni ko'ra olmaslik (yig'uvchi linza kerak)</option>
+      </select>
+    </div>
+    <div class="ctl"><label>Ko'zoynak D = <span id="v6">0</span> dptr</label><input type="range" id="r6" min="-6" max="6" step="0.5" value="0"></div>
+    <canvas id="s6" width="700" height="340"></canvas>
+    <div class="out" id="o6"></div>
+    <p style="font-size:15px">Modelda ko'zoynak va ko'z linzasi optik kuchlari qo'shilib hisoblanadi.</p>
+  </div>
+  <div class="card">
+    <h3>Animatsiya: ko'zoynak taqilganda xira tasvir keskinlashadi</h3>
+    <canvas id="a6" width="700" height="340"></canvas>
+    <div class="ctl" id="a6-ctl"></div>
+  </div>
+</section>
+
+<!-- 7-TAB: TEST -->
+<section class="panel" id="p6">
+  <div class="card" id="testbox"></div>
+</section>
+
+<script>
+/* ---------- Yordamchi funksiyalar ---------- */
+const $=id=>document.getElementById(id);
+const fmt=(x,n=2)=>x.toFixed(n).replace('.',',');
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ease=x=>{x=clamp(x,0,1);return x*x*(3-2*x);};
+const F0=20; // modeldagi linza fokus masofasi, sm
+
+function line(c,x1,y1,x2,y2,col,w){c.strokeStyle=col;c.lineWidth=w||2;c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();}
+function txt(c,s,x,y,col,size,al){c.fillStyle=col||'#1e293b';c.font='bold '+(size||16)+'px sans-serif';c.textAlign=al||'left';c.fillText(s,x,y);}
+// yig'uvchi (b>0) yoki sochuvchi (b<0) linza shakli
+function lens(c,x,y,h,b){
+  c.fillStyle='rgba(56,189,248,.35)';c.strokeStyle='#0284c7';c.lineWidth=2;c.beginPath();
+  if(b>=0){c.moveTo(x,y-h);c.quadraticCurveTo(x+16,y,x,y+h);c.quadraticCurveTo(x-16,y,x,y-h);}
+  else{c.moveTo(x-10,y-h);c.lineTo(x+10,y-h);c.quadraticCurveTo(x+1,y,x+10,y+h);c.lineTo(x-10,y+h);c.quadraticCurveTo(x-1,y,x-10,y-h);}
+  c.fill();c.stroke();
+}
+// vertikal strelka: y1 — asos, y2 — uchi
+function arrow(c,x,y1,y2,col,w){
+  line(c,x,y1,x,y2,col,w||3);
+  const d=y2<y1?1:-1;
+  c.fillStyle=col;c.beginPath();c.moveTo(x,y2);c.lineTo(x-6,y2+d*11);c.lineTo(x+6,y2+d*11);c.closePath();c.fill();
+}
+// alanga (flip — teskari)
+function flame(c,x,y,k,flip){
+  c.save();c.translate(x,y);c.scale(k,flip?-k:k);
+  c.fillStyle='#f59e0b';c.beginPath();c.moveTo(0,-16);c.quadraticCurveTo(11,0,0,11);c.quadraticCurveTo(-11,0,0,-16);c.fill();
+  c.fillStyle='#fde047';c.beginPath();c.moveTo(0,-6);c.quadraticCurveTo(5,2,0,8);c.quadraticCurveTo(-5,2,0,-6);c.fill();
+  c.restore();
+}
+function candle(c,x,y,baseY){
+  c.fillStyle='#fef3c7';c.strokeStyle='#92400e';c.lineWidth=2;
+  c.fillRect(x-9,y+14,18,baseY-y-14);c.strokeRect(x-9,y+14,18,baseY-y-14);
+  flame(c,x,y,1,false);
+}
+// siniq chiziq bo'ylab p (0..1) qismigacha chizish
+function poly(c,pts,p,col,w){
+  let tot=0,seg=[];
+  for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(l);tot+=l;}
+  if(tot<=0)return;
+  let rem=tot*p;c.strokeStyle=col;c.lineWidth=w||2;c.beginPath();c.moveTo(pts[0][0],pts[0][1]);
+  for(let i=1;i<pts.length;i++){
+    const l=seg[i-1];
+    if(rem>=l){c.lineTo(pts[i][0],pts[i][1]);rem-=l;}
+    else{const k=rem/l;c.lineTo(pts[i-1][0]+(pts[i][0]-pts[i-1][0])*k,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*k);break;}
+  }
+  c.stroke();
+}
+// buyum uchidan linza orqali tasvir uchiga o'tuvchi nurlar, ekran (ex) gacha
+function rays(c,fx,fy,lx,ly,ix,iy,ex,offs,p,col){
+  offs.forEach(o=>{
+    const y1=ly+o,sl=(iy-y1)/(ix-lx),ye=y1+sl*(ex-lx);
+    poly(c,[[fx,fy],[lx,y1],[ex,ye]],p,col,2);
+  });
+}
+function pos(e,c){const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height];}
+
+// Animatsiya boshqaruvi: Play / Pause / Qayta boshlash
+function makeAnim(id,dur,draw){
+  const c=$(id),x=c.getContext('2d'),box=$(id+'-ctl');
+  let t=0,run=false,last=0;
+  box.innerHTML='<button class="b g">▶ Play</button><button class="b o">⏸ Pause</button><button class="b r">↺ Qayta boshlash</button>';
+  const bs=box.querySelectorAll('button');
+  function fr(ts){
+    if(!run)return;
+    t=Math.min(1,t+(ts-last)/1000/dur);last=ts;
+    draw(x,c.width,c.height,t);
+    if(t>=1)run=false;else requestAnimationFrame(fr);
+  }
+  bs[0].onclick=()=>{if(run)return;if(t>=1)t=0;run=true;last=performance.now();requestAnimationFrame(fr);};
+  bs[1].onclick=()=>{run=false;};
+  bs[2].onclick=()=>{run=false;t=0;draw(x,c.width,c.height,0);};
+  draw(x,c.width,c.height,0);
+}
+
+/* ---------- Tablar ---------- */
+const titles=['1-reja','2-reja','3-reja','4-reja','5-reja','6-reja','Test'];
+const tabsBox=$('tabs');
+titles.forEach((t,i)=>{
+  const b=document.createElement('button');b.className='tab';b.textContent=t;b.onclick=()=>showTab(i);tabsBox.appendChild(b);
+});
+function showTab(i){
+  document.querySelectorAll('.tab').forEach((b,k)=>b.classList.toggle('active',k===i));
+  document.querySelectorAll('.panel').forEach((p,k)=>p.classList.toggle('active',k===i));
+  window.scrollTo(0,0);
+}
+
+/* ================= 1-REJA ================= */
+const items1=[
+  {n:"Optik skameyka",d:"Asboblar o'rnatiladigan millimetrli shkalali uzun asos. Masofalarni o'lchashga yordam beradi.",hit:[30,222,640,28],
+   dr:c=>{c.fillStyle='#cbd5e1';c.fillRect(40,230,620,18);for(let i=0;i<=60;i++){line(c,40+i*10,230,40+i*10,i%5==0?242:237,'#475569',1);}txt(c,'Optik skameyka',350,222,'#475569',14,'center');}},
+  {n:"O'lchov chizg'ichi",d:"Buyumdan linzagacha (d) va linzadan ekrangacha (f) masofalarni sm yoki mm da o'lchaydi.",hit:[140,260,420,36],
+   dr:c=>{c.fillStyle='#fde68a';c.strokeStyle='#92400e';c.lineWidth=2;c.fillRect(150,265,400,24);c.strokeRect(150,265,400,24);for(let i=0;i<=40;i++){line(c,150+i*10,265,150+i*10,i%5==0?278:272,'#92400e',1);}txt(c,"chizg'ich",350,287,'#92400e',12,'center');}},
+  {n:"Yorug'lik manbai (sham)",d:"Buyum vazifasini bajaradi. Uning alangasining tasviri ekranda hosil qilinadi.",hit:[58,125,44,100],
+   dr:c=>{candle(c,80,150,228);txt(c,'Sham',80,115,'#b45309',15,'center');}},
+  {n:"Yig'uvchi linza",d:"Nurlarni fokusga yig'adi. Tajribada uning fokus masofasi F va optik kuchi D aniqlanadi.",hit:[238,85,44,142],
+   dr:c=>{c.fillStyle='#94a3b8';c.fillRect(252,190,16,38);lens(c,260,155,70,1);txt(c,'Linza',260,70,'#0369a1',15,'center');}},
+  {n:"Ekran",d:"Linza hosil qilgan tasvir shu yerga tushadi. Keskin tasvir hosil bo'lguncha suriladi.",hit:[413,95,44,134],
+   dr:c=>{c.fillStyle='#94a3b8';c.fillRect(428,190,14,38);c.fillStyle='#e2e8f0';c.strokeStyle='#64748b';c.lineWidth=2;c.fillRect(428,98,14,100);c.strokeRect(428,98,14,100);txt(c,'Ekran',435,85,'#475569',15,'center');}}
+];
+let sel1=-1;
+const c1=$('s1'),x1=c1.getContext('2d');
+function draw1(){
+  x1.clearRect(0,0,700,300);
+  items1.forEach(it=>it.dr(x1));
+  if(sel1>=0){const h=items1[sel1].hit;x1.setLineDash([6,4]);x1.strokeStyle='#dc2626';x1.lineWidth=2;x1.strokeRect(h[0],h[1],h[2],h[3]);x1.setLineDash([]);}
+}
+c1.addEventListener('pointerdown',e=>{
+  const[px,py]=pos(e,c1);let f=-1;
+  // kichik asboblar ustuvor bo'lishi uchun oxiridan boshlab qidiramiz
+  for(let i=items1.length-1;i>=0;i--){const h=items1[i].hit;if(px>=h[0]&&px<=h[0]+h[2]&&py>=h[1]&&py<=h[1]+h[3]){f=i;break;}}
+  sel1=f;draw1();
+  $('o1').innerHTML=f>=0?'<b>'+items1[f].n+':</b> '+items1[f].d:'Asbobni tanlang.';
+});
+draw1();
+// 1-animatsiya
+makeAnim('a1',7,(c,w,h,t)=>{
+  c.clearRect(0,0,w,h);
+  const sch=[[0,.2,0,0],[.2,.4,0,-90],[.4,.6,-120,0],[.6,.8,120,0],[.8,1,0,60]];
+  const order=[0,3,2,4,1];
+  let cap="Play tugmasini bosing";
+  order.forEach((idx,k)=>{
+    const s=sch[k],p=ease((t-s[0])/(s[1]-s[0]));
+    if(p<=0)return;
+    c.save();c.globalAlpha=p;c.translate(s[2]*(1-p),s[3]*(1-p));items1[idx].dr(c);c.restore();
+    cap=(k+1)+") "+items1[idx].n+" joylashtirilmoqda";
+  });
+  if(t>=1)cap="Tajriba tayyor: asboblar skameykada joylashdi";
+  txt(c,cap,350,30,'#1d4ed8',18,'center');
+});
+
+/* ================= 2-REJA ================= */
+function scene2(c,F,showBar){
+  const LX=200,AX=140,SC=4,fx=LX+F*SC;
+  c.clearRect(0,0,700,showBar?300:280);
+  c.setLineDash([6,5]);line(c,20,AX,690,AX,'#94a3b8',1);c.setLineDash([]);
+  [-80,-40,0,40,80].forEach(o=>{
+    const sl=-o/(fx-LX),ye=AX+o+sl*(690-LX);
+    poly(c,[[20,AX+o],[LX,AX+o],[690,ye]],1,'#f59e0b',2);
+  });
+  lens(c,LX,AX,100,1);
+  c.fillStyle='#dc2626';c.beginPath();c.arc(fx,AX,6,0,7);c.fill();
+  txt(c,'F',fx,AX+26,'#dc2626',16,'center');
+  line(c,LX,AX+45,fx,AX+45,'#16a34a',2);
+  txt(c,'F = '+fmt(F,0)+' sm',(LX+fx)/2,AX+68,'#16a34a',16,'center');
+  txt(c,'D = '+fmt(100/F,1)+' dptr',350,28,'#1d4ed8',22,'center');
+  if(showBar){
+    c.fillStyle='#e2e8f0';c.fillRect(150,260,400,22);
+    c.fillStyle='#2563eb';c.fillRect(150,260,Math.min(400,100/F*20),22);
+    txt(c,'optik kuch D',150,254,'#475569',14);
+  }
+}
+const c2=$('s2'),x2=c2.getContext('2d');
+function upd2(){
+  const F=+$('r2').value;$('v2').textContent=F;scene2(x2,F,false);
+  $('o2').innerHTML='F = '+F+' sm = '+fmt(F/100)+' m &nbsp;→&nbsp; D = 1/F = 1/'+fmt(F/100)+' = <b>'+fmt(100/F,2)+' dptr</b>. '+(F<=20?'Fokus masofa kichik — linza nurlarni kuchli sindiradi.':'Fokus masofa katta — linza nurlarni kuchsiz sindiradi.');
+}
+$('r2').addEventListener('input',upd2);upd2();
+makeAnim('a2',8,(c,w,h,t)=>{
+  const F=100-90*ease(t);
+  scene2(c,F,true);
+});
+
+/* ================= 3-REJA ================= */
+const AX3=150,X03=40,SC3=6;
+const o3={sham:{x:70,y:150},lens:{x:250,y:175},scr:{x:610,y:150}};
+const c3=$('s3'),x3=c3.getContext('2d');
+let drag3=null;
+const cy3=k=>o3[k].y+(k==='sham'?20:0);
+function draw3(){
+  const c=x3;c.clearRect(0,0,700,300);
+  c.fillStyle='#cbd5e1';c.fillRect(X03-10,245,620,20);
+  for(let i=0;i<=100;i+=2){line(c,X03+i*SC3,245,X03+i*SC3,i%10==0?262:252,'#475569',1);if(i%20==0)txt(c,i,X03+i*SC3,282,'#475569',13,'center');}
+  txt(c,'sm',672,282,'#475569',13,'center');
+  c.setLineDash([6,5]);line(c,X03,AX3,X03+600,AX3,'#94a3b8',1);c.setLineDash([]);
+  const s=o3.sham,l=o3.lens,e=o3.scr;
+  const d=(l.x-s.x)/SC3,sc=(e.x-l.x)/SC3,L=d+sc;
+  const ordered=s.x+15<l.x&&l.x+15<e.x;
+  const hOK=Math.abs(s.y-l.y)<=6&&Math.abs(l.y-e.y)<=6;
+  let f=0,iy=0,ix=0;
+  if(ordered&&d>F0){f=d*F0/(d-F0);iy=l.y+(l.y-s.y)*(f/d);ix=l.x+f*SC3;}
+  // ekran
+  c.fillStyle='#e2e8f0';c.strokeStyle='#64748b';c.lineWidth=2;c.fillRect(e.x-5,e.y-55,10,110);c.strokeRect(e.x-5,e.y-55,10,110);
+  // nurlar
+  if(f>0)rays(c,s.x,s.y,l.x,l.y,ix,iy,e.x,[-40,0,40],1,'rgba(245,158,11,.8)');
+  lens(c,l.x,l.y,70,1);
+  candle(c,s.x,s.y,s.y+55);
+  txt(c,'sham',s.x,s.y-24,'#b45309',14,'center');txt(c,'linza',l.x,l.y-78,'#0369a1',14,'center');txt(c,'ekran',e.x,e.y-62,'#475569',14,'center');
+  let msg='',sharp=false;
+  if(f>0&&Math.abs(iy-e.y)<45){
+    const bl=Math.abs(sc-f)*1.6;sharp=bl<2.4;
+    c.save();c.globalAlpha=sharp?1:Math.max(.3,1-bl/20);c.shadowColor='#f59e0b';c.shadowBlur=sharp?0:Math.min(bl,18);
+    flame(c,e.x,iy,clamp(f/d,.4,2),true);c.restore();
+  }
+  if(!ordered)msg='<span class="bad">Tartib noto\'g\'ri: chapdan o\'ngga sham → linza → ekran bo\'lishi kerak.</span>';
+  else if(!hOK)msg='<span class="warn">Ogohlantirish: sham, linza va ekran markazlari bir balandlikda emas! Tasvir ekranga tushmaydi.</span>';
+  else if(L<=4*F0)msg='<span class="warn">Shamdan ekrangacha masofa 4F = 80 sm dan katta bo\'lishi kerak. Hozir '+fmt(L,0)+' sm.</span>';
+  else if(d<=F0)msg='<span class="warn">Sham linzaga juda yaqin (d ≤ F): haqiqiy tasvir hosil bo\'lmaydi.</span>';
+  else if(sharp)msg='<span class="ok">Ajoyib! Hamma shartlar bajarildi, ekranda aniq tasvir hosil bo\'ldi.</span>';
+  else msg='<span class="warn">Balandlik va masofa to\'g\'ri. Endi ekranni sekin surib, aniq tasvirni toping.</span>';
+  $('o3').innerHTML='d = '+fmt(d,0)+' sm, linzadan ekrangacha = '+fmt(sc,0)+' sm, sham–ekran = '+fmt(L,0)+' sm<br>'+msg;
+}
+c3.addEventListener('pointerdown',e=>{
+  const[px,py]=pos(e,c3);let best=null,bd=55;
+  for(const k in o3){const dd=Math.hypot(px-o3[k].x,(py-cy3(k))*.6);if(dd<bd){bd=dd;best=k;}}
+  drag3=best;if(best)c3.setPointerCapture(e.pointerId);
+});
+c3.addEventListener('pointermove',e=>{
+  if(!drag3)return;const[px,py]=pos(e,c3);
+  o3[drag3].x=clamp(px,X03,X03+600);o3[drag3].y=clamp(py-(drag3==='sham'?20:0),100,200);draw3();
+});
+c3.addEventListener('pointerup',()=>{drag3=null;});
+draw3();
+// 3-animatsiya: ikki variant yonma-yon
+makeAnim('a3',6,(c,w,h,t)=>{
+  c.clearRect(0,0,w,h);
+  const p=ease(t/0.8);
+  [[0,0,true],[150,-18,false]].forEach(v=>{
+    const oy=v[0],dy=v[1],good=v[2],AX=oy+75,d=30,f=60,SC=4;
+    const sx=60,lx=sx+d*SC,ex=lx+f*SC,ly=AX+dy,fy=AX-12;
+    c.setLineDash([5,5]);line(c,20,AX,680,AX,'#cbd5e1',1);c.setLineDash([]);
+    c.fillStyle='#e2e8f0';c.strokeStyle='#64748b';c.lineWidth=2;c.fillRect(ex-5,AX-35,10,70);c.strokeRect(ex-5,AX-35,10,70);
+    const iy=ly+(ly-fy)*(f/d);
+    rays(c,sx,fy,lx,ly,ex,iy,ex,[-30,0,30],p,'rgba(245,158,11,.85)');
+    lens(c,lx,ly,50,1);
+    candle(c,sx,fy,AX+30);
+    if(t>0.8){
+      if(good)flame(c,ex,iy,1.3,true);
+    }
+    txt(c,good?"To'g'ri joylashtirish: tasvir ekranda":"Noto'g'ri (linza baland): tasvir ekrandan tashqarida",350,oy+16,good?'#16a34a':'#dc2626',16,'center');
+    if(t>0.8)txt(c,good?'✔ tasvir ekranga tushdi':'✘ tasvir ekranga tushmadi',ex+30,AX+60,good?'#16a34a':'#dc2626',15,'left');
+  });
+  line(c,0,150,700,150,'#94a3b8',1);
+});
+
+/* ================= 4-REJA ================= */
+const LX4=240,AX4=150,S4=3,VS=5,HOBJ=5;
+function scene4(c,d,s,p){
+  c.clearRect(0,0,700,300);
+  const f=d*F0/(d-F0),ox=LX4-d*S4,ex=LX4+s*S4;
+  c.setLineDash([6,5]);line(c,20,AX4,680,AX4,'#94a3b8',1);c.setLineDash([]);
+  [-2,-1,1,2].forEach(k=>{const x=LX4+k*F0*S4;c.fillStyle='#16a34a';c.beginPath();c.arc(x,AX4,4,0,7);c.fill();txt(c,Math.abs(k)==1?'F':'2F',x,AX4+20,'#16a34a',14,'center');});
+  c.fillStyle='#e2e8f0';c.strokeStyle='#64748b';c.lineWidth=2;c.fillRect(ex-5,AX4-110,10,220);c.strokeRect(ex-5,AX4-110,10,220);
+  txt(c,'ekran',ex,AX4-116,'#475569',14,'center');
+  lens(c,LX4,AX4,120,1);
+  const ty=AX4-HOBJ*VS;arrow(c,ox,AX4,ty,'#dc2626',4);
+  txt(c,'buyum',ox,AX4+22,'#dc2626',14,'center');
+  const iy=AX4+HOBJ*VS*f/d,ix=LX4+f*S4;
+  rays(c,ox,ty,LX4,AX4,ix,iy,ex,[-70,0,70],p,'#f59e0b');
+  const blur=Math.abs(s-f),sharp=blur<1.5;
+  if(p>=1){
+    c.save();c.globalAlpha=sharp?1:Math.max(.3,1-blur/25);c.shadowColor='#2563eb';c.shadowBlur=sharp?0:Math.min(blur*1.2,18);
+    arrow(c,ex,AX4,iy,'#2563eb',4);c.restore();
+  }
+  return{f,sharp,blur};
+}
+const c4=$('s4'),x4=c4.getContext('2d');
+function upd4(){
+  const d=+$('rd4').value,s=+$('rs4').value;
+  $('vd4').textContent=d;$('vs4').textContent=s;
+  const r=scene4(x4,d,s,1),G=r.f/d;
+  let kind=d>2*F0?'kichraygan, teskari, haqiqiy':(d===2*F0?'teng kattalikda, teskari, haqiqiy':'kattalashgan, teskari, haqiqiy');
+  let h='d = '+d+' sm. Tasvir: '+kind+' (kattalashtirish Γ = f/d = '+fmt(G,2)+').<br>';
+  if(r.sharp)h+='<span class="ok">Aniq tasvir! f = '+fmt(s,1)+' sm = '+fmt(s/100,3)+' m</span>';
+  else h+='<span class="warn">Tasvir xira. Ekranni surib, keskin tasvirni toping (hozir ekran linzadan '+fmt(s,1)+' sm da).</span>';
+  $('o4').innerHTML=h;
+}
+$('rd4').addEventListener('input',upd4);$('rs4').addEventListener('input',upd4);
+[[30,'e41'],[40,'e42'],[25,'e43']].forEach(a=>$(a[1]).addEventListener('click',()=>{$('rd4').value=a[0];upd4();}));
+upd4();
+makeAnim('a4',9,(c,w,h,t)=>{
+  const d=30,f=60,p=Math.min(1,t/0.35),s=20+(f-20)*ease((t-0.35)/0.65);
+  scene4(c,d,s,p);
+  let m="Nurlar yurmoqda";
+  if(t>=0.35)m="Ekran suriladi: tasvir keskinlashadi";
+  if(t>=1)m="Aniq tasvir! f = 60 sm (d = 30 sm)";
+  txt(c,m,350,28,t>=1?'#16a34a':'#1d4ed8',20,'center');
+});
+
+/* ================= 5-REJA ================= */
+const base5=[{d:.30,f:.60},{d:.40,f:.40},{d:.25,f:1.00}];
+let cur5=base5.map(r=>({d:r.d,f:r.f}));
+function tbl5(){
+  let h='<table><tr><th>№</th><th>d (m)</th><th>f (m)</th><th>1/d (dptr)</th><th>1/f (dptr)</th><th>D (dptr)</th><th>F (m)</th></tr>',sum=0;
+  cur5.forEach((r,i)=>{
+    const D=1/r.d+1/r.f;sum+=D;
+    h+='<tr><td>'+(i+1)+'</td><td>'+fmt(r.d)+'</td><td>'+fmt(r.f)+'</td><td>'+fmt(1/r.d)+'</td><td>'+fmt(1/r.f)+'</td><td>'+fmt(D)+'</td><td>'+fmt(1/D,3)+'</td></tr>';
+  });
+  const Dm=sum/3,eps=Math.abs(Dm-5)/5*100;
+  h+='<tr class="sum"><td colspan="5">O\'rtacha</td><td>'+fmt(Dm)+'</td><td>'+fmt(1/Dm,3)+'</td></tr></table>';
+  $('t5').innerHTML=h;
+  $('o5').innerHTML='D<sub>o\'rt</sub> = '+fmt(Dm)+' dptr, F<sub>o\'rt</sub> = '+fmt(1/Dm,3)+' m. Nisbiy xatolik: ε = |'+fmt(Dm)+' − 5| / 5 · 100 % = <b>'+fmt(eps,1)+' %</b>';
+}
+$('err5').addEventListener('click',()=>{
+  cur5=base5.map(r=>{const e=(Math.random()<.5?-1:1)*(0.01+0.01*Math.random());return{d:r.d,f:r.f+e};});
+  tbl5();
+});
+$('ideal5').addEventListener('click',()=>{cur5=base5.map(r=>({d:r.d,f:r.f}));tbl5();});
+$('c5').addEventListener('click',()=>{
+  const d=+$('d5').value/100,f=+$('f5').value/100;
+  if(!(d>0&&f>0)){$('oc5').innerHTML='<span class="bad">d va f musbat son bo\'lishi kerak.</span>';return;}
+  const F=d*f/(d+f),D=1/d+1/f;
+  $('oc5').innerHTML='F = d·f/(d+f) = '+fmt(d)+'·'+fmt(f)+'/('+fmt(d)+'+'+fmt(f)+') = <b>'+fmt(F,3)+' m</b> ('+fmt(F*100,1)+' sm)<br>D = 1/'+fmt(d)+' + 1/'+fmt(f)+' = <b>'+fmt(D)+' dptr</b>';
+});
+tbl5();
+makeAnim('a5',12,(c,w,h,t)=>{
+  c.clearRect(0,0,w,h);
+  const lines=[["Formula: D = 1/F = 1/d + 1/f",'#1d4ed8']];
+  base5.forEach((r,i)=>{
+    lines.push([(i+1)+'-tajriba: d = '+fmt(r.d)+' m, f = '+fmt(r.f)+' m','#0f766e']);
+    lines.push(['D = 1/'+fmt(r.d)+' + 1/'+fmt(r.f),'#1e293b']);
+    lines.push(['D = '+fmt(1/r.d)+' + '+fmt(1/r.f)+' = '+fmt(1/r.d+1/r.f)+' dptr  → jadvalga','#16a34a']);
+  });
+  lines.push(["D o'rt = (5 + 5 + 5)/3 = 5,00 dptr → F = 1/5 = 0,20 m = 20 sm",'#1d4ed8']);
+  lines.push(['ε = 0 %  → natija jadvalga yozildi ✔','#16a34a']);
+  const n=Math.ceil(t*lines.length);
+  for(let i=0;i<n;i++)txt(c,lines[i][0],20,28+i*25,lines[i][1],i==0?20:17,'left');
+  if(t===0)txt(c,'Play tugmasini bosing',350,160,'#64748b',20,'center');
+});
+
+/* ================= 6-REJA ================= */
+function eye(c,P0,D,gx,gD,showLetter){
+  const lx=360,R=200,AX=170,ret=lx+R;
+  c.clearRect(0,0,700,340);
+  // ko'z
+  c.fillStyle='#fff7ed';c.strokeStyle='#9a3412';c.lineWidth=3;c.beginPath();c.ellipse(lx+R/2-5,AX,R/2+18,100,0,0,7);c.fill();c.stroke();
+  // to'r parda
+  c.strokeStyle='#dc2626';c.lineWidth=5;c.beginPath();c.arc(ret-70,AX,110,-0.62,0.62);c.stroke();
+  txt(c,"to'r parda",ret+8,AX+110,'#dc2626',13,'center');
+  c.setLineDash([6,5]);line(c,20,AX,ret,AX,'#94a3b8',1);c.setLineDash([]);
+  const P=P0+D,v=R*60/P,fx=lx+v;
+  [-50,-25,0,25,50].forEach(o=>{
+    const sl=-o/(fx-lx),xe=ret,ye=AX+o+sl*(xe-lx);
+    poly(c,[[20,AX+o],[lx,AX+o],[xe,ye]],1,'#f59e0b',2);
+  });
+  lens(c,lx,AX,60,1);
+  // ko'zoynak
+  if(gx!==null){c.save();c.globalAlpha=0.9;if(Math.abs(gD)>0.01)lens(c,gx,AX,75,gD>0?1:-1);else{c.strokeStyle='#0284c7';c.lineWidth=2;c.strokeRect(gx-4,AX-75,8,150);}c.restore();txt(c,"ko'zoynak",gx,AX-85,'#0369a1',13,'center');}
+  const spot=Math.abs(1-R/v)*50,blur=spot*0.55;
+  // ko'rinish oynasi
+  c.fillStyle='#fff';c.strokeStyle='#94a3b8';c.lineWidth=2;c.fillRect(585,10,100,100);c.strokeRect(585,10,100,100);
+  txt(c,"Ko'rinish",635,126,'#475569',13,'center');
+  c.save();c.shadowColor='#1e293b';c.shadowBlur=blur*1.3;c.globalAlpha=Math.max(.25,1-blur/20);txt(c,'A',635,88,'#1e293b',70,'center');c.restore();
+  txt(c,'D = '+fmt(D,1)+' dptr',20,30,'#1d4ed8',18,'left');
+  const sharp=blur<1.2;
+  txt(c,sharp?'Tasvir to\'r pardada: aniq':(v<R?'Tasvir to\'r pardadan oldinda: xira':'Tasvir to\'r pardadan orqada: xira'),20,320,sharp?'#16a34a':'#dc2626',18,'left');
+  return{sharp,v,fx};
+}
+const c6=$('s6'),x6=c6.getContext('2d');
+function upd6(){
+  const P0=+$('t6').value,D=+$('r6').value;$('v6').textContent=fmt(D,1);
+  const r=eye(x6,P0,D,300,D,true);
+  let need=P0===60?0:(P0===63?-3:3);
+  $('o6').innerHTML=(r.sharp?'<span class="ok">Tasvir to\'r pardada keskin.</span>':'<span class="bad">Tasvir to\'r pardada keskin emas.</span>')+' Ko\'zoynak: '+(D>0?'yig\'uvchi (D &gt; 0)':D<0?'sochuvchi (D &lt; 0)':'ko\'zoynaksiz (D = 0)')+(need!==0?'. Bu ko\'z uchun mos linza: '+(need>0?'+':'−')+'3 dptr atrofida.':'.');
+}
+$('t6').addEventListener('change',upd6);$('r6').addEventListener('input',upd6);upd6();
+makeAnim('a6',8,(c,w,h,t)=>{
+  const P0=63,gT=-3;
+  const slide=ease((t-0.2)/0.35),eff=gT*ease((t-0.5)/0.25);
+  const gx=t<0.2?null:60+(300-60)*slide;
+  eye(c,P0,eff,gx,eff,true);
+  let m="Ko'zoynaksiz: tasvir xira (uzoqni ko'ra olmaslik)";
+  if(t>=0.2&&t<0.75)m="Sochuvchi ko'zoynak (−3 dptr) taqilmoqda";
+  if(t>=0.75)m="Ko'zoynak bilan: tasvir keskin";
+  txt(c,m,20,56,'#1d4ed8',16,'left');
+});
+
+/* ================= TEST ================= */
+const Q=[
+ {q:"Linzaning optik kuchi qanday aniqlanadi?",o:["D = F","D = d + f","D = F · f","D = 1/F"],a:3,e:"Optik kuch fokus masofaga teskari kattalik: D = 1/F."},
+ {q:"Optik kuchning birligi qaysi?",o:["Metr (m)","Nyuton (N)","Dioptriya (dptr)","Vatt (W)"],a:2,e:"Optik kuch dioptriyada o'lchanadi: 1 dptr = 1/m."},
+ {q:"Fokus masofasi F = 0,5 m bo'lgan linzaning optik kuchi qancha?",o:["0,5 dptr","5 dptr","1 dptr","2 dptr"],a:3,e:"D = 1/F = 1/0,5 = 2 dptr."},
+ {q:"Optik kuchi D = 4 dptr bo'lgan linzaning fokus masofasi qancha?",o:["25 sm","4 sm","40 sm","2,5 sm"],a:0,e:"F = 1/D = 1/4 = 0,25 m = 25 sm."},
+ {q:"Tajribani tayyorlashda qaysi shart bajarilishi kerak?",o:["Ekran sham bilan linza orasida turadi","Sham, linza va ekran bitta optik o'qda, markazlari bir balandlikda","Asboblar turli balandlikda turadi","Faqat sham va ekran kerak, linza shart emas"],a:1,e:"Tasvir ekranga tushishi uchun hamma asboblar bir optik o'qda va bir balandlikda bo'lishi shart."},
+ {q:"Tajribada nima o'lchanadi?",o:["Linzaning qalinligi","Ekranning o'lchami","Aniq tasvir hosil bo'lganda d va f","Sham alangasining rangi"],a:2,e:"Ekranda aniq tasvir hosil qilib, d (buyum–linza) va f (linza–tasvir) o'lchanadi."},
+ {q:"F = 20 sm bo'lgan linza oldida d = 30 sm masofada buyum turibdi. Tasvir qanday?",o:["Kichraygan, teskari, mavhum","Kattalashgan, to'g'ri, mavhum","Kichraygan, to'g'ri, haqiqiy","Kattalashgan, teskari, haqiqiy"],a:3,e:"2F > d > F (40 sm > 30 sm > 20 sm) bo'lgani uchun tasvir kattalashgan, teskari va haqiqiy bo'ladi (f = 60 sm)."},
+ {q:"Nima uchun D bir necha tajriba natijalarining o'rtachasi sifatida olinadi?",o:["Hisoblashni osonlashtirish uchun","Tasodifiy o'lchov xatolarining ta'sirini kamaytirish uchun","Formulani o'zgartirish uchun","Linzaning fokusini o'zgartirish uchun"],a:1,e:"O'rtacha qiymat tasodifiy xatolarni kamaytiradi va natijani haqiqiyga yaqinlashtiradi."},
+ {q:"Optik kuchi +2,5 dptr bo'lgan ko'zoynak linzasi qanday?",o:["Sochuvchi, D < 0","Tekis oyna","Yig'uvchi, F = 0,4 m","Yig'uvchi, F = 2,5 m"],a:2,e:"D > 0 — yig'uvchi linza; F = 1/2,5 = 0,4 m."},
+ {q:"Tajribada d = 25 sm, f = 100 sm bo'ldi. Linzaning optik kuchi qancha?",o:["4 dptr","1,25 dptr","125 dptr","5 dptr"],a:3,e:"D = 1/0,25 + 1/1,00 = 4 + 1 = 5 dptr."}
+];
+let qi=0,score=0,locked=false;
+function renderQ(){
+  const box=$('testbox');
+  if(qi>=Q.length){
+    const pc=Math.round(score/Q.length*100);
+    box.innerHTML='<h2>Natija</h2><p style="font-size:24px"><b>'+score+' / '+Q.length+'</b> ball — <b>'+pc+' %</b></p><p>'+(pc>=80?"Ajoyib natija! Mavzuni yaxshi o'zlashtirdingiz.":pc>=50?"Yaxshi, lekin 1–6-rejalarni yana bir bor ko'rib chiqing.":"Mavzuni qayta o'qib, simulyatsiyalar bilan mashq qiling.")+'</p><button class="b g" id="rst">↺ Qayta boshlash</button>';
+    $('rst').onclick=()=>{qi=0;score=0;renderQ();};
+    return;
+  }
+  const q=Q[qi];locked=false;
+  let h='<h2>Test: '+(qi+1)+' / '+Q.length+'</h2><p><b>'+q.q+'</b></p>';
+  q.o.forEach((t,i)=>{h+='<button class="opt" data-i="'+i+'">'+String.fromCharCode(65+i)+') '+t+'</button>';});
+  h+='<div id="ex"></div><p>Ball: '+score+'</p>';
+  box.innerHTML=h;
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(locked)return;locked=true;
+    const i=+b.dataset.i;
+    box.querySelectorAll('.opt').forEach((x,k)=>{if(k===q.a)x.classList.add('right');});
+    if(i===q.a)score++;else b.classList.add('wrong');
+    $('ex').innerHTML='<div class="exp"><b>'+(i===q.a?'<span class="ok">To\'g\'ri!</span>':'<span class="bad">Noto\'g\'ri.</span>')+'</b> '+q.e+'</div><button class="b" id="nx" style="margin-top:10px">'+(qi===Q.length-1?'Natijani ko\'rish':'Keyingi savol →')+'</button>';
+    $('nx').onclick=()=>{qi++;renderQ();};
+  });
+}
+renderQ();
+
+showTab(0);
+</script>
+</body>
+</html>

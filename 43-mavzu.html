@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>43-mavzu. Masalalar yechish — Atmosferadagi hodisalar</title>
+<style>
+/* ===== Ranglar: havo — havorang, bulut — oq/och kulrang, yomg'ir — ko'k, issiqlik — to'q sariq, sovuq — och ko'k, simob — qizil ===== */
+:root{
+  --bg:#e6f4fc;--card:#ffffff;--text:#12304a;--muted:#587289;--line:#c9e1f1;
+  --air:#bfe6fb;--cloud:#f1f4f8;--rain:#1f6fe0;--heat:#ff8a1f;--cold:#8dd3ff;--hg:#e0282e;
+  --accent:#1f6fe0;--ok:#168a4a;--bad:#d03030;--sky1:#a5dbf8;--sky2:#e4f6ff;--ground:#8db36a;
+  --okbg:#e2f6ea;--badbg:#fde8e8;
+}
+[data-theme=dark]{
+  --bg:#0b1824;--card:#12273a;--text:#e5f2fc;--muted:#9bb6cc;--line:#26435b;
+  --air:#1d4b6b;--cloud:#cdd7e1;--rain:#5ba3ff;--heat:#ffa24d;--cold:#9fdcff;--hg:#ff555b;
+  --accent:#5ba3ff;--ok:#4cd08a;--bad:#ff7777;--sky1:#0f2f49;--sky2:#1b4a6f;--ground:#3a5833;
+  --okbg:#133a28;--badbg:#431d22;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;font-size:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:linear-gradient(120deg,var(--sky1),var(--sky2));border-bottom:1px solid var(--line)}
+header h1{font-size:1.05rem;line-height:1.25}
+header small{display:block;color:var(--muted);font-weight:400;font-size:.8rem}
+#themeBtn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:20px;padding:7px 12px;font-size:.85rem;cursor:pointer;white-space:nowrap}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 10px 8px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;-webkit-overflow-scrolling:touch}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:var(--bg);color:var(--text);padding:8px 13px;border-radius:18px;font-size:.88rem;cursor:pointer}
+nav button.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+main{max-width:860px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.card h2{font-size:1.05rem;margin-bottom:8px}
+.card h3{font-size:.98rem;margin-bottom:6px}
+.task{font-size:.97rem}
+.gf{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media(max-width:520px){.gf{grid-template-columns:1fr}}
+.box{border-radius:10px;padding:10px 12px;border:1px solid var(--line)}
+.box.g{background:var(--air)}
+.box.f{background:var(--okbg)}
+[data-theme=dark] .box.g{background:#173d58}
+.box b.t{display:block;margin-bottom:3px}
+.box ul{list-style:none}
+.step{background:var(--bg);border-left:4px solid var(--accent);border-radius:6px;padding:8px 10px;margin:7px 0;animation:in .25s ease}
+.step.ans{border-left-color:var(--ok);background:var(--okbg);font-weight:600}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.btn{border:0;background:var(--accent);color:#fff;padding:9px 14px;border-radius:8px;font-size:.92rem;cursor:pointer;margin:6px 6px 0 0}
+.btn.sec{background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.btn.heat{background:var(--heat);color:#1d1000}
+.btn:disabled{opacity:.45;cursor:default}
+.sl{margin:8px 0}
+.sl label{display:flex;justify-content:space-between;font-size:.9rem;gap:8px}
+.sl input[type=range]{width:100%;accent-color:var(--accent)}
+.res{background:var(--bg);border:1px dashed var(--accent);border-radius:8px;padding:9px 11px;margin-top:8px;font-size:.95rem}
+.res p+p{margin-top:3px}
+canvas{display:block;width:100%;height:260px;border-radius:10px;border:1px solid var(--line)}
+.life{border-left:4px solid var(--heat);background:var(--bg);padding:9px 11px;border-radius:6px}
+.own input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:1rem;margin-top:6px}
+.msg{margin-top:8px;padding:8px 10px;border-radius:8px;font-size:.93rem}
+.msg.ok{background:var(--okbg);color:var(--ok)}
+.msg.bad{background:var(--badbg);color:var(--bad)}
+.opt{display:block;width:100%;text-align:left;margin:7px 0;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:.95rem;cursor:pointer}
+.opt.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.opt.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.opt:disabled{cursor:default}
+.prog{height:8px;background:var(--line);border-radius:5px;overflow:hidden;margin-bottom:10px}
+.prog i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.score{font-size:2rem;text-align:center;color:var(--accent);font-weight:700;margin:10px 0}
+@media (prefers-reduced-motion:reduce){.step{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>43-mavzu. Masalalar yechish<small>9-sinf fizika · Atmosferadagi hodisalar</small></h1>
+  <button id="themeBtn" type="button">🌙 To'q mavzu</button>
+</header>
+<nav id="tabs"></nav>
+<main id="panel"></main>
+
+<script>
+/* =====================================================
+   43-mavzu. Masalalar yechish (Atmosferadagi hodisalar)
+   Tuzilishi: yordamchi funksiyalar → masalalar ma'lumoti →
+   animatsiyalar → tab/panel chizish → test
+   ===================================================== */
+const $ = s => document.querySelector(s);
+
+/* ---------- Yordamchi: sonni o'zbekcha (vergulli) ko'rinishda chiqarish ---------- */
+function n(x, d = 2){
+  let s = (+x).toFixed(d);
+  if (s.indexOf('.') >= 0) s = s.replace(/0+$/, '').replace(/\.$/, '');
+  const parts = s.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0'); // minglik ajratgich
+  return parts.join(',');
+}
+/* CSS o'zgaruvchisini canvas uchun olish (mavzuga moslashadi) */
+const C = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+/* ---------- Bofort shkalasi (shamol toifasi) ---------- */
+const BF = [[0.3,0,'Shamolsiz'],[1.6,1,'Sezilar-sezilmas shamol'],[3.4,2,'Yengil shamol'],[5.5,3,'Zaif shamol'],
+  [8,4,"O'rtacha shamol"],[10.8,5,'Tetik shamol'],[13.9,6,'Kuchli shamol'],[17.2,7,'Qattiq shamol'],
+  [20.8,8,'Juda qattiq shamol'],[24.5,9,"Bo'ron"],[28.5,10,"Kuchli bo'ron"],[32.7,11,"Dahshatli bo'ron"],[1e9,12,"To'fon (dovul)"]];
+const bf = v => BF.find(b => v < b[0]);
+
+/* ---------- Shudring nuqtasi (Magnus formulasi, p — kPa) ---------- */
+function dewPoint(p){
+  const l = Math.log(p / 0.6112);
+  return 243.12 * l / (17.62 - l);
+}
+
+/* =====================================================
+   MASALALAR MA'LUMOTI
+   key, name (tab nomi), title, text, given[], find,
+   sliders[], calc(v)->html, steps[], life, own{q, ans, unit, hint}, dur(v)
+   ===================================================== */
+const P = [
+{
+  key:'bosim', name:'1. Bosim', title:'Atmosfera bosimi (Torrichelli tajribasi)',
+  text:`Toshkentdagi fizika kabinetida Torrichelli tajribasi o'tkazildi: bir uchi yopiq shisha naycha simob bilan to'ldirilib, simobli idishga teskari qilib tushirildi. Naychadagi simob ustuni balandligi 760 mm bo'lib qoldi. Atmosfera bosimini toping.`,
+  given:[`ρ = 13600 kg/m³`,`g = 9,8 m/s²`,`h = 760 mm = 0,76 m`], find:`p — atmosfera bosimi (Pa va kPa da)`,
+  sliders:[
+    {id:'h',label:'Simob ustuni balandligi h',min:500,max:900,step:5,val:760,unit:'mm'},
+    {id:'g',label:'Erkin tushish tezlanishi g',min:9.6,max:10,step:0.01,val:9.8,unit:'m/s²'}],
+  calc:v=>{const p=13600*v.g*v.h/1000;
+    return `<p>p = ρ·g·h = 13600 · ${n(v.g)} · ${n(v.h/1000,3)} = <b>${n(p,0)} Pa</b> ≈ <b>${n(p/1000,1)} kPa</b></p>
+    <p>Bu ${n(v.h,0)} mm sim. ust. ga teng${v.h===760?' — normal atmosfera bosimi.':'.'}</p>`;},
+  steps:[
+    `<b>Berilgan:</b> ρ = 13600 kg/m³, g = 9,8 m/s², h = 760 mm.`,
+    `<b>Birliklarni o'tkazamiz (SI):</b> h = 760 mm = 760 : 1000 = 0,76 m.`,
+    `<b>Formula:</b> simob ustunining bosimi atmosfera bosimiga teng: p = ρ·g·h.`,
+    `<b>Qiymatlarni qo'yamiz:</b> p = 13600 · 9,8 · 0,76 = 133 280 · 0,76.`,
+    `<b>Hisoblaymiz:</b> p ≈ 101 293 Pa ≈ 101,3 kPa.`,
+    `<b>Javob:</b> p ≈ 101,3 kPa — bu normal atmosfera bosimi (760 mm sim. ust.).`],
+  life:`Toshkent dengiz sathidan taxminan 440 m balandlikda joylashgan, shuning uchun u yerda bosim 760 emas, taxminan 720 mm sim. ust. bo'ladi.`,
+  own:{q:`Balandligi 10 m bo'lgan suv ustuni hosil qiladigan bosimni kPa da toping (ρ = 1000 kg/m³, g = 9,8 m/s²).`,ans:98,unit:'kPa',hint:`p = ρ·g·h = 1000 · 9,8 · 10 Pa, so'ng kPa ga o'tkazing.`},
+  dur:v=>5
+},
+{
+  key:'balandlik', name:'2. Balandlik', title:`Balandlik va bosim (Chimyon tog'i)`,
+  text:`Chimyon tog'ida har 12 m ko'tarilganda atmosfera bosimi taxminan 1 mm sim. ust. ga kamayadi. Tog' etagida bosim 740 mm sim. ust., tog' balandligi 1200 m. Tog' tepasidagi bosimni toping.`,
+  given:[`p₀ = 740 mm sim. ust.`,`H = 1200 m`,`12 m ↔ 1 mm sim. ust.`], find:`p — tog' tepasidagi bosim`,
+  sliders:[
+    {id:'p0',label:`Pastdagi bosim p₀`,min:700,max:770,step:1,val:740,unit:'mm sim. ust.'},
+    {id:'H',label:'Ko\'tarilish balandligi H',min:0,max:3000,step:12,val:1200,unit:'m'}],
+  calc:v=>{const dp=v.H/12,p=v.p0-dp;
+    return `<p>Δp = H : 12 = ${n(v.H,0)} : 12 = <b>${n(dp,1)} mm sim. ust.</b></p>
+    <p>p = p₀ − Δp = ${n(v.p0,0)} − ${n(dp,1)} = <b>${n(p,1)} mm sim. ust.</b> ≈ ${n(p*0.13332,1)} kPa</p>`;},
+  steps:[
+    `<b>Berilgan:</b> p₀ = 740 mm sim. ust., H = 1200 m; har 12 m ga bosim 1 mm sim. ust. kamayadi.`,
+    `<b>Bosim qancha kamayadi:</b> Δp = H : 12 m = 1200 : 12 = 100 mm sim. ust.`,
+    `<b>Tepadagi bosim:</b> p = p₀ − Δp = 740 − 100 = 640 mm sim. ust.`,
+    `<b>Paskalga o'tkazamiz:</b> 1 mm sim. ust. ≈ 133,3 Pa, demak p ≈ 640 · 133,3 ≈ 85 300 Pa ≈ 85,3 kPa.`,
+    `<b>Javob:</b> tog' tepasida bosim ≈ 640 mm sim. ust. (≈ 85,3 kPa).`],
+  life:`Chimyon tog'iga ko'tarilganda quloqlar «bitib» qoladi: bosim tez kamayadi, quloq ichidagi havo bosimi esa o'zgarishga ulgurmaydi.`,
+  own:{q:`Pastda bosim 750 mm sim. ust. Tog' balandligi 600 m bo'lsa, tepada bosim necha mm sim. ust. bo'ladi?`,ans:700,unit:'mm sim. ust.',hint:`Avval 600 : 12 = 50 mm ni topib, 750 dan ayiring.`},
+  dur:v=>7
+},
+{
+  key:'namlik', name:'3. Namlik', title:'Nisbiy namlik',
+  text:`Samarqandda yoz kuni havoning temperaturasi 20 °C. Havodagi suv bug'ining bosimi 1,2 kPa, shu temperaturadagi to'yingan bug' bosimi esa 2,3 kPa. Nisbiy namlikni toping va shudring nuqtasi haqida xulosa qiling.`,
+  given:[`p = 1,2 kPa`,`p_t = 2,3 kPa (20 °C da)`], find:`φ — nisbiy namlik; shudring nuqtasi haqida xulosa`,
+  sliders:[
+    {id:'p',label:`Bug' bosimi p`,min:0.2,max:3,step:0.1,val:1.2,unit:'kPa'},
+    {id:'pt',label:`To'yingan bug' bosimi p_t`,min:1,max:4,step:0.1,val:2.3,unit:'kPa'}],
+  calc:v=>{const phi=v.p/v.pt*100, full=v.p>=v.pt;
+    return `<p>φ = p / p_t · 100% = ${n(v.p,1)} / ${n(v.pt,1)} · 100% = <b>${n(Math.min(phi,100),1)}%</b></p>
+    <p>${full?`φ = 100% — havo to'yingan, ortiqcha bug' <b>kondensatsiyalanadi</b> (shudring, tuman). (Real havoda p > p_t bo'lmaydi.)`
+      :`Havo to'yinmagan. Shudring nuqtasi ≈ <b>${n(dewPoint(v.p),1)} °C</b>: havo shu temperaturagacha sovisa, shudring tushadi.`}</p>`;},
+  steps:[
+    `<b>Berilgan:</b> p = 1,2 kPa, p_t = 2,3 kPa (t = 20 °C).`,
+    `<b>Formula:</b> φ = (p / p_t) · 100%. Ikkala bosim bir xil birlikda (kPa), shuning uchun o'tkazish shart emas.`,
+    `<b>Hisoblaymiz:</b> φ = 1,2 : 2,3 · 100% ≈ 0,522 · 100% ≈ 52%.`,
+    `<b>Xulosa:</b> φ < 100%, ya'ni havo to'yinmagan — 20 °C da shudring tushmaydi.`,
+    `<b>Shudring nuqtasi:</b> bug' bosimi 1,2 kPa bo'lganda havo to'yinadigan temperatura ≈ 10 °C. Kechqurun havo shu temperaturagacha sovisa, o't ustida shudring paydo bo'ladi.`,
+    `<b>Javob:</b> φ ≈ 52%; shudring nuqtasi taxminan 10 °C.`],
+  life:`Qoraqum va Qizilqum cho'llarida yozda nisbiy namlik 20–30% gacha tushadi, Toshkentda esa erta tongda sovigan havoda shudring ko'p tushadi.`,
+  own:{q:`Havoda bug' bosimi 0,9 kPa, shu temperaturadagi to'yingan bug' bosimi 1,8 kPa. Nisbiy namlik necha foiz?`,ans:50,unit:'%',hint:`φ = p / p_t · 100%.`},
+  dur:v=>1e9
+},
+{
+  key:'yogin', name:`4. Yog'in`, title:`Yog'in miqdori`,
+  text:`Farg'ona vodiysida bo'lgan jala natijasida paxta dalasiga 15 mm qalinlikdagi yog'in qatlami tushdi. Dalaning maydoni 2 ga (20 000 m²). Dalaga tushgan suvning hajmini (m³) va massasini (t) toping.`,
+  given:[`h = 15 mm`,`S = 2 ga = 20 000 m²`,`ρ = 1000 kg/m³`], find:`V — suv hajmi (m³); m — suv massasi (t)`,
+  sliders:[
+    {id:'h',label:`Yog'in qatlami h`,min:1,max:50,step:1,val:15,unit:'mm'},
+    {id:'S',label:'Maydon S',min:0.5,max:5,step:0.5,val:2,unit:'ga'}],
+  calc:v=>{const V=v.h/1000*v.S*10000;
+    return `<p>V = h · S = ${n(v.h/1000,3)} · ${n(v.S*10000,0)} = <b>${n(V,1)} m³</b></p>
+    <p>m = ρ · V = 1000 · ${n(V,1)} = ${n(V*1000,0)} kg = <b>${n(V,1)} t</b></p>`;},
+  steps:[
+    `<b>Berilgan:</b> h = 15 mm, S = 2 ga, ρ = 1000 kg/m³.`,
+    `<b>Birliklarni o'tkazamiz:</b> h = 15 mm = 0,015 m; S = 2 ga = 2 · 10 000 = 20 000 m².`,
+    `<b>Hajm formulasi:</b> V = h · S.`,
+    `<b>Hisoblaymiz:</b> V = 0,015 · 20 000 = 300 m³.`,
+    `<b>Massa:</b> m = ρ · V = 1000 · 300 = 300 000 kg = 300 t.`,
+    `<b>Javob:</b> V = 300 m³, m = 300 t.`],
+  life:`1 mm yog'in 1 m² yerga 1 litr suv tushganini bildiradi. Dehqonlar sug'orish me'yorini shu hisob bilan aniqlaydi.`,
+  own:{q:`Maydoni 5000 m² bo'lgan yerga 10 mm yog'in tushdi. Suv hajmi necha m³?`,ans:50,unit:'m³',hint:`V = h · S, h ni metrga o'tkazing: 10 mm = 0,01 m.`},
+  dur:v=>8
+},
+{
+  key:'chaqmoq', name:'5. Chaqmoq', title:'Chaqmoq va momaqaldiroq',
+  text:`Tog' oldi hududida momaqaldiroq paytida chaqmoq chaqnadi va 6 s dan keyin gumburlash eshitildi. Tovushning havodagi tezligi 340 m/s. Chaqmoqgacha bo'lgan masofani toping.`,
+  given:[`t = 6 s`,`v = 340 m/s`], find:`s — chaqmoqgacha masofa`,
+  sliders:[
+    {id:'t',label:`Chaqmoq va gumburlash orasidagi vaqt t`,min:1,max:15,step:0.5,val:6,unit:'s'},
+    {id:'v',label:'Tovush tezligi v',min:330,max:350,step:1,val:340,unit:'m/s'}],
+  calc:v=>{const s=v.v*v.t;
+    return `<p>s = v · t = ${n(v.v,0)} · ${n(v.t,1)} = <b>${n(s,0)} m</b> = <b>${n(s/1000,2)} km</b></p>
+    <p>${s<1000?`Chaqmoq juda yaqin — xavfli!`:`Chaqmoq ${n(s/1000,1)} km uzoqlikda.`}</p>`;},
+  steps:[
+    `<b>Berilgan:</b> t = 6 s, v = 340 m/s.`,
+    `<b>Mulohaza:</b> yorug'lik tezligi (3·10⁸ m/s) juda katta, shuning uchun chaqmoq nuri deyarli bir zumda ko'rinadi. 6 s — faqat tovushning yurish vaqti.`,
+    `<b>Formula:</b> tekis harakatda s = v · t.`,
+    `<b>Hisoblaymiz:</b> s = 340 · 6 = 2040 m.`,
+    `<b>Kilometrga o'tkazamiz:</b> 2040 m = 2,04 km.`,
+    `<b>Javob:</b> chaqmoq taxminan 2 km (2040 m) uzoqlikda.`],
+  life:`Chaqmoq va gumburlash orasidagi har 3 sekund taxminan 1 km masofaga to'g'ri keladi. Tog'da bunday hisob tabiat shovqinida xavfsiz joyga ulgurish uchun foydali.`,
+  own:{q:`Chaqmoq chaqnagandan 3 s o'tib gumburlash eshitildi (v = 340 m/s). Chaqmoqgacha necha metr?`,ans:1020,unit:'m',hint:`s = v · t = 340 · 3.`},
+  dur:v=>0.5+v.t+1.5
+},
+{
+  key:'shamol', name:'6. Shamol', title:`Shamol`,
+  text:`Orol bo'yida shamol 2 soat davomida o'zgarmas 15 m/s tezlik bilan esdi. Havo massasi bosib o'tgan masofani (km) toping va shamolning toifasini aniqlang.`,
+  given:[`v = 15 m/s`,`t = 2 soat = 7200 s`], find:`s — bosib o'tilgan masofa (km); shamol toifasi`,
+  sliders:[
+    {id:'v',label:'Shamol tezligi v',min:1,max:40,step:1,val:15,unit:'m/s'},
+    {id:'t',label:'Vaqt t',min:0.5,max:6,step:0.5,val:2,unit:'soat'}],
+  calc:v=>{const s=v.v*v.t*3.6,b=bf(v.v);
+    return `<p>s = v · t = ${n(v.v,0)} · ${n(v.t*3600,0)} = ${n(v.v*v.t*3600,0)} m = <b>${n(s,1)} km</b></p>
+    <p>v = ${n(v.v*3.6,1)} km/soat — Bofort bo'yicha <b>${b[1]} ball: ${b[2]}</b>.</p>`;},
+  steps:[
+    `<b>Berilgan:</b> v = 15 m/s, t = 2 soat.`,
+    `<b>Birliklarni o'tkazamiz:</b> t = 2 · 3600 = 7200 s.`,
+    `<b>Formula:</b> s = v · t = 15 · 7200 = 108 000 m.`,
+    `<b>Kilometrga o'tkazamiz:</b> 108 000 m = 108 km.`,
+    `<b>Toifa:</b> 15 m/s = 15 · 3,6 = 54 km/soat. Bofort shkalasi bo'yicha bu 7 ball — qattiq shamol. Bo'ron 9 balldan (≥ 20,8 m/s) boshlanadi, demak bu bo'ron emas.`,
+    `<b>Javob:</b> s = 108 km; shamol — qattiq shamol (7 ball), bo'ron emas.`],
+  life:`Bekobod atrofida kuchli shamollar (Bekobod shamoli) tez-tez esadi; tezligi 20 m/s dan oshsa, daraxtlar sinadi va tom yopmalar uchib ketishi mumkin.`,
+  own:{q:`Shamol 20 m/s tezlik bilan 3 soat esdi. Havo necha km yo'l bosdi?`,ans:216,unit:'km',hint:`3 soat = 10 800 s; s = v · t, so'ng metrni kilometrga o'tkazing.`},
+  dur:v=>8
+}
+];
+
+/* =====================================================
+   ANIMATSIYALAR (canvas). Har biri: (c, W, H, t, v)
+   t — animatsiya vaqti (s), v — slayder qiymatlari
+   ===================================================== */
+function sky(c,W,H){
+  const g=c.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,C('--sky1'));g.addColorStop(1,C('--sky2'));
+  c.fillStyle=g;c.fillRect(0,0,W,H);
+}
+function cloud(c,x,y,s,col){
+  c.fillStyle=col||C('--cloud');c.beginPath();
+  [[0,0,22],[24,-8,26],[52,0,22],[26,8,24]].forEach(([dx,dy,r])=>{c.moveTo(x+dx*s+r*s,y+dy*s);c.arc(x+dx*s,y+dy*s,r*s,0,7);});
+  c.fill();
+}
+function txt(c,s,x,y,col,size,al){c.fillStyle=col||C('--text');c.font=(size||13)+'px system-ui,sans-serif';c.textAlign=al||'left';c.fillText(s,x,y);}
+function arrow(c,x1,y1,x2,y2,col){
+  c.strokeStyle=col;c.fillStyle=col;c.lineWidth=2;
+  c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();
+  const a=Math.atan2(y2-y1,x2-x1);
+  c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-8*Math.cos(a-0.4),y2-8*Math.sin(a-0.4));c.lineTo(x2-8*Math.cos(a+0.4),y2-8*Math.sin(a+0.4));c.closePath();c.fill();
+}
+
+const ANIM = {
+  /* 1. Torrichelli naychasi: simob ustuni asta-sekin 760 mm gacha ko'tariladi */
+  bosim(c,W,H,t,v){
+    sky(c,W,H);
+    const prog=Math.min(t/4,1),k=(H-100)/950,cx=W/2,y0=H-62;
+    c.fillStyle=C('--hg');c.fillRect(cx-78,y0,156,28);               // idishdagi simob
+    c.strokeStyle=C('--muted');c.lineWidth=2;c.strokeRect(cx-80,y0-6,160,36); // idish
+    const top=y0-950*k;
+    c.strokeRect(cx-9,top,18,y0-top+14);                              // shisha naycha
+    const hh=v.h*k*prog;
+    c.fillStyle=C('--hg');c.fillRect(cx-7,y0-hh,14,hh+14);          // simob ustuni
+    if(prog>0.15)txt(c,'vakuum',cx+16,top+16,C('--muted'),12);
+    c.strokeStyle=C('--text');c.lineWidth=1.5;
+    c.beginPath();c.moveTo(cx+32,y0);c.lineTo(cx+32,y0-hh);c.moveTo(cx+26,y0);c.lineTo(cx+38,y0);c.moveTo(cx+26,y0-hh);c.lineTo(cx+38,y0-hh);c.stroke();
+    txt(c,'h = '+n(v.h*prog,0)+' mm',cx+44,y0-hh/2+4,C('--text'),14);
+    [-62,-42,42,62].forEach(dx=>arrow(c,cx+dx,y0-46,cx+dx,y0-10,C('--rain')));
+    txt(c,'atmosfera bosimi',cx-130,y0-52,C('--rain'),12,'center');
+    txt(c,'p = '+n(13600*v.g*v.h/1e6,1)+' kPa',12,24,C('--text'),15);
+    txt(c,'p = ρ·g·h',12,44,C('--muted'),13);
+  },
+  /* 2. Tog'ga ko'tarilayotgan alpinist va bosim o'zgarishi */
+  balandlik(c,W,H,t,v){
+    sky(c,W,H);
+    const f=Math.min(t/7,1),by=H-30,px=W*0.5,py=36;
+    c.fillStyle='#8a9aa8';c.beginPath();c.moveTo(14,by);c.lineTo(px,py);c.lineTo(W-14,by);c.closePath();c.fill();
+    c.fillStyle='#fff';c.beginPath();c.moveTo(px,py);c.lineTo(px-26,py+42);c.lineTo(px+26,py+42);c.closePath();c.fill();
+    c.fillStyle=C('--ground');c.fillRect(0,by,W,30);
+    const x=14+(px-14)*f,y=by+(py-by)*f;
+    c.fillStyle=C('--heat');c.beginPath();c.arc(x,y-8,8,0,7);c.fill();
+    c.strokeStyle=C('--text');c.lineWidth=2;c.beginPath();c.moveTo(x,y);c.lineTo(x,y-1);c.stroke();
+    const hg=v.H*f;
+    txt(c,'Chimyon',px+8,py-6,C('--text'),12);
+    txt(c,'h = '+n(hg,0)+' m',12,24,C('--text'),15);
+    txt(c,'p = '+n(v.p0-hg/12,1)+' mm sim. ust.',12,44,C('--rain'),15);
+    txt(c,'har 12 m ga −1 mm',12,62,C('--muted'),12);
+    // bosim chizig'i (o'ngda)
+    const bw=Math.max(0,(v.p0-hg/12)/v.p0)*70;
+    c.fillStyle=C('--hg');c.fillRect(W-90,24,bw,12);c.strokeStyle=C('--muted');c.lineWidth=1;c.strokeRect(W-90,24,70,12);
+    txt(c,'bosim',W-55,52,C('--muted'),11,'center');
+  },
+  /* 3. Havo namligi: bug' zarralari idishda harakatlanadi */
+  namlik(c,W,H,t,v){
+    sky(c,W,H);
+    const phi=Math.min(v.p/v.pt,1),N=Math.round(40*phi);
+    const x0=20,y0=20,w=W-40,h=H-70;
+    c.globalAlpha=0.55;c.fillStyle=C('--air');c.fillRect(x0,y0,w,h);c.globalAlpha=1;
+    c.strokeStyle=C('--muted');c.lineWidth=2;c.strokeRect(x0,y0,w,h);
+    c.fillStyle=C('--rain');c.globalAlpha=0.6;c.fillRect(x0+1,y0+h-18,w-2,17);c.globalAlpha=1; // suv yuzasi
+    for(let i=0;i<N;i++){
+      const x=x0+12+(w-24)*(0.5+0.5*Math.sin(i*1.7+t*(0.8+0.07*(i%5))));
+      const y=y0+12+(h-48)*(0.5+0.5*Math.cos(i*2.3+t*(0.7+0.06*(i%4))));
+      c.fillStyle=C('--cloud');c.strokeStyle=C('--muted');c.lineWidth=1;
+      c.beginPath();c.arc(x,y,5,0,7);c.fill();c.stroke();
+    }
+    if(v.p>=v.pt){ // to'yinish — kondensatsiya (shudring tomchilari)
+      for(let i=0;i<10;i++){c.fillStyle=C('--rain');c.beginPath();c.arc(x0+20+i*(w-40)/9,y0+6+((t*20+i*7)%14),3,0,7);c.fill();}
+    }
+    txt(c,"Bug' zarralari: "+N+' / 40',x0,H-32,C('--text'),13);
+    txt(c,'φ = '+n(phi*100,0)+'%'+(phi>=1?" — to'yingan":''),x0,H-12,C('--rain'),15);
+    txt(c,`p = ${n(v.p,1)} kPa, p_t = ${n(v.pt,1)} kPa`,W-20,H-12,C('--muted'),12,'right');
+  },
+  /* 4. Yomg'ir yog'adi, o'lchov idishi to'ladi */
+  yogin(c,W,H,t,v){
+    sky(c,W,H);
+    const gy=H-30;
+    cloud(c,20,46,1.5);cloud(c,W*0.38,38,1.8);cloud(c,W*0.62-20,50,1.4);
+    c.fillStyle=C('--ground');c.fillRect(0,gy,W,30);
+    const prog=Math.min(t/8,1),cnt=Math.round(14+v.h*1.0);
+    if(t>0){
+      c.strokeStyle=C('--rain');c.lineWidth=2;
+      for(let i=0;i<cnt;i++){
+        const x=(i*53.7)%(W-120)+10,y=((t*(150+(i%5)*25)+i*37)%(gy-85))+80;
+        c.beginPath();c.moveTo(x,y);c.lineTo(x-2,y+10);c.stroke();
+      }
+    }
+    // o'lchov idishi
+    const cw=44,cxl=W-70,ch=130,top=gy-ch;
+    c.fillStyle=C('--rain');const lv=Math.min(v.h*prog/50,1)*ch;
+    c.fillRect(cxl,gy-lv,cw,lv);
+    c.strokeStyle=C('--muted');c.lineWidth=2;c.beginPath();c.moveTo(cxl,top);c.lineTo(cxl,gy);c.lineTo(cxl+cw,gy);c.lineTo(cxl+cw,top);c.stroke();
+    for(let m=0;m<=50;m+=10){const yy=gy-m/50*ch;c.lineWidth=1;c.beginPath();c.moveTo(cxl,yy);c.lineTo(cxl+10,yy);c.stroke();txt(c,m+'',cxl-4,yy+4,C('--muted'),10,'right');}
+    txt(c,'mm',cxl+cw/2,top-6,C('--muted'),11,'center');
+    txt(c,`Dala: S = ${n(v.S,1)} ga = ${n(v.S*10000,0)} m²`,10,gy+19,C('--text'),12);
+    txt(c,'h = '+n(v.h*prog,1)+' mm',12,H-60,C('--text'),14);
+    txt(c,'V = '+n(v.h/1000*v.S*10000*prog,1)+' m³',12,H-42,C('--rain'),14);
+  },
+  /* 5. Chaqmoq nuri bir zumda, tovush to'lqini esa sekin tarqaladi */
+  chaqmoq(c,W,H,t,v){
+    sky(c,W,H);
+    const gy=H-40,sx=60,ox=W-50,dx=ox-sx,tf=0.5;
+    cloud(c,14,44,1.5,'#6e7d8b');
+    c.fillStyle=C('--ground');c.fillRect(0,gy,W,40);
+    if(t>=tf&&t<tf+0.35){
+      c.strokeStyle='#ffd84a';c.lineWidth=4;c.beginPath();
+      [[60,70],[52,100],[66,116],[54,150],[62,gy]].forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();
+      c.fillStyle='rgba(255,255,255,0.3)';c.fillRect(0,0,W,H);
+    }
+    const r=(t-tf)*dx/v.t;
+    if(t>tf&&r<=dx+6){
+      [0,16].forEach((o,i)=>{if(r-o>0){c.strokeStyle=C('--cold');c.globalAlpha=i?0.5:1;c.lineWidth=3;c.beginPath();c.arc(sx,gy,r-o,Math.PI,2*Math.PI);c.stroke();c.globalAlpha=1;}});
+    }
+    c.fillStyle=C('--text');c.beginPath();c.arc(ox,gy-30,7,0,7);c.fill();c.fillRect(ox-2,gy-23,4,20); // kuzatuvchi
+    arrow(c,sx,gy+16,ox-4,gy+16,C('--muted'));
+    txt(c,`s = v·t = ${n(v.v*v.t,0)} m`,(sx+ox)/2,gy+32,C('--text'),12,'center');
+    const el=Math.max(0,Math.min(t-tf,v.t));
+    txt(c,'t = '+n(el,1)+' s',W-12,22,C('--text'),15,'right');
+    txt(c,'s = '+n(v.v*el,0)+' m',W-12,42,C('--rain'),14,'right');
+    if(t-tf>=v.t)txt(c,'Gumburlash eshitildi!',ox,gy-50,C('--heat'),14,'right');
+  },
+  /* 6. Shamol: bulutlar siljiydi, daraxtlar tebranadi, masofa o'sib boradi */
+  shamol(c,W,H,t,v){
+    sky(c,W,H);
+    const gy=H-36,frac=Math.min(t/8,1);
+    for(let i=0;i<3;i++){const x=((i*W/3+t*v.v*4)%(W+160))-100;cloud(c,x,38+i*30,1.1);}
+    c.strokeStyle=C('--cloud');c.lineWidth=2;
+    for(let i=0;i<5;i++){const x=((t*v.v*12+i*97)%(W+80))-40,y=108+i*22;c.beginPath();c.moveTo(x,y);c.lineTo(x+14+v.v,y);c.stroke();}
+    c.fillStyle=C('--ground');c.fillRect(0,gy,W,36);
+    const amp=Math.min(v.v,30)/30*0.4;
+    [0.2,0.5,0.8].forEach((fx,i)=>{
+      c.save();c.translate(W*fx,gy);c.rotate(Math.sin(t*4+i)*amp+amp*0.5);
+      c.fillStyle='#7a5a3a';c.fillRect(-4,-50,8,50);
+      c.fillStyle='#3f9a4a';c.beginPath();c.arc(0,-62,24,0,7);c.fill();c.restore();
+    });
+    const b=bf(v.v);
+    txt(c,`v = ${n(v.v,0)} m/s (${n(v.v*3.6,0)} km/soat)`,12,22,C('--text'),14);
+    txt(c,`${b[1]} ball: ${b[2]}`,12,42,C('--heat'),13);
+    txt(c,`s = ${n(v.v*3.6*v.t*frac,1)} km  (t = ${n(v.t*frac,1)} soat)`,12,H-12,C('--text'),14);
+  }
+};
+
+/* =====================================================
+   HOLAT va CANVAS BOSHQARUVI
+   ===================================================== */
+const vals={};P.forEach(p=>vals[p.key]=Object.fromEntries(p.sliders.map(s=>[s.id,s.val])));
+const st={run:false,t:0,dirty:true,last:0};
+let cur=0,stepIdx=0,cv=null,ctx=null,CW=0,CH=260;
+const TESTN = P.length; // Test tabi indeksi
+
+function setupCanvas(){
+  cv=$('#cv');if(!cv){ctx=null;return;}
+  const dpr=window.devicePixelRatio||1;
+  CW=cv.clientWidth;CH=cv.clientHeight;
+  cv.width=CW*dpr;cv.height=CH*dpr;
+  ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  st.dirty=true;
+}
+function draw(){
+  if(!ctx)return;
+  ctx.clearRect(0,0,CW,CH);
+  const p=P[cur];ANIM[p.key](ctx,CW,CH,st.t,vals[p.key]);
+}
+function loop(ts){
+  requestAnimationFrame(loop);
+  const dt=Math.min((ts-st.last)/1000||0,0.1);st.last=ts;
+  if(!ctx||cur>=TESTN)return;
+  if(st.run){
+    st.t+=dt;st.dirty=true;
+    if(st.t>P[cur].dur(vals[P[cur].key])){st.run=false;st.t=P[cur].dur(vals[P[cur].key]);}
+  }
+  if(st.dirty){draw();st.dirty=false;}
+}
+requestAnimationFrame(loop);
+window.addEventListener('resize',()=>{setupCanvas();});
+
+/* =====================================================
+   TAB MENYU va PANELNI CHIZISH
+   ===================================================== */
+function buildTabs(){
+  const nav=$('#tabs');nav.innerHTML='';
+  P.concat([{name:'Test'}]).forEach((p,i)=>{
+    const b=document.createElement('button');b.type='button';b.textContent=p.name;
+    b.className=i===cur?'active':'';b.onclick=()=>show(i);nav.appendChild(b);
+  });
+}
+function show(i){
+  cur=i;stepIdx=0;st.run=false;st.t=0;st.dirty=true;
+  buildTabs();
+  if(i===TESTN){renderTest();ctx=null;}else renderProblem();
+  window.scrollTo({top:0});
+  const act=document.querySelector('#tabs .active');if(act&&act.scrollIntoView)act.scrollIntoView({inline:'center',block:'nearest'});
+}
+
+function renderProblem(){
+  const p=P[cur],v=vals[p.key];
+  $('#panel').innerHTML=`
+  <section class="card">
+    <h2>${p.title}</h2>
+    <p class="task">${p.text}</p>
+    <div class="gf">
+      <div class="box g"><b class="t">Berilgan:</b><ul>${p.given.map(g=>`<li>• ${g}</li>`).join('')}</ul></div>
+      <div class="box f"><b class="t">Topish kerak:</b><ul><li>• ${p.find}</li></ul></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>Bosqichma-bosqich yechim</h3>
+    <div id="steps"></div>
+    <button class="btn" id="nextStep" type="button">Keyingi qadam</button>
+    <button class="btn sec" id="resetStep" type="button">Boshidan</button>
+  </section>
+
+  <section class="card">
+    <h3>Simulyatsiya (slayderlarni suring)</h3>
+    ${p.sliders.map(s=>`
+      <div class="sl"><label><span>${s.label}</span><b><span id="o_${s.id}">${n(v[s.id],2)}</span> ${s.unit}</b></label>
+      <input type="range" id="s_${s.id}" min="${s.min}" max="${s.max}" step="${s.step}" value="${v[s.id]}"></div>`).join('')}
+    <div class="res" id="res"></div>
+  </section>
+
+  <section class="card">
+    <h3>Animatsiya</h3>
+    <canvas id="cv"></canvas>
+    <button class="btn" id="bStart" type="button">▶ Boshlash</button>
+    <button class="btn sec" id="bStop" type="button">⏸ To'xtatish</button>
+    <button class="btn heat" id="bRestart" type="button">↻ Qayta boshlash</button>
+  </section>
+
+  <section class="card">
+    <h3>Hayotiy misol</h3>
+    <p class="life">${p.life}</p>
+  </section>
+
+  <section class="card own">
+    <h3>Mustaqil masala</h3>
+    <p>${p.own.q}</p>
+    <input id="ownIn" type="text" inputmode="decimal" placeholder="Javobni kiriting (${p.own.unit})" autocomplete="off">
+    <button class="btn" id="ownBtn" type="button">Tekshirish</button>
+    <div id="ownMsg"></div>
+  </section>`;
+
+  // Yechim qadamlari
+  const stepsBox=$('#steps');
+  function showSteps(){
+    stepsBox.innerHTML=p.steps.slice(0,stepIdx).map((s,i)=>`<div class="step${i===p.steps.length-1?' ans':''}">${s}</div>`).join('')
+      ||`<p style="color:var(--muted)">«Keyingi qadam» tugmasini bosing.</p>`;
+    $('#nextStep').disabled=stepIdx>=p.steps.length;
+  }
+  $('#nextStep').onclick=()=>{if(stepIdx<p.steps.length){stepIdx++;showSteps();}};
+  $('#resetStep').onclick=()=>{stepIdx=0;showSteps();};
+  showSteps();
+
+  // Slayderlar: qiymat o'zgarsa natija va animatsiya qayta hisoblanadi
+  function update(){$('#res').innerHTML=p.calc(v);st.dirty=true;}
+  p.sliders.forEach(s=>{
+    $('#s_'+s.id).addEventListener('input',e=>{
+      v[s.id]=parseFloat(e.target.value);$('#o_'+s.id).textContent=n(v[s.id],2);update();
+    });
+  });
+  update();
+
+  // Animatsiya tugmalari
+  setupCanvas();
+  $('#bStart').onclick=()=>{if(st.t>=p.dur(v))st.t=0;st.run=true;};
+  $('#bStop').onclick=()=>{st.run=false;};
+  $('#bRestart').onclick=()=>{st.t=0;st.run=true;st.dirty=true;};
+
+  // Mustaqil masala
+  function check(){
+    const raw=$('#ownIn').value.replace(/\s/g,'').replace(',','.');
+    const x=parseFloat(raw),box=$('#ownMsg');
+    if(isNaN(x)){box.innerHTML=`<div class="msg bad">Iltimos, son kiriting.</div>`;return;}
+    const ok=Math.abs(x-p.own.ans)<=Math.max(Math.abs(p.own.ans)*0.01,1e-6);
+    box.innerHTML=ok?`<div class="msg ok">✅ To'g'ri! Javob: ${n(p.own.ans,2)} ${p.own.unit}.</div>`
+      :`<div class="msg bad">❌ Noto'g'ri. Maslahat: ${p.own.hint}</div>`;
+  }
+  $('#ownBtn').onclick=check;
+  $('#ownIn').addEventListener('keydown',e=>{if(e.key==='Enter')check();});
+}
+
+/* =====================================================
+   TEST TABI: 5 ta savol, A–D variant, darhol natija
+   ===================================================== */
+const QUIZ=[
+  {q:`Normal atmosfera bosimi simob ustunining necha mm balandligiga teng?`,o:['560 mm','760 mm','960 mm','1013 mm'],a:1,e:`Torrichelli tajribasida simob ustuni 760 mm bo'ladi (≈ 101,3 kPa).`},
+  {q:`Tog'ga ko'tarilganda har 12 m da atmosfera bosimi taxminan qanchaga kamayadi?`,o:['1 mm sim. ust.','12 mm sim. ust.','10 mm sim. ust.','100 mm sim. ust.'],a:0,e:`Taxminan har 12 m ga 1 mm sim. ust. kamayadi.`},
+  {q:`Bug' bosimi 1 kPa, to'yingan bug' bosimi 4 kPa bo'lsa, nisbiy namlik necha foiz?`,o:['25%','40%','4%','75%'],a:0,e:`φ = 1 : 4 · 100% = 25%.`},
+  {q:`2 ga (20 000 m²) maydonga 10 mm yog'in tushdi. Suv hajmi qancha?`,o:['20 m³','200 m³','2000 m³','2 m³'],a:1,e:`V = h·S = 0,01 · 20 000 = 200 m³.`},
+  {q:`Chaqmoqdan 3 s o'tib gumburlash eshitildi (v = 340 m/s). Chaqmoqgacha masofa qancha?`,o:['113 m','340 m','1020 m','1700 m'],a:2,e:`s = v·t = 340 · 3 = 1020 m.`}
+];
+let qi=0,score=0,answered=false;
+
+function renderTest(){
+  qi=0;score=0;answered=false;showQ();
+}
+function showQ(){
+  const box=$('#panel');
+  if(qi>=QUIZ.length){
+    const pct=score/QUIZ.length;
+    box.innerHTML=`<section class="card"><h2>Test yakunlandi</h2>
+      <div class="score">${score} / ${QUIZ.length}</div>
+      <p style="text-align:center">${pct===1?`Ajoyib! Hammasi to'g'ri.`:pct>=0.6?`Yaxshi natija! Xatolarni masalalar tabida takrorlang.`:`Masalalar tablaridagi yechimlarni qayta ko'rib chiqing va yana urinib ko'ring.`}</p>
+      <div style="text-align:center"><button class="btn" id="again" type="button">Testni qayta boshlash</button></div></section>`;
+    $('#again').onclick=renderTest;return;
+  }
+  const q=QUIZ[qi],L='ABCD';answered=false;
+  box.innerHTML=`<section class="card">
+    <div class="prog"><i style="width:${qi/QUIZ.length*100}%"></i></div>
+    <h2>Savol ${qi+1} / ${QUIZ.length}</h2>
+    <p class="task">${q.q}</p>
+    ${q.o.map((o,i)=>`<button class="opt" type="button" data-i="${i}">${L[i]}) ${o}</button>`).join('')}
+    <div id="fb"></div>
+    <button class="btn" id="nextQ" type="button" style="display:none">${qi===QUIZ.length-1?'Natijani ko\'rish':'Keyingi savol'}</button>
+  </section>`;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(answered)return;answered=true;
+    const i=+b.dataset.i,okk=i===q.a;
+    if(okk)score++;
+    document.querySelectorAll('.opt').forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add('ok');});
+    if(!okk)b.classList.add('bad');
+    $('#fb').innerHTML=`<div class="msg ${okk?'ok':'bad'}">${okk?`✅ To'g'ri!`:`❌ Noto'g'ri. To'g'ri javob: ${L[q.a]}.`} ${q.e}</div>`;
+    $('#nextQ').style.display='inline-block';
+  });
+  $('#nextQ').onclick=()=>{qi++;showQ();};
+}
+
+/* =====================================================
+   OCH / TO'Q MAVZU
+   ===================================================== */
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  $('#themeBtn').textContent=t==='dark'?'☀️ Och mavzu':`🌙 To'q mavzu`;
+  try{localStorage.setItem('f43theme',t);}catch(e){}
+  st.dirty=true;
+}
+$('#themeBtn').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+(function(){
+  let t=null;try{t=localStorage.getItem('f43theme');}catch(e){}
+  if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  setTheme(t);
+})();
+
+/* Ishga tushirish */
+show(0);
+</script>
+</body>
+</html>

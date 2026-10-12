@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>57-mavzu. Geliotexnika. O'zbekistonda quyosh energiyasidan foydalanish</title>
+<style>
+:root{--sun:#FFB703;--or:#FB8500;--deep:#023047;--sky:#8ECAE6;--mid:#219EBC;--paper:#FFFBF0;--ink:#12303f;--ok:#2a9d4a;--bad:#d62828}
+*{box-sizing:border-box}
+html{scroll-padding-top:70px}
+body{margin:0;font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.65;color:var(--ink);background:var(--paper)}
+header{background:linear-gradient(120deg,var(--deep) 0%,#0b6a8a 55%,var(--or) 100%);color:#fff;padding:22px 16px 18px}
+header h1{margin:0;font-size:clamp(22px,4.6vw,34px);line-height:1.25}
+header p{margin:6px 0 0;opacity:.92;font-size:17px}
+nav{position:sticky;top:0;z-index:20;background:var(--deep);display:flex;gap:6px;overflow-x:auto;padding:8px 10px;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+nav button{flex:0 0 auto;border:0;border-radius:10px;padding:10px 16px;font:inherit;font-size:17px;font-weight:700;background:#0d4a66;color:#d9f1ff;cursor:pointer}
+nav button.on{background:var(--sun);color:var(--deep)}
+nav button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+main{max-width:980px;margin:0 auto;padding:16px 14px 50px}
+.panel{display:none}.panel.on{display:block}
+h2{font-size:clamp(22px,4vw,30px);margin:8px 0 10px;color:var(--deep)}
+h3{font-size:22px;margin:22px 0 8px;color:var(--or)}
+.theory{background:#fff;border-left:7px solid var(--sun);border-radius:10px;padding:12px 16px;box-shadow:0 2px 8px rgba(2,48,71,.08)}
+.theory p{margin:8px 0}
+.formula{display:inline-block;background:#fff3cf;border:2px solid var(--sun);border-radius:10px;padding:4px 14px;margin:4px 0;font-weight:700;font-size:20px;color:var(--deep)}
+.box{background:#fff;border:2px solid #ffe3a3;border-radius:14px;padding:12px;margin-top:8px}
+canvas{width:100%;height:auto;display:block;border-radius:10px;background:#e8f6ff;touch-action:manipulation}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 18px;margin:10px 0}
+.ctl{display:block;font-size:17px}
+.ctl span{display:block;font-weight:700}
+.ctl input[type=range]{width:100%;height:30px;accent-color:var(--or)}
+.out{background:var(--deep);color:#fff;border-radius:12px;padding:10px 14px;margin-top:8px;font-size:18px}
+.out b{color:var(--sun);font-size:20px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.btn,.btns button{border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;font-size:17px;cursor:pointer;background:var(--or);color:#fff}
+.btns button[data-do=stop]{background:#6c757d}
+.btns button[data-do=reset]{background:var(--mid)}
+.btn.alt{background:var(--mid)}
+select{font:inherit;font-size:17px;padding:8px;border-radius:8px;border:2px solid var(--mid);background:#fff}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.seg button{border:2px solid var(--mid);background:#fff;color:var(--deep);border-radius:10px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.seg button.on{background:var(--mid);color:#fff}
+.prob{background:#fff;border:2px solid #ffe3a3;border-radius:12px;padding:10px 14px;margin:10px 0}
+.sol{display:none;background:#eefaf0;border-left:6px solid var(--ok);border-radius:8px;padding:8px 12px;margin-top:8px}
+.sol.on{display:block}
+.q{font-size:20px;font-weight:700;margin:6px 0 12px}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px 14px;border:2px solid #b8dff0;border-radius:10px;background:#fff;font:inherit;cursor:pointer}
+.opt.right{background:#d8f5de;border-color:var(--ok)}
+.opt.wrong{background:#fde0e0;border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.exp{margin-top:10px;padding:10px 14px;border-radius:10px;background:#fff3cf;display:none}
+.prog{height:10px;background:#ffe3a3;border-radius:6px;overflow:hidden;margin-bottom:10px}
+.prog i{display:block;height:100%;background:var(--or);width:0;transition:width .3s}
+.score{font-size:30px;font-weight:700;color:var(--deep);text-align:center;padding:16px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){body{font-size:17px}.formula{font-size:18px}}
+</style>
+</head>
+<body>
+<header>
+<h1>57-mavzu. Geliotexnika. O'zbekistonda quyosh energiyasidan foydalanish</h1>
+<p>9-sinf fizika. Nazariya, simulyatsiya, animatsiya va test.</p>
+</header>
+<nav id="tabs"></nav>
+<main>
+
+<!-- 1-REJA -->
+<section class="panel" id="p1">
+<h2>1-reja. Geliotexnika va quyosh energiyasi</h2>
+<div class="theory">
+<p><b>Geliotexnika</b> — quyosh energiyasini issiqlik va elektr energiyasiga aylantirish hamda undan foydalanish bilan shug'ullanadigan texnika sohasi ("helios" — quyosh).</p>
+<p>Quyosh — Yerdagi deyarli barcha energiyaning manbai. Atmosfera tashqarisida quyosh doimiysi taxminan <b>1361 Vt/m²</b>. Yer sirtiga ochiq havoda taxminan <b>1000 Vt/m²</b> gacha yetib keladi. Quyosh energiyasi <b>qayta tiklanadigan</b> energiya manbalaridan biri.</p>
+<p>Quyosh balandligi kichik bo'lsa, nurlar ko'proq atmosfera qatlamidan o'tadi, bir xil nur dastasi esa katta yuzaga yoyiladi va quvvat kamayadi.</p>
+<span class="formula">I = 1000 · sin(α) Vt/m²</span>
+</div>
+<h3>Simulyatsiya: Quyosh balandligi</h3>
+<div class="box"><canvas id="s1" width="700" height="420"></canvas>
+<div class="controls" id="c1"></div><div class="out" id="o1"></div></div>
+<h3>Animatsiya: Quyosh nurlarining Yerga yetib kelishi</h3>
+<div class="box"><canvas id="a1" width="700" height="420"></canvas>
+<div class="btns" data-a="a1"><button data-do="start">Boshlash</button><button data-do="stop">To'xtatish</button><button data-do="reset">Qayta boshlash</button></div>
+<div class="out" id="oa1">Nurlar: qaytgan 0 · yutilgan 0 · Yerga yetgan 0</div></div>
+</section>
+
+<!-- 2-REJA -->
+<section class="panel" id="p2">
+<h2>2-reja. Quyosh energiyasini issiqlikka aylantirish</h2>
+<div class="theory">
+<p><b>Quyosh kollektori</b> (suv isitgich) quyosh nurini yutib, suvni isitadi. Qora sirt nurni yaxshi yutadi. Shisha qoplama issiqlikning chiqib ketishini kamaytiradi (issiqxona effekti).</p>
+<p>Kollektor turlari: <b>yassi</b> va <b>vakuumli naychali</b>. <b>Konsentratorlar</b> (parabolik oynalar) nurlarni bir nuqtaga yig'ib, yuqori harorat hosil qiladi (quyosh pechlari).</p>
+<p>Suvga berilgan issiqlik miqdori (suvning solishtirma issiqlik sig'imi c = 4200 J/(kg·°C)):</p>
+<span class="formula">Q = c · m · ΔT</span>
+</div>
+<h3>Simulyatsiya: Kollektor (FIK = 60%)</h3>
+<div class="box"><canvas id="s2" width="700" height="420"></canvas>
+<div class="controls" id="c2"></div><div class="out" id="o2"></div></div>
+<h3>Animatsiya: Kollektor va parabolik ko'zgu</h3>
+<div class="box"><div class="seg" id="seg2"><button class="on" data-m="0">Kollektor</button><button data-m="1">Parabolik ko'zgu</button></div>
+<canvas id="a2" width="700" height="420"></canvas>
+<div class="btns" data-a="a2"><button data-do="start">Boshlash</button><button data-do="stop">To'xtatish</button><button data-do="reset">Qayta boshlash</button></div>
+<div class="out" id="oa2"></div></div>
+</section>
+
+<!-- 3-REJA -->
+<section class="panel" id="p3">
+<h2>3-reja. Quyosh energiyasini elektr energiyasiga aylantirish</h2>
+<div class="theory">
+<p><b>Quyosh batareyalari</b> (fotoelementlar, quyosh panellari) yarimo'tkazgich (asosan kremniy) yordamida yorug'lik energiyasini bevosita elektr energiyasiga aylantiradi. Asosi — <b>ichki fotoeffekt</b> va <b>p-n o'tish</b>.</p>
+<span class="formula">P = η · S · I</span>
+<p>Bunda η — FIK (odatda 15–22%), S — panel yuzasi, I — quyosh nurlanish quvvati zichligi. Quyosh elektr stansiyalarida panellar ko'p bo'lib, <b>invertor</b> o'zgarmas tokni o'zgaruvchan tokka aylantiradi. Bulutli havoda ishlab chiqarish kamayadi, kechasi to'xtaydi.</p>
+</div>
+<h3>Simulyatsiya: Panel quvvati</h3>
+<div class="box"><canvas id="s3" width="700" height="420"></canvas>
+<div class="controls" id="c3"></div><div class="out" id="o3"></div></div>
+<h3>Animatsiya: Fotoelementda tok hosil bo'lishi</h3>
+<div class="box"><canvas id="a3" width="700" height="420"></canvas>
+<div class="btns" data-a="a3"><button data-do="start">Boshlash</button><button data-do="stop">To'xtatish</button><button data-do="reset">Qayta boshlash</button></div>
+<div class="out" id="oa3"></div></div>
+</section>
+
+<!-- 4-REJA -->
+<section class="panel" id="p4">
+<h2>4-reja. O'zbekistonda quyosh energiyasidan foydalanish</h2>
+<div class="theory">
+<p>O'zbekiston quyosh energiyasiga boy: yiliga taxminan <b>300 dan ortiq</b> kun quyoshli, nurlanish yuqori. Quyosh energiyasi potensiali juda katta.</p>
+<p>Toshkent viloyati Parkent tumanidagi <b>"Quyosh" ilmiy-ishlab chiqarish majmuasi</b>da Katta quyosh pechi (geliokompleks) qurilgan; unda yuqori haroratli tajribalar o'tkaziladi.</p>
+<p>So'nggi yillarda yirik quyosh elektr stansiyalari qurildi (masalan, Navoiy va Samarqand viloyatlarida 100 MVt quvvatli stansiyalar), yangilari rejalashtirilmoqda. Quyosh panellari va suv isitgichlar uy-joylarda, maktab va shifoxonalarda ham joriy etilmoqda. Davlat qayta tiklanadigan energiya ulushini oshirishni maqsad qilgan.</p>
+</div>
+<h3>Simulyatsiya: Viloyatlar bo'yicha nurlanish</h3>
+<p>Xarita soddalashtirilgan va qiymatlar taxminiy. Viloyat ustiga bosing.</p>
+<div class="box"><canvas id="s4" width="700" height="400"></canvas>
+<div class="controls" id="c4"></div><div class="out" id="o4">Viloyat ustiga bosing.</div></div>
+<h3>Animatsiya: Kun bo'yi Quyosh va stansiyalar quvvati</h3>
+<div class="box"><canvas id="a4" width="700" height="400"></canvas>
+<div class="btns" data-a="a4"><button data-do="start">Boshlash</button><button data-do="stop">To'xtatish</button><button data-do="reset">Qayta boshlash</button></div>
+<div class="out" id="oa4"></div></div>
+</section>
+
+<!-- 5-REJA -->
+<section class="panel" id="p5">
+<h2>5-reja. Afzalliklari, kamchiliklari va ekologik ahamiyati</h2>
+<div class="theory">
+<p><b>Afzalliklari:</b> tugamaydigan (qayta tiklanadigan) manba; zararli chiqindi va issiqxona gazlari chiqarmaydi; yoqilg'i narxiga bog'liq emas; olis hududlarda ham qo'llash mumkin; ishlatish xarajati kam.</p>
+<p><b>Kamchiliklari:</b> kechasi va bulutli havoda ishlamaydi; quvvat zichligi kichik, katta maydon kerak; boshlang'ich qurilish narxi baland; energiyani saqlash (akkumulyator) kerak.</p>
+<p><b>Ekologik ahamiyati:</b> ko'mir, gaz va neft yoqishga nisbatan CO₂ chiqindisini kamaytiradi.</p>
+</div>
+<h3>Simulyatsiya: Energiya manbalarini taqqoslash</h3>
+<p>CO₂ hisobi taxminiy o'rtacha qiymatlarga asoslangan (quyosh ≈ 45, gaz ≈ 490, ko'mir ≈ 820 kg CO₂ / MVt·soat).</p>
+<div class="box"><div class="seg" id="seg5"><button class="on" data-k="0">Quyosh</button><button data-k="1">Gaz</button><button data-k="2">Ko'mir</button></div>
+<canvas id="s5" width="700" height="400"></canvas>
+<div class="controls" id="c5"></div><div class="out" id="o5"></div></div>
+<h3>Animatsiya: Ikki shahar</h3>
+<div class="box"><canvas id="a5" width="700" height="400"></canvas>
+<div class="btns" data-a="a5"><button data-do="start">Boshlash</button><button data-do="stop">To'xtatish</button><button data-do="reset">Qayta boshlash</button></div>
+<div class="out" id="oa5"></div></div>
+</section>
+
+<!-- 6-REJA -->
+<section class="panel" id="p6">
+<h2>6-reja. Hisoblash masalalari</h2>
+<div class="theory"><p>Formulalar: <span class="formula">P = η·S·I</span> <span class="formula">Q = c·m·ΔT</span> <span class="formula">t = Q / P</span> <span class="formula">E = P·t</span></p></div>
+<div id="probs"></div>
+<h3>Simulyatsiya: Interaktiv kalkulyator</h3>
+<div class="box"><div class="controls" id="c6"></div><div class="out" id="o6"></div></div>
+<h3>Animatsiya: Yechilish jarayoni</h3>
+<div class="box"><label>Masala: <select id="sel6"><option value="0">1-masala</option><option value="1">2-masala</option><option value="2">3-masala</option><option value="3">4-masala</option></select></label>
+<canvas id="a6" width="700" height="360" style="margin-top:8px"></canvas>
+<div class="btns" data-a="a6"><button data-do="start">Boshlash</button><button data-do="stop">To'xtatish</button><button data-do="reset">Qayta boshlash</button><button class="btn alt" id="next6" style="background:var(--sun);color:var(--deep)">Keyingi qadam</button></div></div>
+</section>
+
+<!-- TEST -->
+<section class="panel" id="p7">
+<h2>Test</h2>
+<div class="box" id="testbox"></div>
+</section>
+
+</main>
+<script>
+"use strict";
+const S={};
+const $=id=>document.getElementById(id);
+const fmt=(v,d=1)=>(+v).toFixed(d).replace('.',',');
+const mixc=(a,b,t)=>{t=Math.max(0,Math.min(1,t));return 'rgb('+a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')+')'};
+const BLUE=[40,120,230],RED=[230,40,30];
+
+function ctrl(boxId,key,label,min,max,step,val,unit,cb){
+  const d=document.createElement('label');d.className='ctl';
+  d.innerHTML='<span>'+label+': <b></b> '+unit+'</span><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'">';
+  const inp=d.querySelector('input'),b=d.querySelector('b');
+  S[key]=val;b.textContent=String(val).replace('.',',');
+  inp.addEventListener('input',()=>{S[key]=+inp.value;b.textContent=String(S[key]).replace('.',',');cb()});
+  $(boxId).appendChild(d);
+}
+function T(x,txt,px,py,size,col,al){x.font='700 '+size+'px "Trebuchet MS",Arial,sans-serif';x.fillStyle=col||'#12303f';x.textAlign=al||'left';x.fillText(txt,px,py)}
+function sun(x,cx,cy,r){
+  const g=x.createRadialGradient(cx,cy,r*.3,cx,cy,r*2.6);g.addColorStop(0,'rgba(255,200,40,.9)');g.addColorStop(1,'rgba(255,200,40,0)');
+  x.fillStyle=g;x.beginPath();x.arc(cx,cy,r*2.6,0,7);x.fill();
+  x.fillStyle='#FFB703';x.beginPath();x.arc(cx,cy,r,0,7);x.fill();
+  x.fillStyle='#FB8500';x.beginPath();x.arc(cx,cy,r*.7,0,7);x.fill();
+}
+function sky(x,W,H,top,bot){const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,top||'#bfe6ff');g.addColorStop(1,bot||'#eaf7ff');x.fillStyle=g;x.fillRect(0,0,W,H)}
+function line(x,a,b,c,d,col,w){x.strokeStyle=col;x.lineWidth=w||2;x.beginPath();x.moveTo(a,b);x.lineTo(c,d);x.stroke()}
+
+class Anim{
+  constructor(id,init,step,draw){this.x=$(id).getContext('2d');this.init=init;this.step=step;this.draw=draw;this.run=false;this.last=0;this.loop=this.loop.bind(this);this.reset()}
+  loop(t){if(!this.run)return;const dt=Math.min(.05,(t-this.last)/1000||.016);this.last=t;this.step(dt);this.draw(this.x);if(this.run)requestAnimationFrame(this.loop)}
+  start(){if(this.run)return;this.run=true;this.last=performance.now();requestAnimationFrame(this.loop)}
+  stop(){this.run=false}
+  reset(){this.stop();this.init();this.draw(this.x)}
+}
+const ANIMS={};
+document.querySelectorAll('[data-a]').forEach(box=>{
+  box.addEventListener('click',e=>{const b=e.target.closest('button[data-do]');if(!b)return;const a=ANIMS[box.dataset.a];a[b.dataset.do==='start'?'start':b.dataset.do==='stop'?'stop':'reset']()});
+});
+
+/* ---------- TABS ---------- */
+const names=['1-reja','2-reja','3-reja','4-reja','5-reja','6-reja','Test'];
+names.forEach((n,i)=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>show(i);$('tabs').appendChild(b)});
+function show(i){
+  Object.values(ANIMS).forEach(a=>a.stop());
+  document.querySelectorAll('.panel').forEach((p,k)=>p.classList.toggle('on',k===i));
+  [...$('tabs').children].forEach((b,k)=>b.classList.toggle('on',k===i));
+  window.scrollTo({top:0});
+}
+
+/* ---------- 1-REJA ---------- */
+function sim1(){
+  const c=$('s1'),x=c.getContext('2d'),W=700,H=420,gy=340;
+  const a=S.ang*Math.PI/180,sa=Math.sin(a),ca=Math.cos(a);
+  sky(x,W,H);
+  x.fillStyle='rgba(110,160,220,.28)';x.fillRect(0,230,W,110);
+  T(x,'atmosfera',10,255,16,'#3a6ea5');
+  x.fillStyle='#7a5a2a';x.fillRect(0,gy,W,H-gy);
+  const px=350,py=gy,R=290,sx=px-R*ca,sy=py-R*sa,L=Math.min(300,70/sa);
+  const nx=-sa,ny=ca;
+  x.fillStyle='rgba(255,190,40,.45)';x.beginPath();
+  x.moveTo(sx+nx*35,sy+ny*35);x.lineTo(px+L/2,py);x.lineTo(px-L/2,py);x.lineTo(sx-nx*35,sy-ny*35);x.closePath();x.fill();
+  line(x,px-L/2,py,px+L/2,py,'#FB8500',8);
+  sun(x,sx,sy,22);
+  T(x,'Yer sirti',W-10,H-14,18,'#fff','right');
+  T(x,'α = '+S.ang+'°',px,H-14,20,'#fff','center');
+  const I=1000*sa;
+  $('o1').innerHTML='Quyosh balandligi α = <b>'+S.ang+'°</b><br>Tushayotgan quvvat: I = 1000·sin α = <b>'+fmt(I,0)+' Vt/m²</b><br>Havo qatlamidagi yo\'l: 1/sin α ≈ <b>'+fmt(1/sa,2)+'</b> marta uzun';
+}
+ctrl('c1','ang','Quyosh balandligi α',1,90,1,60,'°',sim1);sim1();
+
+ANIMS.a1=new Anim('a1',()=>{S.p1=[];S.sp1=0;S.cnt1=[0,0,0]},
+ dt=>{
+  S.sp1+=dt;
+  while(S.sp1>.07){S.sp1-=.07;const tx=180+Math.random()*460,r=Math.random();
+    S.p1.push({x:90,y:70,tx:tx,ty:370,t:0,k:r<.25?0:r<.45?1:2,s:.35+Math.random()*.1,rf:false});}
+  S.p1.forEach(p=>{p.t+=dt/ (p.s*4);
+    const ay=140; // atmosfera yuqori chegarasi
+    if(!p.dead){
+      if(!p.rf){const fx=p.x+(p.tx-p.x)*p.t,fy=p.y+(p.ty-p.y)*p.t;p.cx=fx;p.cy=fy;
+        if(p.k===0&&fy>ay+20&&!p.hit){p.hit=1;p.rf=true;S.cnt1[0]++;p.vx=(p.tx-p.x)*.5;p.vy=-180;p.rx=fx;p.ry=fy}
+        else if(p.k===1&&fy>ay+70&&!p.hit){p.hit=1;p.dead=1;p.flash=.4;S.cnt1[1]++}
+        else if(p.k===2&&fy>=ty()&&!p.hit){p.hit=1;p.dead=1;p.flash=.3;S.cnt1[2]++}
+      }else{p.rx+=p.vx*dt;p.ry+=p.vy*dt;p.cx=p.rx;p.cy=p.ry;if(p.ry<20)p.dead=1}
+    }else p.flash=(p.flash||0)-dt;
+  });
+  function ty(){return 360}
+  S.p1=S.p1.filter(p=>!(p.dead&&p.flash<=0));
+ },
+ x=>{
+  sky(x,700,420,'#0b2a5a','#9fd4f5');
+  x.fillStyle='rgba(150,200,255,.25)';x.fillRect(0,160,700,120);
+  T(x,'atmosfera',690,180,16,'#e8f4ff','right');
+  x.fillStyle='#4b7f3a';x.fillRect(0,372,700,48);T(x,'Yer',350,405,18,'#fff','center');
+  sun(x,70,60,26);
+  S.p1.forEach(p=>{
+    if(p.dead){x.fillStyle=p.k===1?'rgba(255,120,0,.8)':'rgba(255,255,200,.9)';x.beginPath();x.arc(p.cx,p.cy,10,0,7);x.fill();return}
+    const col=p.k===0?'#fff':p.k===1?'#ffb347':'#ffe44d';
+    if(p.cx!==undefined){x.strokeStyle=col;x.lineWidth=3;x.beginPath();x.moveTo(p.cx,p.cy);
+      const bx=p.rf?-p.vx*.04:-(p.tx-p.x)*.06,by=p.rf?-p.vy*.04:-(p.ty-p.y)*.06;x.lineTo(p.cx+bx,p.cy+by);x.stroke();}
+  });
+  T(x,'Oq: qaytadi · To\'q sariq: atmosferada yutiladi · Sariq: Yerga yetadi',350,26,15,'#fff','center');
+  $('oa1').innerHTML='Nurlar: qaytgan <b>'+S.cnt1[0]+'</b> · yutilgan <b>'+S.cnt1[1]+'</b> · Yerga yetgan <b>'+S.cnt1[2]+'</b>';
+ });
+
+/* ---------- 2-REJA ---------- */
+function sim2(){
+  const x=$('s2').getContext('2d');sky(x,700,420);
+  const P=.6*S.A2*S.G2,c=4200,m=S.m2;
+  const dT1=P*3600/(c*m),Tend=Math.min(100,20+dT1),t40=c*m*40/P/3600;
+  x.fillStyle='#8a6a3a';x.fillRect(0,380,700,40);
+  sun(x,70,60,24);
+  const w=60+S.A2*45,h=40+S.A2*10;
+  x.save();x.translate(110,300);x.rotate(-.35);
+  for(let i=0;i<5;i++){line(x,40+i*12,-30,40+i*12+(w*.2),-h-20,'rgba(255,190,40,.6)',4)}
+  x.fillStyle='#1b1b2a';x.fillRect(0,0,w,26);x.strokeStyle='#9fd8ff';x.lineWidth=4;x.strokeRect(0,0,w,26);
+  x.restore();
+  T(x,'S = '+S.A2+' m²',120,350,17,'#12303f');
+  line(x,110+w*.9,330-w*.3,500,330-w*.3,'#555',6);
+  line(x,500,330-w*.3,500,250,'#555',6);
+  // tank
+  const tc=mixc(BLUE,RED,(Tend-20)/80);
+  x.fillStyle='#d9d9d9';x.fillRect(480,120,130,200);x.fillStyle=tc;x.fillRect(486,126,118,188);
+  T(x,Math.round(Tend)+'°C',545,230,28,'#fff','center');
+  T(x,'1 soatdan keyin',545,110,16,'#12303f','center');
+  // termometr
+  x.fillStyle='#fff';x.fillRect(650,60,18,260);x.strokeStyle='#333';x.lineWidth=2;x.strokeRect(650,60,18,260);
+  x.fillStyle='#d62828';const hh=260*(Tend/100);x.fillRect(650,320-hh,18,hh);
+  T(x,'100°',635,70,14,'#333','right');T(x,'0°',635,320,14,'#333','right');
+  $('o2').innerHTML='Foydali quvvat: P = 0,6·S·I = <b>'+fmt(P,0)+' Vt</b><br>1 soatda suv isiydi: ΔT ≈ <b>'+fmt(dT1,1)+' °C</b> → <b>'+fmt(Tend,0)+' °C</b> (20 °C dan boshlab)<br>40 °C ga isish vaqti: <b>'+fmt(t40,1)+' soat</b> (Q = '+fmt(c*m*40/1e6,2)+' MJ)';
+}
+ctrl('c2','A2','Kollektor maydoni',1,6,.5,3,'m²',sim2);
+ctrl('c2','G2','Quyosh nuri',200,1000,50,800,'Vt/m²',sim2);
+ctrl('c2','m2','Suv massasi',20,200,10,100,'kg',sim2);sim2();
+
+S.mode2=0;
+ANIMS.a2=new Anim('a2',()=>{S.t2=0;S.Tw=20},
+ dt=>{S.t2+=dt;S.Tw=Math.min(85,20+S.t2*4)},
+ x=>{
+  sky(x,700,420);
+  if(S.mode2===0){
+    sun(x,60,55,24);
+    x.fillStyle='#8a6a3a';x.fillRect(0,385,700,35);
+    // kollektor
+    x.fillStyle='#1b1b2a';x.fillRect(80,160,120,150);x.strokeStyle='#9fd8ff';x.lineWidth=4;x.strokeRect(80,160,120,150);
+    for(let i=0;i<4;i++)line(x,40+i*25,70+i*8,100+i*25,170+i*8,'rgba(255,190,40,.7)',4);
+    T(x,'kollektor',140,335,16,'#12303f','center');
+    const path=[[110,300],[110,130],[560,130],[560,300],[110,300]];
+    x.strokeStyle='#777';x.lineWidth=14;x.beginPath();path.forEach((p,i)=>i?x.lineTo(...p):x.moveTo(...p));x.stroke();
+    x.fillStyle='#d9d9d9';x.fillRect(440,160,150,140);x.fillStyle=mixc(BLUE,RED,(S.Tw-20)/65);x.fillRect(446,166,138,128);
+    T(x,'suv bak',515,240,18,'#fff','center');
+    // zarrachalar
+    const segs=[];let tot=0;for(let i=0;i<4;i++){const a=path[i],b=path[i+1],l=Math.hypot(b[0]-a[0],b[1]-a[1]);segs.push([a,b,l]);tot+=l}
+    for(let k=0;k<26;k++){let d=((k/26)*tot+S.t2*90)%tot,u=d/tot,i=0;while(d>segs[i][2]){d-=segs[i][2];i++}
+      const a=segs[i][0],b=segs[i][1],f=d/segs[i][2],px=a[0]+(b[0]-a[0])*f,py=a[1]+(b[1]-a[1])*f;
+      const heat=u<.28?u/.28:u<.6?1:1-(u-.6)/.4*.6;
+      x.fillStyle=mixc(BLUE,RED,heat);x.beginPath();x.arc(px,py,6,0,7);x.fill();}
+    x.fillStyle='#fff';x.fillRect(645,60,18,260);x.strokeStyle='#333';x.strokeRect(645,60,18,260);
+    x.fillStyle='#d62828';const hh=260*(S.Tw/100);x.fillRect(645,320-hh,18,hh);
+    T(x,Math.round(S.Tw)+'°C',654,345,17,'#12303f','center');
+    $('oa2').textContent='Suv kollektorda isiydi, issiq suv baka ko\'tariladi, sovuq suv pastga tushadi. Bak harorati: '+Math.round(S.Tw)+' °C';
+  }else{
+    sun(x,350,35,20);
+    x.fillStyle='#8a6a3a';x.fillRect(0,345,700,75);
+    const f=110,vx=350,vy=335,par=dx=>vy-dx*dx/(4*f);
+    x.strokeStyle='#c9d6df';x.lineWidth=7;x.beginPath();for(let dx=-170;dx<=170;dx+=5){const px=vx+dx,py=par(dx);dx===-170?x.moveTo(px,py):x.lineTo(px,py)}x.stroke();
+    const fx=vx,fy=vy-f,heat=Math.min(1,S.t2/8);
+    const gl=x.createRadialGradient(fx,fy,2,fx,fy,18+heat*40);gl.addColorStop(0,'rgba(255,255,200,'+(.6+heat*.4)+')');gl.addColorStop(1,'rgba(255,100,0,0)');
+    x.fillStyle=gl;x.beginPath();x.arc(fx,fy,18+heat*40,0,7);x.fill();
+    x.fillStyle='#d62828';x.beginPath();x.arc(fx,fy,6,0,7);x.fill();T(x,'fokus',fx+14,fy-12,16,'#12303f');
+    for(let k=0;k<9;k++){const dx=-160+k*40,hx=vx+dx,hy=par(dx),L1=hy-60,L2=Math.hypot(fx-hx,fy-hy),tot=L1+L2;
+      line(x,hx,60,hx,hy,'rgba(255,170,0,.35)',2);line(x,hx,hy,fx,fy,'rgba(255,170,0,.35)',2);
+      for(let j=0;j<2;j++){let d=((S.t2*140+k*37+j*tot/2)%tot),px,py;if(d<L1){px=hx;py=60+d}else{const f2=(d-L1)/L2;px=hx+(fx-hx)*f2;py=hy+(fy-hy)*f2}
+        x.fillStyle='#ffd23f';x.beginPath();x.arc(px,py,5,0,7);x.fill();}}
+    $('oa2').textContent='Parabolik ko\'zgu parallel nurlarni bir nuqtaga (fokusga) yig\'adi. Fokusdagi harorat ortib boradi (quyosh pechi).';
+  }
+ });
+$('seg2').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.mode2=+b.dataset.m;[...$('seg2').children].forEach(k=>k.classList.toggle('on',k===b));ANIMS.a2.reset()});
+
+/* ---------- 3-REJA ---------- */
+function sim3(){
+  const x=$('s3').getContext('2d');sky(x,700,420,'#a9dcff','#eaf7ff');
+  const cl=S.cl3/100,k=1-.75*cl,I=S.I3,P=S.e3/100*S.S3*I*k,E=P*6/1000;
+  sun(x,80,70,26*(I/1000)+8);
+  x.fillStyle='rgba(120,130,150,'+(.2+cl*.7)+')';
+  [[60,80],[130,70],[100,100],[200,60]].forEach(c=>{x.beginPath();x.arc(c[0]+30,c[1],26+cl*14,0,7);x.arc(c[0]+8,c[1]+8,22+cl*12,0,7);x.arc(c[0]+55,c[1]+8,22+cl*12,0,7);x.fill()});
+  const side=Math.sqrt(S.S3)*34+40,pw=Math.min(300,side*1.3),ph=Math.min(190,side);
+  x.fillStyle='#8a6a3a';x.fillRect(0,385,700,35);
+  x.save();x.translate(380,370);x.transform(1,0,-.35,1,0,0);
+  x.fillStyle='#14306b';x.fillRect(0,-ph,pw,ph);x.strokeStyle='#8fb4ff';x.lineWidth=2;
+  for(let i=0;i<=8;i++){line(x,pw*i/8,-ph,pw*i/8,0,'#8fb4ff',1.5)}for(let j=0;j<=5;j++){line(x,0,-ph*j/5,pw,-ph*j/5,'#8fb4ff',1.5)}
+  x.restore();
+  T(x,'S = '+S.S3+' m²',380,405,16,'#fff');
+  x.fillStyle='#fff';x.fillRect(560,60,100,22);x.strokeStyle='#333';x.strokeRect(560,60,100,22);
+  const mx=Math.max(1,.25*50*1000);x.fillStyle='#FB8500';x.fillRect(560,60,100*Math.min(1,P/mx*1.0),22);
+  T(x,'quvvat',610,52,16,'#12303f','center');
+  const br=Math.min(1,P/12500);x.fillStyle='rgba(255,230,80,'+(.15+br*.85)+')';x.beginPath();x.arc(610,140,26,0,7);x.fill();x.strokeStyle='#555';x.lineWidth=3;x.stroke();
+  const pt=P>=1000?fmt(P/1000,2)+' kVt':fmt(P,0)+' Vt';
+  $('o3').innerHTML='Bulutlilik koeffitsiyenti: <b>'+fmt(k,2)+'</b><br>Panel quvvati: P = η·S·I = <b>'+pt+'</b><br>1 kunda (6 soat): E = <b>'+fmt(E,1)+' kVt·soat</b>';
+}
+ctrl('c3','S3','Panel yuzasi',1,50,1,10,'m²',sim3);
+ctrl('c3','e3','FIK η',10,25,1,18,'%',sim3);
+ctrl('c3','I3','Nurlanish',0,1000,50,800,'Vt/m²',sim3);
+ctrl('c3','cl3','Bulutlilik',0,100,5,0,'%',sim3);sim3();
+
+ANIMS.a3=new Anim('a3',()=>{S.ph=[];S.el=[];S.cur=0;S.sp3=0;S.t3=0;S.pe=0;
+   for(let i=0;i<16;i++)S.el.push(i/16)},
+ dt=>{
+  S.t3+=dt;S.sp3+=dt;
+  while(S.sp3>.35){S.sp3-=.35;S.ph.push({x:130+Math.random()*190,y:30+Math.random()*10,vx:0})}
+  S.ph.forEach(p=>{p.y+=170*dt;if(p.y>=150){p.dead=true;S.cur=Math.min(1,S.cur+.35);S.pe++}});
+  S.ph=S.ph.filter(p=>!p.dead);
+  S.cur=Math.max(0,S.cur-.18*dt);
+  S.el=S.el.map(u=>(u+dt*S.cur*.55)%1);
+ },
+ x=>{
+  sky(x,700,420,'#d7efff','#fff8e0');
+  sun(x,60,50,22);
+  // plastina
+  x.fillStyle='#2a6fb0';x.fillRect(100,150,250,40);T(x,'n-qatlam',225,177,17,'#fff','center');
+  x.fillStyle='#c0482d';x.fillRect(100,190,250,50);T(x,'p-qatlam',225,222,17,'#fff','center');
+  line(x,100,190,350,190,'#ffe44d',3);T(x,'p-n o\'tish',360,195,15,'#12303f');
+  // fotonlar
+  S.ph.forEach(p=>{x.fillStyle='#ffd23f';x.beginPath();x.arc(p.x,p.y,7,0,7);x.fill();line(x,p.x,p.y-24,p.x,p.y-8,'rgba(255,190,0,.6)',3)});
+  T(x,'foton',380,60,16,'#12303f');
+  // sxema
+  const path=[[350,170],[580,170],[580,330],[225,330],[225,240]];
+  x.strokeStyle='#666';x.lineWidth=6;x.beginPath();path.forEach((p,i)=>i?x.lineTo(...p):x.moveTo(...p));x.stroke();
+  const segs=[];let tot=0;for(let i=0;i<4;i++){const a=path[i],b=path[i+1],l=Math.hypot(b[0]-a[0],b[1]-a[1]);segs.push([a,b,l]);tot+=l}
+  S.el.forEach(u=>{let d=u*tot,i=0;while(d>segs[i][2]){d-=segs[i][2];i++}const a=segs[i][0],b=segs[i][1],f=d/segs[i][2];
+    x.fillStyle='#1d4ed8';x.beginPath();x.arc(a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,6,0,7);x.fill();T(x,'−',a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f+5,14,'#fff','center')});
+  // lampochka
+  const g=x.createRadialGradient(580,250,5,580,250,70*S.cur+10);g.addColorStop(0,'rgba(255,240,120,'+(.3+S.cur*.7)+')');g.addColorStop(1,'rgba(255,240,120,0)');
+  x.fillStyle=g;x.beginPath();x.arc(580,250,70*S.cur+10,0,7);x.fill();
+  x.fillStyle='rgba(255,230,80,'+(.2+S.cur*.8)+')';x.beginPath();x.arc(580,250,24,0,7);x.fill();x.strokeStyle='#555';x.lineWidth=3;x.stroke();
+  T(x,'lampochka',580,300,16,'#12303f','center');
+  T(x,'elektronlar (−) sxema bo\'ylab oqadi',350,380,17,'#12303f','center');
+  $('oa3').innerHTML='Yutilgan fotonlar: <b>'+S.pe+'</b> · Tok kuchi darajasi: <b>'+Math.round(S.cur*100)+'%</b>';
+ });
+
+/* ---------- 4-REJA ---------- */
+const OUT=[[30,120],[120,60],[230,40],[300,90],[360,110],[420,150],[470,150],[520,175],[600,190],[640,215],[610,250],[560,250],[530,285],[480,300],[440,340],[400,350],[380,310],[330,300],[300,270],[250,250],[180,230],[120,200],[60,170]];
+const REG=[
+ ["Qoraqalpog'iston",130,130,6.8,1.6,290],["Xorazm",160,208,6.7,1.8,295],["Navoiy",330,170,7.0,2.2,310],["Buxoro",290,245,7.0,2.3,315],
+ ["Qashqadaryo",395,305,7.1,2.6,320],["Surxondaryo",445,335,7.2,2.9,325],["Samarqand",430,250,6.8,2.1,300],["Jizzax",480,222,6.8,2.0,305],
+ ["Sirdaryo",510,195,6.6,1.8,295],["Toshkent",560,158,6.4,1.6,280],["Namangan",595,190,6.2,1.6,285],["Andijon",640,215,6.2,1.7,285],["Farg'ona",600,232,6.3,1.7,285]];
+const STN={"Navoiy":"Navoiy viloyatida 100 MVt quvvatli quyosh elektr stansiyasi bor.","Samarqand":"Samarqand viloyatida 100 MVt quvvatli quyosh elektr stansiyasi bor.","Toshkent":"Parkent tumanida \"Quyosh\" ilmiy-ishlab chiqarish majmuasi va Katta quyosh pechi joylashgan."};
+const PATH=new Path2D();OUT.forEach((p,i)=>i?PATH.lineTo(p[0],p[1]):PATH.moveTo(p[0],p[1]));PATH.closePath();
+const mapC=document.createElement('canvas');mapC.width=700;mapC.height=400;
+function irr(r){return r[4]+(r[3]-r[4])*S.sea/100}
+function buildMap(){
+  const m=mapC.getContext('2d');m.clearRect(0,0,700,400);m.save();m.clip(PATH);
+  for(let y=30;y<360;y+=5)for(let xx=20;xx<660;xx+=5){let best=0,bd=1e9;REG.forEach((r,i)=>{const d=(r[1]-xx)**2+(r[2]-y)**2;if(d<bd){bd=d;best=i}});
+    const v=(irr(REG[best])-1.5)/5.8;m.fillStyle=mixc([255,236,110],[220,40,30],v);m.fillRect(xx,y,5,5)}
+  m.restore();m.strokeStyle='#5b3a00';m.lineWidth=3;m.stroke(PATH);
+}
+function drawMap(x){
+  x.fillStyle='#cfeaff';x.fillRect(0,0,700,400);x.drawImage(mapC,0,0);
+  REG.forEach(r=>T(x,r[0].replace("Qoraqalpog'iston","Qoraqalpog'.").replace('Qashqadaryo','Qashqad.').replace('Surxondaryo','Surxond.'),r[1],r[2],12,'#3a2400','center'));
+}
+function sim4(){
+  buildMap();const x=$('s4').getContext('2d');drawMap(x);
+  if(S.sel!==undefined){const r=REG[S.sel];x.strokeStyle='#023047';x.lineWidth=3;x.beginPath();x.arc(r[1],r[2],16,0,7);x.stroke();
+    $('o4').innerHTML='<b>'+r[0]+'</b><br>Nurlanish ('+(S.sea>=50?'yozga yaqin':'qishga yaqin')+'): <b>'+fmt(irr(r),1)+' kVt·soat/m² kuniga</b><br>Quyoshli kunlar: taxminan <b>'+r[5]+'</b> kun/yil<br>'+(STN[r[0]]||'Bu modelda yirik stansiya ko\'rsatilmagan; uy-joy, maktab, shifoxonalarda kichik tizimlar qo\'llanadi.');}
+  x.fillStyle='rgba(255,255,255,.85)';x.fillRect(20,360,300,30);
+  const gr=x.createLinearGradient(25,0,215,0);gr.addColorStop(0,'rgb(255,236,110)');gr.addColorStop(1,'rgb(220,40,30)');x.fillStyle=gr;x.fillRect(25,366,140,18);
+  T(x,'kam → ko\'p',172,380,14,'#12303f');
+}
+ctrl('c4','sea','Fasl: qish (0) — yoz (100)',0,100,5,100,'',()=>{sim4();ANIMS.a4.draw(ANIMS.a4.x)});
+$('s4').addEventListener('click',e=>{
+  const c=$('s4'),r=c.getBoundingClientRect(),px=(e.clientX-r.left)*700/r.width,py=(e.clientY-r.top)*400/r.height;
+  if(!c.getContext('2d').isPointInPath(PATH,px,py))return;
+  let best=0,bd=1e9;REG.forEach((g,i)=>{const d=(g[1]-px)**2+(g[2]-py)**2;if(d<bd){bd=d;best=i}});S.sel=best;sim4();
+});
+sim4();
+
+const STS=[["Navoiy",345,185,100],["Samarqand",445,265,100]];
+function pw(t){const s=Math.sin(Math.PI*(t-6)/14);return s>0?Math.pow(s,1.2):0}
+ANIMS.a4=new Anim('a4',()=>{S.t4=5},dt=>{S.t4+=dt*1.2;if(S.t4>21)S.t4=5},
+ x=>{
+  drawMap(x);
+  const t=S.t4,f=pw(t),sf=.55+.45*S.sea/100;
+  const ang=Math.PI*(t-5)/16,sx=40+620*(t-5)/16,sy=70-Math.sin(ang)*55;
+  if(f===0){x.fillStyle='rgba(2,30,70,.35)';x.fillRect(0,0,700,400)}
+  sun(x,sx,sy,18);
+  STS.forEach(s=>{const mw=s[3]*f*sf;x.fillStyle='#023047';x.beginPath();x.moveTo(s[1],s[2]-14);x.lineTo(s[1]+12,s[2]+8);x.lineTo(s[1]-12,s[2]+8);x.fill();
+    x.fillStyle='#fff';x.fillRect(s[1]-26,s[2]+12,52,18);T(x,Math.round(mw)+' MVt',s[1],s[2]+26,14,'#023047','center');
+    x.strokeStyle='rgba(255,183,3,'+(f*.9)+')';x.lineWidth=4;x.beginPath();x.arc(s[1],s[2],14+f*10,0,7);x.stroke()});
+  x.fillStyle='#fff';x.beginPath();x.arc(560,158,6,0,7);x.fill();
+  // egri chiziq paneli
+  x.fillStyle='rgba(255,255,255,.92)';x.fillRect(20,290,220,100);x.strokeStyle='#023047';x.lineWidth=1.5;x.strokeRect(20,290,220,100);
+  x.strokeStyle='#FB8500';x.lineWidth=3;x.beginPath();for(let h=5;h<=21;h+=.25){const px=30+200*(h-5)/16,py=375-70*pw(h)*sf;h===5?x.moveTo(px,py):x.lineTo(px,py)}x.stroke();
+  const dx=30+200*(t-5)/16;line(x,dx,300,dx,378,'rgba(2,48,71,.4)',1.5);x.fillStyle='#d62828';x.beginPath();x.arc(dx,375-70*f*sf,6,0,7);x.fill();
+  T(x,'Kunlik quvvat egri chizig\'i',130,306,12,'#023047','center');T(x,'5:00',30,388,11,'#023047');T(x,'21:00',210,388,11,'#023047');
+  const hh=Math.floor(t),mm=Math.floor((t-hh)*60);
+  $('oa4').innerHTML='Soat: <b>'+hh+':'+String(mm).padStart(2,'0')+'</b> · Har bir stansiya quvvati: <b>'+Math.round(100*f*sf)+' MVt</b> (maksimum 100 MVt)';
+ });
+
+/* ---------- 5-REJA ---------- */
+const SRC=[["Quyosh",45,'#FFB703'],["Gaz",490,'#6c8ea4'],["Ko'mir",820,'#333']];
+S.k5=0;
+function sim5(){
+  const x=$('s5').getContext('2d');x.fillStyle='#f4fbff';x.fillRect(0,0,700,400);
+  const E=S.E5,mx=820*E||1;
+  line(x,70,40,70,340,'#555',2);line(x,70,340,680,340,'#555',2);
+  T(x,'CO₂ (tonna)',10,30,16,'#12303f');
+  SRC.forEach((s,i)=>{const v=s[1]*E/1000,h=290*s[1]*E/mx,bx=130+i*190;
+    x.fillStyle=s[2];x.fillRect(bx,340-h,120,h);
+    if(i===S.k5){x.strokeStyle='#d62828';x.lineWidth=4;x.strokeRect(bx-3,340-h-3,126,h+6)}
+    T(x,s[0],bx+60,365,18,'#12303f','center');T(x,fmt(v,1)+' t',bx+60,340-h-10,18,'#12303f','center')});
+  const s=SRC[S.k5],v=s[1]*E/1000,sav=(820-s[1])*E/1000;
+  $('o5').innerHTML='Tanlangan manba: <b>'+s[0]+'</b>, ishlab chiqarish: <b>'+E+' MVt·soat</b><br>CO₂ chiqindisi ≈ <b>'+fmt(v,1)+' tonna</b><br>Ko\'mirga nisbatan kamayish ≈ <b>'+fmt(sav,1)+' tonna</b>';
+}
+ctrl('c5','E5','Ishlab chiqarilgan elektr energiyasi',10,1000,10,100,'MVt·soat',sim5);sim5();
+$('seg5').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.k5=+b.dataset.k;[...$('seg5').children].forEach(k=>k.classList.toggle('on',k===b));sim5()});
+
+ANIMS.a5=new Anim('a5',()=>{S.sm=[];S.co=[0,0];S.t5=0;S.sp5=0},
+ dt=>{S.t5+=dt;S.sp5+=dt;S.co[0]+=45*dt;S.co[1]+=820*dt;
+  while(S.sp5>.09){S.sp5-=.09;S.sm.push({x:535+(Math.random()-.5)*10,y:190,r:8,a:.7,vx:6+Math.random()*10});S.sm.push({x:575+(Math.random()-.5)*10,y:190,r:8,a:.7,vx:6+Math.random()*10})}
+  S.sm.forEach(p=>{p.y-=35*dt;p.x+=p.vx*dt;p.r+=7*dt;p.a-=.1*dt});S.sm=S.sm.filter(p=>p.a>0)},
+ x=>{
+  sky(x,350,400,'#9bd7ff','#e6f6ff');
+  const dark=Math.min(.6,S.t5*.04);
+  const g=x.createLinearGradient(350,0,350,400);g.addColorStop(0,'rgb('+Math.round(155-dark*120)+','+Math.round(215-dark*150)+','+Math.round(255-dark*160)+')');g.addColorStop(1,'rgb('+Math.round(230-dark*150)+','+Math.round(246-dark*170)+','+Math.round(255-dark*170)+')');
+  x.fillStyle=g;x.fillRect(350,0,350,400);
+  x.fillStyle='#4b7f3a';x.fillRect(0,330,700,70);line(x,350,0,350,400,'#fff',4);
+  T(x,'Quyosh energiyasi',175,28,19,'#023047','center');T(x,'Ko\'mir',525,28,19,'#fff','center');
+  sun(x,60,70,20);
+  [[70,170],[150,190],[230,210]].forEach((b,i)=>{x.fillStyle=['#6f8fa3','#8aa6b6','#5e7d92'][i];x.fillRect(b[0],b[1]+30,60,130);for(let r=0;r<4;r++)for(let c=0;c<2;c++){x.fillStyle='#fff3b0';x.fillRect(b[0]+8+c*28,b[1]+42+r*28,20,16)}});
+  x.fillStyle='#14306b';x.save();x.translate(60,310);x.transform(1,0,-.4,1,0,0);x.fillRect(0,-18,90,18);x.fillRect(110,-18,90,18);x.restore();
+  [[400,200],[460,215],[640,205]].forEach((b,i)=>{x.fillStyle='#3e3e48';x.fillRect(b[0],b[1]+30,56,100)});
+  x.fillStyle='#2b2b30';x.fillRect(525,190,22,140);x.fillRect(565,190,22,140);x.fillRect(515,300,80,30);
+  S.sm.forEach(p=>{x.fillStyle='rgba(40,40,45,'+Math.max(0,p.a)+')';x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()});
+  x.fillStyle='rgba(255,255,255,.9)';x.fillRect(20,340,310,50);x.fillRect(370,340,310,50);
+  T(x,'CO₂: '+fmt(S.co[0],0)+' kg',175,372,22,'#2a9d4a','center');T(x,'CO₂: '+fmt(S.co[1],0)+' kg',525,372,22,'#d62828','center');
+  $('oa5').textContent='Modelda har soniya 1 MVt·soat elektr energiya hisoblanadi: quyosh ≈ 45 kg, ko\'mir ≈ 820 kg CO₂.';
+ });
+
+/* ---------- 6-REJA ---------- */
+const PR=[
+ ["Yuzasi 2 m², FIK 18% bo'lgan quyosh paneliga 800 Vt/m² nur tushmoqda. Panel quvvatini toping.",["Berilgan: S = 2 m², η = 0,18, I = 800 Vt/m²","Formula: P = η · S · I","Qo'yamiz: P = 0,18 · 2 · 800","Natija: P = 288 Vt"]],
+ ["Quyosh kollektori 100 kg suvni 20°C dan 60°C gacha isitishi uchun qancha issiqlik kerak?",["Berilgan: m = 100 kg, ΔT = 60 − 20 = 40 °C","c = 4200 J/(kg·°C), Formula: Q = c · m · ΔT","Qo'yamiz: Q = 4200 · 100 · 40","Natija: Q = 16 800 000 J = 16,8 MJ"]],
+ ["2-masalada kollektorning foydali quvvati 960 Vt bo'lsa, suv necha soatda isiydi?",["Berilgan: Q = 16,8 MJ, P = 960 Vt","Formula: t = Q / P","Qo'yamiz: t = 16 800 000 / 960 = 17 500 s","Natija: 17 500 / 3600 ≈ 4,9 soat"]],
+ ["Quvvati 100 MVt bo'lgan quyosh stansiyasi kuniga o'rtacha 6 soat to'liq quvvatda ishlasa, qancha energiya ishlab chiqaradi?",["Berilgan: P = 100 MVt, t = 6 soat","Formula: E = P · t","Qo'yamiz: E = 100 · 6","Natija: E = 600 MVt·soat"]]];
+$('probs').innerHTML=PR.map((p,i)=>'<div class="prob"><b>'+(i+1)+'-masala.</b> '+p[0]+'<div class="btns"><button class="btn alt" data-i="'+i+'">Yechimni ko\'rsat</button></div><div class="sol" id="sol'+i+'">'+p[1].map(s=>'<div>'+s+'</div>').join('')+'</div></div>').join('');
+$('probs').addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(!b)return;const s=$('sol'+b.dataset.i);s.classList.toggle('on');b.textContent=s.classList.contains('on')?'Yechimni yashir':"Yechimni ko'rsat"});
+
+function sim6(){
+  const P=S.e6/100*S.A6*S.G6,Q=4200*S.m6*S.dT6,t=Q/S.Pf6,E=S.Ps6*6;
+  $('o6').innerHTML='Panel quvvati: P = η·S·I = '+fmt(S.e6/100,2)+' · '+S.A6+' · '+S.G6+' = <b>'+fmt(P,0)+' Vt</b><br>'+
+  'Issiqlik: Q = c·m·ΔT = 4200 · '+S.m6+' · '+S.dT6+' = <b>'+fmt(Q/1e6,2)+' MJ</b><br>'+
+  'Isish vaqti: t = Q/P = '+fmt(Q,0)+' / '+S.Pf6+' = <b>'+fmt(t,0)+' s ≈ '+fmt(t/3600,1)+' soat</b><br>'+
+  'Stansiya energiyasi (6 soat): E = '+S.Ps6+' · 6 = <b>'+fmt(E,0)+' MVt·soat</b>';
+}
+ctrl('c6','A6','Panel yuzasi S',1,50,1,2,'m²',sim6);
+ctrl('c6','e6','FIK η',10,25,1,18,'%',sim6);
+ctrl('c6','G6','Nurlanish I',200,1000,50,800,'Vt/m²',sim6);
+ctrl('c6','m6','Suv massasi m',20,200,10,100,'kg',sim6);
+ctrl('c6','dT6','Harorat farqi ΔT',10,70,5,40,'°C',sim6);
+ctrl('c6','Pf6','Kollektor foydali quvvati',300,3000,20,960,'Vt',sim6);
+ctrl('c6','Ps6','Stansiya quvvati',10,200,10,100,'MVt',sim6);sim6();
+
+S.pr=0;S.auto6=false;
+const a6=new Anim('a6',()=>{S.sh=0;S.al=[1,0,0,0,0];S.auto6=false;S.tm6=0},
+ dt=>{
+  if(S.auto6){S.tm6+=dt;if(S.tm6>1.3&&S.sh<4){S.sh++;S.tm6=0}}
+  let busy=false;for(let i=0;i<5;i++){const goal=i<S.sh+1?1:0;if(S.al[i]<goal){S.al[i]=Math.min(goal,S.al[i]+dt*2.2);busy=true}}
+  if(!busy&&!S.auto6)a6.stop();
+ },
+ x=>{
+  x.fillStyle='#fffbf0';x.fillRect(0,0,700,360);
+  const pr=PR[S.pr];
+  x.fillStyle='#FB8500';x.fillRect(0,0,700,46);T(x,(S.pr+1)+'-masala yechimi',350,32,22,'#fff','center');
+  const labels=['Berilgan','Formula','Qo\'yish','Natija'];
+  for(let i=0;i<4;i++){
+    const a=S.al[i+1>4?4:i+1]; // 0-qadam = shart (indeks 0)
+  }
+  // 0-satr: berilgan (har doim)
+  const lines=pr[1];
+  for(let i=0;i<4;i++){
+    const a=S.al[i];if(a<=0)continue;
+    x.globalAlpha=a;
+    const y=100+i*62+(1-a)*24;
+    x.fillStyle=i===3?'#d8f5de':'#fff';x.strokeStyle=i===3?'#2a9d4a':'#ffd27a';x.lineWidth=2;
+    x.beginPath();x.roundRect(20,y-32,660,50,10);x.fill();x.stroke();
+    let size=21;x.font='700 '+size+'px "Trebuchet MS",Arial';while(x.measureText(lines[i]).width>630&&size>11){size--;x.font='700 '+size+'px "Trebuchet MS",Arial'}
+    T(x,lines[i],35,y,size,'#12303f');
+    x.globalAlpha=1;
+  }
+  x.globalAlpha=1;
+  T(x,'Qadam: '+Math.min(4,S.sh+1)+' / 4',350,345,16,'#6c757d','center');
+ });
+ANIMS.a6=a6;
+a6.start=function(){S.auto6=true;Anim.prototype.start.call(this)};
+// next6: avtoyurishsiz bitta qadam
+$('next6').onclick=()=>{if(S.sh<3)S.sh++;S.auto6=false;Anim.prototype.start.call(a6)};
+$('sel6').onchange=e=>{S.pr=+e.target.value;a6.reset()};
+a6.reset();
+
+/* ---------- TEST ---------- */
+const QS=[
+ ["Geliotexnika nima bilan shug'ullanadi?",["Shamol energiyasini o'rganish bilan","Quyosh energiyasini issiqlik va elektr energiyasiga aylantirish va undan foydalanish bilan","Yadro energiyasini olish bilan","Suv oqimi energiyasidan foydalanish bilan"],1,"\"Helios\" — quyosh. Geliotexnika quyosh energiyasidan foydalanishni o'rganadi."],
+ ["Quyosh doimiysi (atmosfera tashqarisida) taxminan qancha?",["136 Vt/m²","1361 Vt/m²","13 610 Vt/m²","500 Vt/m²"],1,"Quyosh doimiysi taxminan 1361 Vt/m²; Yer sirtiga ochiq havoda taxminan 1000 Vt/m² gacha yetadi."],
+ ["Katta quyosh pechi (geliokompleks) O'zbekistonning qaysi hududida joylashgan?",["Navoiy viloyati","Samarqand viloyati","Toshkent viloyati, Parkent tumani","Buxoro viloyati"],2,"\"Quyosh\" ilmiy-ishlab chiqarish majmuasi Parkent tumanida joylashgan."],
+ ["Quyosh kollektorining nur yutuvchi sirti odatda qanday rangda va nima uchun?",["Oq — nurni yaxshi qaytaradi","Qora — nurni yaxshi yutadi","Ko'k — nurni sindiradi","Yashil — nurni o'tkazadi"],1,"Qora sirt nurni yaxshi yutadi, shuning uchun suv tezroq isiydi."],
+ ["Quyosh panellarida asosan qaysi yarimo'tkazgich ishlatiladi?",["Mis","Alyuminiy","Kremniy","Temir"],2,"Fotoelementlar asosan kremniydan tayyorlanadi (ichki fotoeffekt va p-n o'tish)."],
+ ["Yuzasi 2 m², FIK 20% bo'lgan panelga 1000 Vt/m² nur tushsa, quvvat qancha? (P = η·S·I)",["200 Vt","400 Vt","2000 Vt","100 Vt"],1,"P = 0,2 · 2 · 1000 = 400 Vt."],
+ ["10 kg suvni 10°C ga isitish uchun qancha issiqlik kerak? (c = 4200 J/(kg·°C))",["42 kJ","4200 J","420 kJ","4,2 MJ"],2,"Q = 4200 · 10 · 10 = 420 000 J = 420 kJ."],
+ ["O'zbekistonda yiliga taxminan nechta kun quyoshli?",["100 ga yaqin","200 ga yaqin","300 dan ortiq","50 dan kam"],2,"O'zbekistonda yiliga 300 dan ortiq kun quyoshli, shuning uchun potensial katta."],
+ ["Quyosh energiyasining kamchiligi qaysi?",["Zararli gaz chiqaradi","Kechasi va bulutli havoda ishlamaydi yoki kamayadi","Yoqilg'i narxiga bog'liq","Tez tugab qoladi"],1,"Kechasi va bulutli havoda ishlab chiqarish kamayadi, shuning uchun akkumulyator kerak bo'ladi."],
+ ["Quvvati 100 MVt bo'lgan stansiya kuniga 6 soat to'liq quvvatda ishlasa, qancha energiya ishlab chiqaradi?",["16 MVt·soat","106 MVt·soat","600 MVt·soat","60 MVt·soat"],2,"E = P·t = 100 · 6 = 600 MVt·soat."]];
+let qi=0,sc=0,locked=false;
+function renderQ(){
+  const box=$('testbox');
+  if(qi>=QS.length){const pc=Math.round(sc/QS.length*100);
+    box.innerHTML='<div class="score">Natija: '+sc+' / '+QS.length+' ball ('+pc+'%)<br><span style="font-size:20px">'+(pc>=80?'Ajoyib!':pc>=60?'Yaxshi, yana takrorlang.':'Mavzuni qayta o\'qib chiqing.')+'</span></div><div class="btns" style="justify-content:center"><button class="btn" id="rs">Qayta boshlash</button></div>';
+    $('rs').onclick=()=>{qi=0;sc=0;renderQ()};return}
+  const q=QS[qi];locked=false;
+  box.innerHTML='<div class="prog"><i style="width:'+(qi/QS.length*100)+'%"></i></div><div>Savol '+(qi+1)+' / '+QS.length+' · Ball: '+sc+'</div><div class="q">'+q[0]+'</div>'+
+   q[1].map((o,i)=>'<button class="opt" data-i="'+i+'"><b>'+'abcd'[i]+')</b> '+o+'</button>').join('')+'<div class="exp" id="exp"></div><div class="btns"><button class="btn" id="nx" style="display:none">'+(qi===QS.length-1?'Natijani ko\'rish':'Keyingi savol')+'</button></div>';
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(locked)return;locked=true;const i=+b.dataset.i;
+    box.querySelectorAll('.opt').forEach(o=>{o.disabled=true;if(+o.dataset.i===q[2])o.classList.add('right')});
+    if(i===q[2])sc++;else b.classList.add('wrong');
+    const e=$('exp');e.style.display='block';e.innerHTML=(i===q[2]?'<b>To\'g\'ri!</b> ':'<b>Noto\'g\'ri.</b> To\'g\'ri javob: '+'abcd'[q[2]]+'). ')+q[3];
+    $('nx').style.display='inline-block';
+  });
+  $('nx').onclick=()=>{qi++;renderQ()};
+}
+renderQ();
+
+show(0);
+</script>
+</body>
+</html>

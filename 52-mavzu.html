@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>52-mavzu: Masalalar yechish — yupqa linza</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#1e293b;--mut:#64748b;--pri:#2563eb;--red:#dc2626;--line:#e2e8f0;--ok:#16a34a}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:14px}
+h1{font-size:clamp(1.2rem,4.5vw,1.8rem);margin:6px 0 2px}
+.sub{color:var(--mut);margin:0 0 12px;font-size:.95rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px;box-shadow:0 2px 8px rgba(30,41,59,.05)}
+.card h2{font-size:1.05rem;margin:0 0 8px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tab{border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:8px 16px;font-size:1rem;font-weight:600;cursor:pointer}
+.tab.active{background:var(--pri);border-color:var(--pri);color:#fff;box-shadow:0 3px 10px rgba(37,99,235,.35)}
+.tag{display:inline-block;background:#eff6ff;color:var(--pri);border-radius:8px;padding:2px 10px;font-weight:600;font-size:.85rem;margin-bottom:6px}
+.box{background:#f8fafc;border-left:4px solid var(--pri);border-radius:8px;padding:8px 12px;margin:6px 0}
+.box.ans{border-color:var(--ok);background:#f0fdf4}
+ol{margin:6px 0;padding-left:22px}
+li{margin:4px 0}
+canvas{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:12px}
+.row{display:flex;gap:10px 18px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.sl{flex:1 1 220px}
+.sl label{display:flex;justify-content:space-between;font-weight:600;font-size:.92rem}
+.sl input[type=range]{width:100%}
+button.b{border:none;border-radius:10px;padding:9px 14px;font-size:.95rem;font-weight:600;cursor:pointer;background:var(--pri);color:#fff}
+button.b.sec{background:#e2e8f0;color:var(--ink)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}
+.res div{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:.9rem}
+.res b{display:block;font-size:1.05rem}
+.stage{margin-top:10px;padding:10px 12px;border-radius:10px;background:#fffbeb;border:1px solid #fde68a;min-height:44px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--mut);margin-top:6px}
+.legend i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:4px}
+input[type=text]{padding:9px 12px;font-size:1rem;border:2px solid var(--line);border-radius:10px;width:140px}
+#msg{font-weight:700;margin-top:8px;min-height:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>52-mavzu: Masalalar yechish</h1>
+  <p class="sub">Yupqa linza yordamida tasvir yasash · 9-sinf fizika</p>
+
+  <div class="tabs" id="tabs"></div>
+
+  <!-- Masala matni va yechimi -->
+  <div class="card" id="problem">
+    <span class="tag" id="ptag"></span>
+    <div class="box"><b>Berilgan:</b> <span id="pgiven"></span></div>
+    <div class="box"><b>Topish kerak:</b> <span id="pfind"></span></div>
+    <h2 style="margin-top:10px">Yechish</h2>
+    <ol id="psteps"></ol>
+    <div class="box ans"><b>Javob:</b> <span id="pans"></span></div>
+    <div class="box ans" style="margin-top:6px"><b>Tasvir xususiyatlari:</b> <span id="pprop"></span></div>
+  </div>
+
+  <!-- Simulyatsiya va animatsiya -->
+  <div class="card">
+    <h2>Simulyatsiya va nur yo'li</h2>
+    <canvas id="cv"></canvas>
+    <div class="legend">
+      <span><i style="background:#2563eb"></i>Jism</span>
+      <span><i style="background:#dc2626"></i>Tasvir</span>
+      <span><i style="background:#16a34a"></i>1-nur</span>
+      <span><i style="background:#f59e0b"></i>2-nur</span>
+      <span><i style="background:#9333ea"></i>3-nur</span>
+      <span>Punktir — mavhum (davom) chiziqlar</span>
+    </div>
+
+    <div class="row">
+      <div class="sl"><label>Jism masofasi d: <span id="dv"></span></label>
+        <input type="range" id="sd" min="2" max="60" step="0.5"></div>
+      <div class="sl"><label>Fokus masofasi F: <span id="Fv"></span></label>
+        <input type="range" id="sF" min="5" max="40" step="1"></div>
+      <button class="b sec" id="reset">Qayta o'rnatish</button>
+    </div>
+
+    <div class="res">
+      <div>f<b id="rf">—</b></div>
+      <div>Γ = |f|/d<b id="rG">—</b></div>
+      <div>H<b id="rH">—</b></div>
+      <div>D = 1/F<b id="rD">—</b></div>
+      <div>Tasvir<b id="rP">—</b></div>
+    </div>
+
+    <h2 style="margin-top:14px">Animatsiya</h2>
+    <div class="row" style="margin-top:0">
+      <button class="b" id="bStart">Nur yo'lini yasash — Boshlash</button>
+      <button class="b sec" id="bPause">Pauza</button>
+      <button class="b sec" id="bRestart">Qayta boshlash</button>
+      <div class="sl" style="max-width:240px"><label>Tezlik: <span id="spv">1×</span></label>
+        <input type="range" id="sp" min="0.4" max="3" step="0.1" value="1"></div>
+    </div>
+    <div class="stage" id="stage">Slayderlarni suring yoki «Boshlash» tugmasini bosing.</div>
+  </div>
+
+  <!-- Tekshir -->
+  <div class="card">
+    <h2>Tekshir</h2>
+    <div class="row" style="margin-top:0">
+      <label for="ans" id="chkLabel" style="font-weight:600"></label>
+      <input type="text" id="ans" inputmode="decimal" placeholder="Javob">
+      <button class="b" id="chk">Tekshirish</button>
+    </div>
+    <div id="msg"></div>
+  </div>
+</div>
+
+<script>
+/* ============ 1. MASALALAR MA'LUMOTLARI ============ */
+const P = [
+ {tag:"Yig'uvchi linza, d > 2F", sign:1, F:10, d:30, h:6,
+  given:"F = 10 sm, d = 30 sm, h = 6 sm",
+  find:"f, Γ, H va tasvir turi",
+  steps:["Linza formulasi: 1/F = 1/d + 1/f, bundan 1/f = 1/F − 1/d",
+         "1/f = 1/10 − 1/30 = 3/30 − 1/30 = 2/30 = 1/15 → f = 15 sm",
+         "Γ = f/d = 15/30 = 0,5",
+         "H = Γ·h = 0,5 · 6 = 3 sm",
+         "f > 0 → tasvir haqiqiy va teskari; Γ < 1 → kichraygan"],
+  ans:"f = 15 sm, Γ = 0,5, H = 3 sm", prop:"haqiqiy, teskari, kichraygan",
+  chk:{label:"f ni kiriting (sm):", val:15}},
+ {tag:"Yig'uvchi linza, d = 2F", sign:1, F:10, d:20, h:4,
+  given:"F = 10 sm, d = 20 sm, h = 4 sm",
+  find:"f, Γ, H va tasvir turi",
+  steps:["1/f = 1/F − 1/d = 1/10 − 1/20 = 2/20 − 1/20 = 1/20 → f = 20 sm",
+         "Γ = f/d = 20/20 = 1",
+         "H = Γ·h = 1 · 4 = 4 sm",
+         "f > 0 → haqiqiy va teskari; Γ = 1 → jism bilan teng o'lchamli"],
+  ans:"f = 20 sm, Γ = 1, H = 4 sm", prop:"haqiqiy, teskari, teng o'lchamli",
+  chk:{label:"f ni kiriting (sm):", val:20}},
+ {tag:"Yig'uvchi linza, d < F (lupa)", sign:1, F:10, d:5, h:3,
+  given:"F = 10 sm, d = 5 sm, h = 3 sm",
+  find:"f, Γ, H va tasvir turi",
+  steps:["1/f = 1/F − 1/d = 1/10 − 1/5 = 1/10 − 2/10 = −1/10 → f = −10 sm",
+         "Γ = |f|/d = 10/5 = 2",
+         "H = Γ·h = 2 · 3 = 6 sm",
+         "f < 0 → tasvir mavhum va to'g'ri; Γ > 1 → kattalashgan"],
+  ans:"f = −10 sm, Γ = 2, H = 6 sm", prop:"mavhum, to'g'ri, kattalashgan",
+  chk:{label:"f ni kiriting (sm):", val:-10}},
+ {tag:"Sochuvchi linza", sign:-1, F:15, d:30, h:9,
+  given:"F = −15 sm (sochuvchi linza), d = 30 sm, h = 9 sm",
+  find:"f, Γ, H va tasvir turi",
+  steps:["1/f = 1/F − 1/d = −1/15 − 1/30 = −2/30 − 1/30 = −3/30 = −1/10 → f = −10 sm",
+         "Γ = |f|/d = 10/30 = 1/3",
+         "H = Γ·h = (1/3) · 9 = 3 sm",
+         "f < 0 → mavhum va to'g'ri; Γ < 1 → kichraygan"],
+  ans:"f = −10 sm, Γ = 1/3, H = 3 sm", prop:"mavhum, to'g'ri, kichraygan",
+  chk:{label:"f ni kiriting (sm):", val:-10}},
+ {tag:"F va D ni topish", sign:1, F:20, d:30, h:5,
+  given:"d = 30 sm, f = 60 sm (haqiqiy tasvir), h = 5 sm",
+  find:"F, D, Γ, H",
+  steps:["1/F = 1/d + 1/f = 1/30 + 1/60 = 2/60 + 1/60 = 3/60 = 1/20 → F = 20 sm",
+         "D = 1/F = 1/0,2 m = 5 dptr (F = 20 sm = 0,2 m)",
+         "Γ = f/d = 60/30 = 2",
+         "H = Γ·h = 2 · 5 = 10 sm",
+         "f > 0 → haqiqiy va teskari; Γ > 1 → kattalashgan"],
+  ans:"F = 20 sm, D = 5 dptr, Γ = 2, H = 10 sm", prop:"haqiqiy, teskari, kattalashgan",
+  chk:{label:"F ni kiriting (sm):", val:20}}
+];
+
+/* ============ 2. HOLAT ============ */
+const $ = id => document.getElementById(id);
+const cv = $("cv"), ctx = cv.getContext("2d");
+let cur = 0, sign = 1, d = 30, Fabs = 10, h = 6;
+let mode = "static";      // "static" — hamma nur ko'rinadi; "anim" — bosqichma-bosqich
+let t = 0, playing = false, speed = 1;
+let W = 800, H = 400, S = 6;     // canvas o'lchami va masshtab (px/sm)
+
+/* ============ 3. MASALANI YUKLASH ============ */
+function buildTabs(){
+  $("tabs").innerHTML = "";
+  P.forEach((p,i)=>{
+    const b = document.createElement("button");
+    b.className = "tab"; b.textContent = (i+1) + "-masala";
+    b.onclick = () => load(i);
+    $("tabs").appendChild(b);
+  });
+}
+function load(i){
+  cur = i; const p = P[i];
+  document.querySelectorAll(".tab").forEach((b,k)=>b.classList.toggle("active",k===i));
+  $("ptag").textContent = (i+1) + "-masala · " + p.tag;
+  $("pgiven").textContent = p.given;
+  $("pfind").textContent = p.find;
+  $("psteps").innerHTML = p.steps.map(s=>"<li>"+s+"</li>").join("");
+  $("pans").textContent = p.ans;
+  $("pprop").textContent = p.prop;
+  $("chkLabel").textContent = p.chk.label;
+  $("ans").value = ""; $("msg").textContent = "";
+  resetSim();
+}
+function resetSim(){
+  const p = P[cur];
+  sign = p.sign; d = p.d; Fabs = p.F; h = p.h;
+  $("sd").value = d; $("sF").value = Fabs;
+  mode = "static"; t = 0; playing = false;
+  $("stage").textContent = "Slayderlarni suring yoki «Boshlash» tugmasini bosing.";
+  update();
+}
+
+/* ============ 4. HISOBLASH ============ */
+function calc(){
+  const F = sign * Fabs;
+  const inf = Math.abs(d - F) < 1e-9;           // d = F: tasvir cheksizlikda
+  const f = inf ? Infinity : d * F / (d - F);   // 1/F = 1/d + 1/f
+  const G = inf ? Infinity : Math.abs(f) / d;
+  const Hi = G * h;
+  const yi = inf ? 0 : -h * f / d;              // tasvir balandligi (ishorali)
+  const real = !inf && f > 0;
+  return {F, f, G, Hi, yi, inf, real, virt: !inf && f < 0};
+}
+const fmt = (x,n=2) => (Math.round(x*Math.pow(10,n))/Math.pow(10,n)).toString().replace(".",",");
+
+function update(){
+  const c = calc();
+  $("dv").textContent = fmt(d,1) + " sm";
+  $("Fv").textContent = (sign<0?"−":"") + Fabs + " sm";
+  if(c.inf){
+    ["rf","rG","rH"].forEach(k=>$(k).textContent="∞");
+    $("rP").textContent = "hosil bo'lmaydi";
+  } else {
+    $("rf").textContent = fmt(c.f) + " sm";
+    $("rG").textContent = fmt(c.G);
+    $("rH").textContent = fmt(c.Hi) + " sm";
+    const a = c.real ? "haqiqiy, teskari, " : "mavhum, to'g'ri, ";
+    const b = Math.abs(c.G-1)<0.005 ? "teng o'lchamli" : (c.G>1 ? "kattalashgan" : "kichraygan");
+    $("rP").textContent = a + b;
+  }
+  $("rD").textContent = fmt(100 / c.F) + " dptr";
+}
+
+/* ============ 5. NURLAR (sm koordinatalarida) ============ */
+// Sg(x1,y1,x2,y2,dash) — kesma; dash=1 bo'lsa punktir
+const Sg = (x1,y1,x2,y2,dash) => ({x1,y1,x2,y2,dash,len:Math.hypot(x2-x1,y2-y1)*S});
+function buildRays(c){
+  const xr = W/2/S + 2, F = c.F, f = c.f, yi = c.yi;
+  const R1 = [Sg(-d,h,0,h,0), Sg(0,h,xr,h*(1-xr/F),0)];            // o'qqa parallel nur → fokus
+  if(c.virt) R1.push(Sg(0,h, F<0 ? F : f, F<0 ? 0 : yi, 1));       // davomi (punktir)
+  const R2 = [Sg(-d,h,xr,-(h/d)*xr,0)];                            // markazdan o'tuvchi nur
+  if(c.virt && Math.abs(f)>d) R2.push(Sg(-d,h,f,yi,1));
+  const rays = [R1,R2];
+  if(!c.inf){
+    const y3 = -h*F/(d-F);                                         // linzadagi balandlik
+    const R3 = [Sg(-d,h,0,y3,0), Sg(0,y3,xr,y3,0)];                // fokus orqali → o'qqa parallel
+    if(c.virt) R3.push(Sg(0,y3,f,y3,1));
+    if(F>0 && d<F) R3.push(Sg(-d,h,-F,0,1));
+    if(F<0) R3.push(Sg(0,y3,-F,0,1));
+    rays.push(R3);
+  }
+  return rays;
+}
+
+/* ============ 6. CHIZISH ============ */
+const X = x => W/2 + x*S, Y = y => H/2 - y*S;
+function line(x1,y1,x2,y2,col,w,dash){
+  ctx.beginPath(); ctx.setLineDash(dash?[6,5]:[]); ctx.strokeStyle = col; ctx.lineWidth = w;
+  ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.setLineDash([]);
+}
+function drawRay(segs,frac,col){
+  let total = segs.reduce((a,s)=>a+s.len,0), target = frac*total;
+  for(const s of segs){
+    if(target<=0) break;
+    const l = Math.min(s.len,target), k = s.len>0 ? l/s.len : 0;
+    line(X(s.x1),Y(s.y1), X(s.x1+(s.x2-s.x1)*k), Y(s.y1+(s.y2-s.y1)*k), col, 2, s.dash);
+    target -= l;
+  }
+}
+function arrow(x,y0,y1,col,dash,alpha){
+  ctx.globalAlpha = alpha;
+  line(x,y0,x,y1,col,3,dash);
+  if(Math.abs(y1-y0)>4){
+    const dir = y1<y0 ? -1 : 1;
+    ctx.fillStyle = col; ctx.beginPath();
+    ctx.moveTo(x,y1); ctx.lineTo(x-6,y1-dir*11); ctx.lineTo(x+6,y1-dir*11); ctx.closePath(); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+function text(s,x,y,col,size,align){
+  ctx.fillStyle = col; ctx.font = (size||13)+"px system-ui,sans-serif"; ctx.textAlign = align||"center"; ctx.fillText(s,x,y);
+}
+function drawLens(){
+  const cx = W/2, cy = H/2, lh = H*0.4;
+  ctx.fillStyle = "rgba(147,197,253,.45)"; ctx.strokeStyle = "#1d4ed8"; ctx.lineWidth = 2;
+  ctx.beginPath();
+  if(sign>0){        // yig'uvchi — o'rtasi qalin
+    ctx.moveTo(cx,cy-lh); ctx.quadraticCurveTo(cx+16,cy,cx,cy+lh); ctx.quadraticCurveTo(cx-16,cy,cx,cy-lh);
+  } else {           // sochuvchi — o'rtasi ingichka
+    ctx.moveTo(cx-12,cy-lh); ctx.lineTo(cx+12,cy-lh); ctx.quadraticCurveTo(cx+3,cy,cx+12,cy+lh);
+    ctx.lineTo(cx-12,cy+lh); ctx.quadraticCurveTo(cx-3,cy,cx-12,cy-lh);
+  }
+  ctx.fill(); ctx.stroke();
+  // uchlaridagi strelkalar: yig'uvchi — tashqariga, sochuvchi — ichkariga
+  ctx.fillStyle = "#1d4ed8";
+  [-1,1].forEach(k=>{
+    const y = cy + k*lh, dir = sign>0 ? k : -k;
+    ctx.beginPath(); ctx.moveTo(cx, y+dir*(sign>0?10:-2));
+    ctx.lineTo(cx-6, y+dir*(sign>0?-2:10)); ctx.lineTo(cx+6, y+dir*(sign>0?-2:10)); ctx.closePath(); ctx.fill();
+  });
+  text(sign>0?"Yig'uvchi linza":"Sochuvchi linza", cx, cy-lh-8, "#1d4ed8", 12);
+}
+function draw(){
+  const c = calc(), cx = W/2, cy = H/2;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "#fff"; ctx.fillRect(0,0,W,H);
+
+  // bosh optik o'q va 10 sm lik belgilar
+  line(0,cy,W,cy,"#94a3b8",1.5);
+  for(let k=-60;k<=60;k+=10){ if(k===0) continue;
+    line(X(k),cy-3,X(k),cy+3,"#cbd5e1",1);
+  }
+  text("bosh optik o'q", W-62, cy-8, "#94a3b8", 11);
+
+  drawLens();
+
+  // F va 2F nuqtalari (ikkala tomonda)
+  [-2,-1,1,2].forEach(k=>{
+    const x = X(k*Fabs);
+    ctx.fillStyle = "#0f172a"; ctx.beginPath(); ctx.arc(x,cy,3.5,0,7); ctx.fill();
+    text(Math.abs(k)===2?"2F":"F", x, cy+20, "#0f172a", 13);
+  });
+
+  // animatsiya bosqichlari
+  const rays = buildRays(c), n = rays.length;
+  const tt = mode==="static" ? n+1 : t;
+  const cols = ["#16a34a","#f59e0b","#9333ea"];
+  rays.forEach((r,i)=>drawRay(r, Math.max(0,Math.min(1,tt-i)), cols[i]));
+
+  // jism (ko'k)
+  arrow(X(-d),cy,Y(h),"#2563eb",false,1);
+  text("jism", X(-d), Y(h)-12, "#2563eb", 12);
+
+  // tasvir (qizil) — barcha nurlar chizilgach paydo bo'ladi
+  const a = Math.max(0,Math.min(1,tt-n));
+  if(!c.inf && a>0 && Math.abs(c.f)*S < 3000){
+    arrow(X(c.f),cy,Y(c.yi),"#dc2626",c.virt,a);
+    ctx.globalAlpha = a;
+    text(c.virt?"mavhum tasvir":"tasvir", X(c.f), Y(c.yi)+(c.yi>=0?-12:20), "#dc2626", 12);
+    ctx.globalAlpha = 1;
+  }
+
+  // bosqich izohi
+  if(mode==="anim"){
+    const st = Math.min(Math.floor(tt), n);
+    const txt = [
+      sign>0 ? "1-nur: jism uchidan bosh optik o'qqa parallel nur linzadan o'tgach fokus (F) orqali o'tadi."
+             : "1-nur: o'qqa parallel nur linzadan keyin sinib tarqaladi; uning davomi (punktir) fokusdan chiqqandek bo'ladi.",
+      "2-nur: linza markazi orqali o'tuvchi nur sinmaydi, to'g'ri chiziq bo'ylab davom etadi.",
+      "3-nur: oldingi fokus orqali o'tuvchi nur linzadan keyin bosh optik o'qqa parallel bo'ladi.",
+      c.real ? "Nurlar kesishgan nuqtada HAQIQIY, TESKARI tasvir hosil bo'ldi."
+             : "Nurlarning davomlari (punktir) kesishgan nuqtada MAVHUM, TO'G'RI tasvir hosil bo'ldi."
+    ];
+    let s;
+    if(c.inf && st>=2) s = "d = F: nurlar linzadan keyin parallel chiqadi — tasvir hosil bo'lmaydi (cheksizlikda).";
+    else s = txt[Math.min(st,3)];
+    if($("stage").textContent !== s) $("stage").textContent = s;
+  }
+}
+
+/* ============ 7. ASOSIY SIKL ============ */
+let last = 0;
+function loop(ts){
+  const dt = Math.min(0.1,(ts-last)/1000); last = ts;
+  if(mode==="anim" && playing){
+    const n = calc().inf ? 2 : 3;
+    t += dt*speed*0.6;                  // 1 bosqich ≈ 1,7 s / tezlik
+    if(t >= n+1){ t = n+1; playing = false; }
+  }
+  draw(); requestAnimationFrame(loop);
+}
+
+/* ============ 8. O'LCHAMNI MOSLASH ============ */
+function resize(){
+  const w = Math.max(300, cv.parentElement.clientWidth - 28);
+  const dpr = window.devicePixelRatio || 1;
+  W = w; H = w < 520 ? 300 : 400;
+  S = (W/2 - 12) / 62;                  // d = 60 sm gacha sig'adi
+  cv.width = W*dpr; cv.height = H*dpr;
+  cv.style.height = H + "px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener("resize", resize);
+
+/* ============ 9. HODISALAR ============ */
+$("sd").oninput = e => { d = +e.target.value; update(); };
+$("sF").oninput = e => { Fabs = +e.target.value; update(); };
+$("reset").onclick = resetSim;
+$("sp").oninput = e => { speed = +e.target.value; $("spv").textContent = fmt(speed,1)+"×"; };
+$("bStart").onclick = () => {
+  const n = calc().inf ? 2 : 3;
+  if(mode!=="anim" || t>=n+1) t = 0;
+  mode = "anim"; playing = true;
+};
+$("bPause").onclick = () => { playing = false; };
+$("bRestart").onclick = () => { t = 0; mode = "anim"; playing = true; };
+
+// Tekshir: o'quvchi javobini solishtirish (vergul ham, nuqta ham qabul)
+function check(){
+  const v = parseFloat($("ans").value.replace(",",".").replace("−","-"));
+  const m = $("msg");
+  if(isNaN(v)){ m.style.color = "#b45309"; m.textContent = "Iltimos, son kiriting."; return; }
+  if(Math.abs(v - P[cur].chk.val) <= 0.05){
+    m.style.color = "#16a34a"; m.textContent = "✔ To'g'ri!";
+  } else {
+    m.style.color = "#dc2626"; m.textContent = "✘ Noto'g'ri, qayta urinib ko'ring.";
+  }
+}
+$("chk").onclick = check;
+$("ans").addEventListener("keydown", e => { if(e.key==="Enter") check(); });
+
+/* ============ 10. BOSHLASH ============ */
+buildTabs();
+resize();
+load(0);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
