@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>59-mavzu: Fizika va texnika taraqqiyoti</title>
+<style>
+/* ===== Ranglar (yorugʻ / qorongʻi) ===== */
+:root{--bg:#f4f7fb;--card:#fff;--fg:#14213d;--mut:#5b6b85;--ac:#2563eb;--ac2:#f59e0b;--ok:#16a34a;--bad:#dc2626;--bd:#dbe3ef;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1424;--card:#16203a;--fg:#e8eefc;--mut:#9fb0d0;--ac:#60a5fa;--ac2:#fbbf24;--ok:#4ade80;--bad:#f87171;--bd:#2a3858}}
+:root[data-theme="dark"]{--bg:#0d1424;--card:#16203a;--fg:#e8eefc;--mut:#9fb0d0;--ac:#60a5fa;--ac2:#fbbf24;--ok:#4ade80;--bad:#f87171;--bd:#2a3858}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:16px;text-align:center;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff}
+header h1{margin:0;font-size:1.25rem}header p{margin:4px 0 0;opacity:.9;font-size:.9rem}
+#theme{margin-top:8px;background:#ffffff33;color:#fff;border:0;border-radius:20px;padding:8px 16px;font-size:.9rem}
+nav{display:flex;gap:8px;overflow-x:auto;padding:10px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;border-bottom:1px solid var(--bd)}
+nav button{flex:0 0 auto;padding:12px 16px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--fg);font-size:.95rem;font-weight:600}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+main{max-width:860px;margin:0 auto;padding:14px}
+section{display:none}section.on{display:block}
+h2{font-size:1.2rem;margin:.2em 0 .5em}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin:12px 0}
+.card h3{margin:0 0 8px;font-size:1rem;color:var(--ac)}
+canvas{width:100%;height:auto;display:block;border-radius:12px;background:var(--bg)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.btns button,.big{min-height:48px;padding:10px 16px;border-radius:12px;border:2px solid var(--ac);background:var(--card);color:var(--fg);font-size:1rem;font-weight:600}
+.btns button.on{background:var(--ac);color:#fff}
+.big{background:var(--ac);color:#fff;width:100%}
+.out{background:var(--bg);border-left:4px solid var(--ac2);padding:10px 12px;border-radius:8px;margin-top:8px}
+label.sl{display:block;margin:10px 0 2px;font-weight:600}
+input[type=range]{width:100%;height:36px;accent-color:var(--ac)}
+.bar{height:22px;border-radius:11px;background:var(--bg);overflow:hidden;border:1px solid var(--bd)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac2),var(--ok));width:0}
+svg text{fill:var(--fg);font-size:11px}
+.pt{cursor:pointer;fill:var(--ac2);stroke:var(--fg);stroke-width:1.5}
+.q{padding:10px 0;border-bottom:1px solid var(--bd)}
+.q label{display:block;padding:12px;margin:6px 0;border:2px solid var(--bd);border-radius:12px;cursor:pointer}
+.q label.ok{border-color:var(--ok);background:#16a34a22}.q label.no{border-color:var(--bad);background:#dc262622}
+.q input{margin-right:8px;transform:scale(1.3)}
+#score{font-size:1.2rem;font-weight:700;text-align:center;margin:12px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>59-mavzu. Fizika va texnika taraqqiyoti</h1>
+  <p>Oʻzbekistonda fizika sohasidagi tadqiqotlar · 9-sinf</p>
+  <button id="theme">🌓 Rejimni almashtirish</button>
+</header>
+<nav id="tabs"></nav>
+<main>
+
+<!-- 1-REJA -->
+<section id="s1"><h2>1. Fizika va texnika oʻrtasidagi bogʻliqlik</h2>
+<div class="card"><p>Fizika tabiat qonunlarini oʻrganadi, texnika esa bu qonunlarni amalda qoʻllaydi. Yoʻl quyidagicha: <b>kashfiyot → qonun → qurilma → sanoat → hayotdagi oʻzgarish</b>.</p></div>
+<div class="card"><h3>Simulyatsiya: Kashfiyotdan qurilmagacha</h3>
+<div class="btns" id="b1"></div><div class="out" id="o1">Bosqichni tanlang.</div></div>
+<div class="card"><h3>Animatsiya: hodisa → qurilma</h3><canvas id="c1" width="640" height="280"></canvas></div></section>
+
+<!-- 2-REJA -->
+<section id="s2"><h2>2. Texnika taraqqiyotini belgilagan kashfiyotlar</h2>
+<div class="card"><p><b>Bugʻ mashinasi</b> (issiqlik fizikasi, 1-sanoat inqilobi); <b>elektromagnit induksiya</b> (Faradey, generator va elektr energetikasi); <b>yarimoʻtkazgichlar va tranzistor</b> (kompyuter, telefon); <b>lazer va optik tolalar</b> (aloqa, tibbiyot).</p></div>
+<div class="card"><h3>Simulyatsiya: vaqt chizigʻi</h3><div class="btns" id="b2"></div><div class="out" id="o2">Kashfiyotni tanlang.</div></div>
+<div class="card"><h3>Animatsiya: generator rotori va lampochka</h3><canvas id="c2" width="640" height="280"></canvas></div></section>
+
+<!-- 3-REJA -->
+<section id="s3"><h2>3. Oʻzbekistonda fizika va astronomiya tarixi</h2>
+<div class="card"><p><b>Xorazmiy</b> — algebra va astronomik jadvallar muallifi. <b>Beruniy</b> — Yer radiusini oʻlchagan. <b>Ibn Sino</b> — optika va harakat haqida fikrlar bildirgan. <b>Mirzo Ulugʻbek</b> — Samarqand rasadxonasini qurdi (yirik sekstant), “Ziji jadidi Koragoniy” yulduzlar jadvalida <b>1018</b> yulduz bor.</p></div>
+<div class="card"><h3>Simulyatsiya: Beruniy usuli bilan Yer radiusi</h3>
+<p>Formula: <b>R = h·cosθ / (1 − cosθ)</b>, h — togʻ balandligi, θ — gorizont chizigʻining pastga ogʻish burchagi. (Oʻquv misoli, qiymatlar tanlanadi.)</p>
+<label class="sl">Togʻ balandligi h: <span id="hv"></span> m</label><input type="range" id="h3" min="100" max="1000" step="10" value="500">
+<label class="sl">Gorizont burchagi θ: <span id="tv"></span>°</label><input type="range" id="t3" min="0.30" max="1.20" step="0.01" value="0.72">
+<div class="out" id="o3"></div></div>
+<div class="card"><h3>Animatsiya: sekstant orqali yulduz kuzatish</h3><canvas id="c3" width="640" height="280"></canvas></div></section>
+
+<!-- 4-REJA -->
+<section id="s4"><h2>4. Zamonaviy fizika ilmiy markazlari</h2>
+<div class="card"><p>Fanlar akademiyasi <b>Yadro fizikasi instituti</b> (Toshkent, Ulugʻbek shaharchasi) tadqiqot yadro reaktori va izotoplar bilan ishlaydi. <b>“Fizika–Quyosh”</b> ilmiy-ishlab chiqarish birlashmasi Parkentdagi <b>Katta quyosh pechi</b> bilan materialshunoslikda tadqiqot olib boradi. Yarimoʻtkazgichlar, ion-plazma va lazer texnologiyalari boʻyicha institutlar ham bor.</p></div>
+<div class="card"><h3>Simulyatsiya: sxematik xarita (nuqtani bosing)</h3>
+<svg viewBox="0 0 400 240" width="100%"><polygon points="20,100 90,65 170,75 230,45 290,60 375,105 330,135 285,150 330,190 250,215 200,185 120,175 60,145" fill="var(--bg)" stroke="var(--ac)" stroke-width="2"/>
+<circle class="pt" data-k="0" cx="290" cy="95" r="11"/><text x="205" y="99">Toshkent</text>
+<circle class="pt" data-k="1" cx="318" cy="108" r="11"/><text x="333" y="123">Parkent</text>
+<circle class="pt" data-k="2" cx="268" cy="118" r="11"/><text x="195" y="135">Institutlar</text></svg>
+<div class="out" id="o4">Xaritadagi nuqtani bosing.</div></div>
+<div class="card"><h3>Animatsiya: geliostatlar nurni fokusga yigʻadi</h3><canvas id="c4" width="640" height="280"></canvas></div></section>
+
+<!-- 5-REJA -->
+<section id="s5"><h2>5. Fizika yutuqlarining amaliy qoʻllanishi</h2>
+<div class="card"><p>Quyosh energiyasi, yadro tibbiyoti (izotoplar), lazer texnologiyalari, yangi materiallar va yarimoʻtkazgichli asboblar kundalik hayotda keng qoʻllanadi.</p></div>
+<div class="card"><h3>Simulyatsiya 1: quyosh paneli</h3>
+<label class="sl">Panel qiyaligi: <span id="bv"></span>°</label><input type="range" id="tilt" min="0" max="90" value="30">
+<label class="sl">Quyosh balandligi: <span id="ev"></span>°</label><input type="range" id="sun" min="10" max="90" value="60">
+<div class="bar"><i id="pb"></i></div><div class="out" id="o5"></div></div>
+<div class="card"><h3>Simulyatsiya 2: yarim yemirilish davri</h3>
+<label class="sl">Vaqt: <span id="hlv"></span> T (T — yarim yemirilish davri)</label><input type="range" id="hl" min="0" max="5" step="0.1" value="0">
+<canvas id="c5b" width="640" height="200"></canvas><div class="out" id="o5b"></div></div>
+<div class="card"><h3>Animatsiya: quyosh nuri → panel → elektr toki → uy</h3><canvas id="c5" width="640" height="280"></canvas></div></section>
+
+<!-- 6-REJA -->
+<section id="s6"><h2>6. Fizikaning kelajagi va yoshlar uchun imkoniyatlar</h2>
+<div class="card"><p>Nanotexnologiya, kvant kompyuterlar, yangi energiya manbalari, sunʼiy intellekt va fizika kelajakni belgilaydi. Kasblar: <b>fizik-tadqiqotchi, muhandis, energetik, tibbiyot fizigi</b>.</p></div>
+<div class="card"><h3>Simulyatsiya: “Kelajak kasbi”</h3><p>Sizni nima qiziqtiradi?</p><div class="btns" id="b6"></div><div class="out" id="o6">Qiziqishni tanlang.</div></div>
+<div class="card"><h3>Animatsiya: odam boʻyidan atomgacha</h3><canvas id="c6" width="640" height="280"></canvas></div></section>
+
+<!-- TEST -->
+<section id="s7"><h2>Test (10 ta savol)</h2><div class="card" id="quiz"></div>
+<button class="big" id="chk">Javoblarni tekshirish</button><div id="score"></div></section>
+</main>
+
+<script>
+/* ===== Yordamchi funksiyalar ===== */
+const $=s=>document.querySelector(s), css=getComputedStyle(document.documentElement);
+const C=n=>css.getPropertyValue(n).trim();
+const TITLES=["1 · Bogʻliqlik","2 · Kashfiyotlar","3 · Tarix","4 · Markazlar","5 · Qoʻllanish","6 · Kelajak","Test"];
+let cur=1;
+
+/* Tablar */
+TITLES.forEach((t,i)=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>show(i+1);$("#tabs").appendChild(b)});
+function show(n){cur=n;document.querySelectorAll("section").forEach((s,i)=>s.classList.toggle("on",i+1===n));
+ document.querySelectorAll("#tabs button").forEach((b,i)=>b.classList.toggle("on",i+1===n));scrollTo(0,0);if(n===5)drawHL()}
+/* Rejim tugmasi */
+$("#theme").onclick=()=>{const r=document.documentElement,d=r.dataset.theme==="dark"||(!r.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches);r.dataset.theme=d?"light":"dark";drawHL()};
+
+/* Tugmalar guruhini yasash */
+function group(id,items,fn){const box=$(id);items.forEach((t,i)=>{const b=document.createElement("button");b.textContent=t;
+ b.onclick=()=>{box.querySelectorAll("button").forEach(x=>x.classList.remove("on"));b.classList.add("on");fn(i)};box.appendChild(b)})}
+
+/* ===== 1-reja ===== */
+let z1=-1;
+const S1=["Kashfiyot: Faradey 1831-yilda elektromagnit induksiya hodisasini kashf etdi.","Qonun: oʻzgaruvchan magnit oqimi oʻtkazgichda elektr yurituvchi kuch (EYuK) hosil qiladi.","Qurilma: generator mexanik energiyani elektr energiyasiga aylantiradi.","Sanoat: elektr stansiyalar va elektr tarmoqlari qurildi.","Hayotdagi oʻzgarish: yoritish, zavodlar, maishiy texnika elektr bilan ishlaydi."];
+group("#b1",["Kashfiyot","Qonun","Qurilma","Sanoat","Hayot"],i=>{z1=i;$("#o1").textContent=S1[i]});
+
+/* ===== 2-reja ===== */
+const S2=[["Bugʻ mashinasi","XVIII asr · Issiqlik fizikasi","Issiqlik mexanik ishga aylantirildi: zavodlar, bugʻ lokomotivi, 1-sanoat inqilobi."],
+["Elektromagnit induksiya","1831 · Faradey","Generator va elektr energetikasi: elektr stansiyalar, tarmoqlar."],
+["Tranzistor","1947 · Yarimoʻtkazgichlar","Kompyuter, telefon va zamonaviy elektronika."],
+["Lazer","1960 · Optik tolalar","Aloqa (optik tola), tibbiyot va sanoatda qoʻllanadi."]];
+group("#b2",S2.map(a=>a[0]),i=>{$("#o2").innerHTML="<b>"+S2[i][1]+"</b><br>"+S2[i][2]});
+
+/* ===== 3-reja: Beruniy usuli ===== */
+function calc3(){const h=+$("#h3").value,th=+$("#t3").value,c=Math.cos(th*Math.PI/180);
+ const R=h*c/(1-c);$("#hv").textContent=h;$("#tv").textContent=th.toFixed(2);
+ $("#o3").innerHTML="R ≈ <b>"+(R/1000).toFixed(0)+" km</b><br><small>Solishtirish: Yerning oʻrtacha radiusi ≈ 6371 km. Burchak juda kichik, shuning uchun natija aniq oʻlchashga sezgir.</small>"}
+$("#h3").oninput=$("#t3").oninput=calc3;calc3();
+
+/* ===== 4-reja ===== */
+const S4=[["Yadro fizikasi instituti (Toshkent, Ulugʻbek shaharchasi)","Yoʻnalish: yadro fizikasi. Yutuq: tadqiqot yadro reaktori, izotoplar olish."],
+["“Fizika–Quyosh” birlashmasi (Parkent)","Yoʻnalish: geliotexnika va materialshunoslik. Yutuq: Katta quyosh pechi."],
+["Yarimoʻtkazgichlar, ion-plazma va lazer institutlari","Yoʻnalish: yarimoʻtkazgichlar, plazma, lazer texnologiyalari."]];
+document.querySelectorAll(".pt").forEach(p=>p.onclick=()=>{const s=S4[p.dataset.k];$("#o4").innerHTML="<b>"+s[0]+"</b><br>"+s[1]});
+
+/* ===== 5-reja ===== */
+let pw=.8;
+function calc5(){const b=+$("#tilt").value,e=+$("#sun").value;const inc=Math.abs(90-e-b)*Math.PI/180;
+ pw=Math.max(0,Math.cos(inc));$("#bv").textContent=b;$("#ev").textContent=e;$("#pb").style.width=pw*100+"%";
+ $("#o5").innerHTML="Nisbiy quvvat: <b>"+(pw*100).toFixed(0)+"%</b> (quvvat ~ cos φ, φ — nur va panel normali orasidagi burchak). Eng yaxshi holat: nur panelga tik tushganda."}
+$("#tilt").oninput=$("#sun").oninput=calc5;calc5();
+function drawHL(){const c=$("#c5b"),x=c.getContext("2d"),t=+$("#hl").value,W=640,H=200,m=40;x.clearRect(0,0,W,H);
+ const X=v=>m+v/5*(W-2*m),Y=v=>H-30-v/100*(H-50);
+ x.strokeStyle=C("--mut");x.fillStyle=C("--fg");x.font="13px sans-serif";x.beginPath();x.moveTo(m,10);x.lineTo(m,H-30);x.lineTo(W-10,H-30);x.stroke();
+ for(let i=0;i<=5;i++)x.fillText(i+"T",X(i)-6,H-12);[100,50,25].forEach(v=>x.fillText(v+"%",2,Y(v)+4));
+ x.strokeStyle=C("--ac");x.lineWidth=3;x.beginPath();for(let i=0;i<=100;i++){const v=i/20,n=100*Math.pow(.5,v);i?x.lineTo(X(v),Y(n)):x.moveTo(X(v),Y(n))}x.stroke();
+ const n=100*Math.pow(.5,t);x.fillStyle=C("--ac2");x.beginPath();x.arc(X(t),Y(n),8,0,7);x.fill();
+ $("#hlv").textContent=t;$("#o5b").innerHTML="Qolgan yadrolar: <b>"+n.toFixed(1)+"%</b> · N = N₀·(1/2)^(t/T)"}
+$("#hl").oninput=drawHL;
+
+/* ===== 6-reja ===== */
+const S6=[["Energiya","Energetik yoki quyosh energetikasi muhandisi: yangi energiya manbalari bilan ishlaydi."],
+["Salomatlik","Tibbiyot fizigi: izotoplar va lazerlardan tashxis va davolashda foydalanadi."],
+["Kompyuterlar va AI","Fizik-tadqiqotchi: kvant kompyuterlar va sunʼiy intellekt bilan bogʻliq tadqiqotlar."],
+["Yangi materiallar","Muhandis: nanotexnologiya va yangi materiallarni ishlab chiqadi."]];
+group("#b6",S6.map(a=>a[0]),i=>{$("#o6").innerHTML="Tavsiya: <b>"+S6[i][1]+"</b>"});
+
+/* ===== Animatsiyalar (canvas, requestAnimationFrame) ===== */
+function txt(x,s,px,py,col){x.fillStyle=col||C("--fg");x.font="13px sans-serif";x.textAlign="center";x.fillText(s,px,py)}
+const D={};
+
+D[1]=(x,t)=>{const xs=[60,190,320,450,580],nm=["Kashfiyot","Qonun","Qurilma","Sanoat","Hayot"],bx=60+((t*.12)%1)*520;
+ x.strokeStyle=C("--bd");x.lineWidth=5;x.beginPath();x.moveTo(60,130);x.lineTo(580,130);x.stroke();
+ xs.forEach((px,i)=>{const lit=i===z1||bx>=px;x.fillStyle=lit?C("--ac"):C("--card");x.strokeStyle=C("--ac");x.lineWidth=3;
+  x.beginPath();x.arc(px,130,24,0,7);x.fill();x.stroke();txt(x,i+1,px,135,lit?"#fff":C("--fg"));txt(x,nm[i],px,185)});
+ x.fillStyle=C("--ac2");x.shadowColor=C("--ac2");x.shadowBlur=15;x.beginPath();x.arc(bx,130,9,0,7);x.fill();x.shadowBlur=0;
+ x.save();x.translate(580,70);x.rotate(t);x.strokeStyle=C("--ac2");x.lineWidth=5;for(let i=0;i<6;i++){x.rotate(Math.PI/3);x.beginPath();x.moveTo(10,0);x.lineTo(24,0);x.stroke()}x.beginPath();x.arc(0,0,12,0,7);x.stroke();x.restore()};
+
+D[2]=(x,t)=>{const a=t*2.5,cx=300,cy=140;x.strokeStyle=C("--mut");x.lineWidth=8;x.beginPath();x.arc(cx,cy,100,0,7);x.stroke();
+ x.save();x.translate(cx,cy);x.rotate(a);x.fillStyle="#dc2626";x.fillRect(-90,-18,90,36);x.fillStyle="#2563eb";x.fillRect(0,-18,90,36);
+ x.fillStyle="#fff";x.font="bold 18px sans-serif";x.textAlign="center";x.fillText("N",-45,6);x.fillText("S",45,6);x.restore();
+ const b=Math.abs(Math.sin(a));x.strokeStyle=C("--mut");x.lineWidth=3;x.beginPath();x.moveTo(400,140);x.lineTo(520,140);x.stroke();
+ x.fillStyle="rgba(250,204,21,"+(.15+.85*b)+")";x.shadowColor="#facc15";x.shadowBlur=40*b;x.beginPath();x.arc(560,130,28,0,7);x.fill();x.shadowBlur=0;
+ x.strokeStyle=C("--fg");x.lineWidth=2;x.stroke();txt(x,"Lampochka",560,185);txt(x,"Rotor (magnit)",cx,270)};
+
+D[3]=(x,t)=>{const px=120,py=240,a=(52+22*Math.sin(t*.6))*Math.PI/180,dx=Math.sin(a),dy=-Math.cos(a);
+ for(let i=0;i<30;i++){const sx=(i*97)%640,sy=(i*53)%140,tw=.4+.6*Math.abs(Math.sin(t*2+i));x.fillStyle=C("--ac2");x.globalAlpha=tw*.7;x.fillRect(sx,sy,2,2)}x.globalAlpha=1;
+ x.strokeStyle=C("--fg");x.lineWidth=3;x.beginPath();x.arc(px,py,190,-Math.PI/2,0);x.stroke();
+ for(let d=0;d<=90;d+=5){const r=d*Math.PI/180,l=d%15?6:12;x.beginPath();x.moveTo(px+190*Math.sin(r),py-190*Math.cos(r));x.lineTo(px+(190-l)*Math.sin(r),py-(190-l)*Math.cos(r));x.stroke()}
+ x.strokeStyle=C("--ac");x.lineWidth=5;x.beginPath();x.moveTo(px,py);x.lineTo(px+200*dx,py+200*dy);x.stroke();
+ x.setLineDash([6,6]);x.lineWidth=2;x.beginPath();x.moveTo(px+200*dx,py+200*dy);x.lineTo(px+260*dx,py+260*dy);x.stroke();x.setLineDash([]);
+ x.fillStyle=C("--ac2");x.shadowColor=C("--ac2");x.shadowBlur=15;x.beginPath();x.arc(px+270*dx,py+270*dy,8,0,7);x.fill();x.shadowBlur=0;
+ txt(x,"Yulduz balandligi ≈ "+(90-a*180/Math.PI).toFixed(0)+"°",480,250);txt(x,"Ulugʻbek sekstanti (sxema)",480,225)};
+
+D[4]=(x,t)=>{const sun=[60,30],f=[570,60],off=-t*40,U=(a,b)=>{const d=Math.hypot(a,b);return[a/d,b/d]};
+ x.fillStyle="#fbbf24";x.beginPath();x.arc(sun[0],sun[1],18,0,7);x.fill();
+ x.fillStyle=C("--mut");x.fillRect(560,60,20,190);txt(x,"Pech",570,262);
+ for(let i=0;i<6;i++){const mx=130+i*64,my=245,s=U(sun[0]-mx,sun[1]-my),g=U(f[0]-mx,f[1]-my),n=U(s[0]+g[0],s[1]+g[1]);
+  x.lineWidth=2;x.setLineDash([8,6]);x.lineDashOffset=off;x.strokeStyle="#fbbf24";x.beginPath();x.moveTo(sun[0],sun[1]);x.lineTo(mx,my);x.stroke();
+  x.strokeStyle="#f97316";x.beginPath();x.moveTo(mx,my);x.lineTo(f[0],f[1]);x.stroke();x.setLineDash([]);
+  x.strokeStyle=C("--ac");x.lineWidth=6;x.beginPath();x.moveTo(mx+n[1]*16,my-n[0]*16);x.lineTo(mx-n[1]*16,my+n[0]*16);x.stroke()}
+ const g=x.createRadialGradient(f[0],f[1],0,f[0],f[1],30+6*Math.sin(t*5));g.addColorStop(0,"#fff");g.addColorStop(.4,"#f97316");g.addColorStop(1,"transparent");
+ x.fillStyle=g;x.beginPath();x.arc(f[0],f[1],40,0,7);x.fill();txt(x,"Geliostat oynalari",290,272)};
+
+D[5]=(x,t)=>{const sun=[50,50];x.fillStyle="#fbbf24";x.beginPath();x.arc(sun[0],sun[1],22,0,7);x.fill();
+ x.setLineDash([8,6]);x.lineDashOffset=-t*40;x.strokeStyle="#fbbf24";x.lineWidth=3;
+ for(let k=-1;k<=1;k++){x.beginPath();x.moveTo(sun[0]+25,sun[1]+k*12+10);x.lineTo(190,120+k*20);x.stroke()}x.setLineDash([]);
+ x.fillStyle=C("--ac");x.beginPath();x.moveTo(170,150);x.lineTo(280,120);x.lineTo(300,170);x.lineTo(190,200);x.fill();txt(x,"Panel",240,225);
+ const P=[[240,185],[240,250],[470,250],[470,215]];x.strokeStyle=C("--mut");x.lineWidth=3;x.beginPath();P.forEach((p,i)=>i?x.lineTo(...p):x.moveTo(...p));x.stroke();
+ const L=[0,65,230,35],T=L[1]+L[2]+L[3];x.fillStyle=C("--ac2");
+ for(let i=0;i<8;i++){let d=((t*60*(.2+pw)+i*T/8)%T),k=0;while(d>[65,230,35][k]&&k<2){d-=[65,230,35][k];k++}
+  const a=P[k],b=P[k+1],r=d/[65,230,35][k];x.beginPath();x.arc(a[0]+(b[0]-a[0])*r,a[1]+(b[1]-a[1])*r,5,0,7);x.fill()}
+ x.fillStyle=C("--card");x.strokeStyle=C("--fg");x.lineWidth=3;x.fillRect(420,150,100,65);x.strokeRect(420,150,100,65);
+ x.beginPath();x.moveTo(410,150);x.lineTo(470,105);x.lineTo(530,150);x.closePath();x.stroke();
+ x.fillStyle="rgba(250,204,21,"+(.2+.8*pw)+")";x.fillRect(450,165,40,30);txt(x,"Uy",470,235+25)};
+
+D[6]=(x,t)=>{const P=2.8,i=Math.floor(t/P)%4,f=(t%P)/P,s=.6+f*.8,al=Math.min(1,f*4,(1-f)*4),cx=320,cy=120,
+ L=["Odam boʻyi ≈ 1 m","Hujayra ≈ 10⁻⁵ m","DNK qalinligi ≈ 2·10⁻⁹ m","Atom ≈ 10⁻¹⁰ m"];
+ x.save();x.globalAlpha=al;x.translate(cx,cy);x.scale(s,s);x.strokeStyle=C("--ac");x.fillStyle=C("--ac");x.lineWidth=4;
+ if(i===0){x.beginPath();x.arc(0,-70,18,0,7);x.stroke();x.beginPath();x.moveTo(0,-52);x.lineTo(0,20);x.moveTo(-35,-35);x.lineTo(35,-35);x.moveTo(0,20);x.lineTo(-25,75);x.moveTo(0,20);x.lineTo(25,75);x.stroke()}
+ if(i===1){x.beginPath();x.arc(0,0,80,0,7);x.stroke();x.fillStyle=C("--ac2");x.beginPath();x.arc(10,0,28,0,7);x.fill()}
+ if(i===2){for(let k=0;k<2;k++){x.strokeStyle=k?C("--ac2"):C("--ac");x.beginPath();for(let u=-120;u<=120;u+=4){const y=30*Math.sin(u/20+t*2+k*Math.PI);u===-120?x.moveTo(u,y):x.lineTo(u,y)}x.stroke()}}
+ if(i===3){x.beginPath();x.arc(0,0,12,0,7);x.fill();x.lineWidth=2;x.beginPath();x.ellipse(0,0,80,30,0,0,7);x.stroke();x.fillStyle=C("--ac2");x.beginPath();x.arc(80*Math.cos(t*4),30*Math.sin(t*4),7,0,7);x.fill()}
+ x.restore();txt(x,L[i],cx,250)};
+
+/* Asosiy sikl */
+function loop(ms){const f=D[cur];if(f){const c=$("#c"+cur),x=c.getContext("2d");x.clearRect(0,0,640,280);x.lineDashOffset=0;x.setLineDash([]);x.textAlign="left";f(x,ms/1000)}requestAnimationFrame(loop)}
+
+/* ===== Test ===== */
+const Q=[["Texnika nima bilan shugʻullanadi?",["Tabiat qonunlarini oʻrganadi","Qonunlarni amalda qoʻllaydi","Faqat yulduzlarni kuzatadi"],1],
+["Toʻgʻri zanjirni tanlang:",["Qurilma → qonun → kashfiyot","Kashfiyot → qonun → qurilma → sanoat → hayot","Sanoat → kashfiyot → hayot"],1],
+["Elektromagnit induksiyani kim kashf etgan?",["Faradey","Beruniy","Ulugʻbek"],0],
+["Generator qanday energiyani aylantiradi?",["Elektrni mexanik energiyaga","Mexanik energiyani elektr energiyasiga","Yorugʻlikni issiqlikka"],1],
+["1-sanoat inqilobining asosiy texnikasi qaysi?",["Lazer","Tranzistor","Bugʻ mashinasi"],2],
+["Yer radiusini oʻlchagan olim kim?",["Xorazmiy","Beruniy","Ibn Sino"],1],
+["“Ziji jadidi Koragoniy”da nechta yulduz bor?",["1018","100","10 000"],0],
+["Parkentdagi Katta quyosh pechi qaysi birlashmaga tegishli?",["Yadro fizikasi instituti","“Fizika–Quyosh” birlashmasi","Samarqand rasadxonasi"],1],
+["Quyosh paneli quvvati qachon eng katta boʻladi?",["Nur panelga yon tomondan tushganda","Panel soyada turganda","Nur panelga tik tushganda"],2],
+["Yarim yemirilish davri nima?",["Yadrolar soni ikki marta ortadigan vaqt","Boshlangʻich yadrolar soni yarmiga kamayadigan vaqt","Izotop butunlay yoʻq boʻladigan vaqt"],1]];
+$("#quiz").innerHTML=Q.map((q,i)=>"<div class='q'><b>"+(i+1)+". "+q[0]+"</b>"+q[1].map((o,j)=>"<label><input type='radio' name='q"+i+"' value='"+j+"'>"+o+"</label>").join("")+"</div>").join("");
+$("#chk").onclick=()=>{let s=0;Q.forEach((q,i)=>{const L=document.querySelectorAll("input[name=q"+i+"]");
+ L.forEach((r,j)=>{const lb=r.parentElement;lb.classList.remove("ok","no");if(j===q[2])lb.classList.add("ok");else if(r.checked)lb.classList.add("no");if(r.checked&&j===q[2])s++})});
+ $("#score").textContent="Natija: "+s+" / 10 ball"+(s>=9?" 🏆 Ajoyib!":s>=6?" 👍 Yaxshi!":" 📘 Mavzuni takrorlang.")};
+
+show(1);drawHL();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

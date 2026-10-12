@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>58-mavzu. Olamning yagona fizik manzarasi</title>
+<style>
+:root{--bg:#f4f7fb;--card:#ffffff;--fg:#14213d;--muted:#5b6678;--accent:#2563eb;--line:#d7deea;--cv:#fbfcff;--ok:#16a34a;--bad:#dc2626}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1422;--card:#172036;--fg:#e8edf7;--muted:#9aa7bd;--accent:#60a5fa;--line:#2b3855;--cv:#0a101c;--ok:#4ade80;--bad:#f87171}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);line-height:1.5}
+header{max-width:900px;margin:auto;padding:14px 16px 4px}
+h1{font-size:1.25rem;margin:0}
+header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+nav{display:flex;gap:6px;overflow-x:auto;padding:8px 16px;max-width:900px;margin:auto;position:sticky;top:0;background:var(--bg);z-index:5}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:999px;font-size:.85rem;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+main{max-width:900px;margin:auto;padding:4px 16px 40px}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+h2{font-size:1.1rem;margin:10px 0 0}
+h3{font-size:1rem;margin:0 0 8px}
+.theory p{margin:6px 0}
+.formula{background:var(--cv);border:1px dashed var(--line);border-radius:8px;padding:6px 10px;margin:8px 0;font-family:Georgia,serif}
+canvas{width:100%;height:auto;display:block;background:var(--cv);border:1px solid var(--line);border-radius:10px;touch-action:none}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 0}
+.ctl button,.ctl select{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:7px 11px;border-radius:8px;font-size:.85rem;cursor:pointer}
+.ctl button.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.ctl button.sel{outline:2px solid var(--accent)}
+.sl{display:flex;align-items:center;gap:6px;font-size:.85rem;flex:1 1 220px}
+.sl input{flex:1;min-width:80px}
+.info{width:100%;font-size:.88rem;background:var(--cv);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+table.t{width:100%;border-collapse:collapse;font-size:.85rem}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left}
+.q{margin:12px 0}.q p{margin:4px 0;font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts button{border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 12px;border-radius:8px;font-size:.88rem;cursor:pointer}
+.opts button.ok{background:#16a34a;color:#fff;border-color:#16a34a}
+.opts button.bad{background:#dc2626;color:#fff;border-color:#dc2626}
+.opts button:disabled{cursor:default}
+.fb{font-size:.88rem;margin-top:4px;min-height:1.2em}
+</style>
+</head>
+<body>
+<header>
+  <h1>58-mavzu. Olamning yagona fizik manzarasi</h1>
+  <p>9-sinf fizika · 6 ta reja · simulyatsiya, animatsiya va nazorat savollari</p>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+
+<script>
+'use strict';
+/* ====================== UMUMIY YORDAMCHILAR ====================== */
+const W = 600, H = 340;                       // canvas mantiqiy o'lchami
+const TH = {};                                // mavzu (och/to'q) ranglari
+function loadTheme(){
+  const s = getComputedStyle(document.documentElement);
+  ['fg','muted','accent','line','cv'].forEach(k => TH[k] = s.getPropertyValue('--'+k).trim());
+}
+loadTheme();
+const RED='#ef4444', BLUE='#3b82f6', GREEN='#22c55e', AMBER='#f59e0b', PURPLE='#a855f7', GRAY='#94a3b8';
+
+// DOM element yaratish
+function $(tag, cls, parent, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  if(parent) parent.appendChild(e);
+  return e;
+}
+const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+const smooth = x => { x = clamp(x,0,1); return x*x*(3-2*x); };
+const sup = x => String(x).replace(/\d/g, d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]).replace('-','⁻');
+function rng(seed){ return function(){ seed = (seed*1664525 + 1013904223) % 4294967296; return seed/4294967296; }; }
+
+// Chizish funksiyalari
+function circ(c,x,y,r,fill,stroke,lw){
+  c.beginPath(); c.arc(x,y,Math.max(r,0),0,6.2832);
+  if(fill){ c.fillStyle = fill; c.fill(); }
+  if(stroke){ c.strokeStyle = stroke; c.lineWidth = lw||1; c.stroke(); }
+}
+function line(c,x1,y1,x2,y2,col,w){
+  c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2);
+  c.strokeStyle = col; c.lineWidth = w||1; c.stroke();
+}
+function arrow(c,x1,y1,x2,y2,col,w){
+  const dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy);
+  if(L<2) return;
+  line(c,x1,y1,x2,y2,col,w);
+  const a=Math.atan2(dy,dx), h=Math.min(9,L*0.5);
+  c.beginPath(); c.moveTo(x2,y2);
+  c.lineTo(x2-h*Math.cos(a-0.45), y2-h*Math.sin(a-0.45));
+  c.lineTo(x2-h*Math.cos(a+0.45), y2-h*Math.sin(a+0.45));
+  c.closePath(); c.fillStyle = col; c.fill();
+}
+function txt(c,s,x,y,col,size,al){
+  c.fillStyle = col || TH.fg;
+  c.font = (size||12) + 'px system-ui,sans-serif';
+  c.textAlign = al || 'left'; c.textBaseline = 'alphabetic';
+  c.fillText(s,x,y);
+}
+// Ko'chuvchi strelkalar (energiya oqimi)
+function flow(c,x1,x2,y,t,col){
+  for(let x = x1 + ((t*40)%22); x < x2-6; x += 22){
+    c.beginPath(); c.moveTo(x,y-5); c.lineTo(x+9,y); c.lineTo(x,y+5); c.closePath();
+    c.fillStyle = col; c.fill();
+  }
+}
+
+/* ====================== RUNNER (rAF, Play/Pauza/Qayta) ====================== */
+const runners = [];
+class Runner{
+  constructor(box, scene, ui){
+    this.scene = scene; this.t = 0; this.run = false; this.raf = 0; this.last = 0;
+    this.cv = $('canvas','',box);
+    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.cv.width = W*this.dpr; this.cv.height = H*this.dpr;
+    this.cv.style.aspectRatio = W + '/' + H;
+    this.ctx = this.cv.getContext('2d');
+    this.bar = $('div','ctl',box);
+    const bp = $('button','pri',this.bar,'▶ Play');
+    const bs = $('button','',this.bar,'⏸ Pauza');
+    const br = $('button','',this.bar,'↺ Qayta boshlash');
+    bp.onclick = () => this.play();
+    bs.onclick = () => this.pause();
+    br.onclick = () => { this.reset(); this.play(); };
+    this.ui = $('div','ctl',box);
+    if(ui) ui(this.ui, this);
+    if(scene.init) scene.init(this);
+    this.reset();
+    runners.push(this);
+  }
+  pos(e){ const r = this.cv.getBoundingClientRect(); return {x:(e.clientX-r.left)*W/r.width, y:(e.clientY-r.top)*H/r.height}; }
+  reset(){ this.t = 0; this.scene.reset(this); this.draw(); }
+  draw(){
+    const c = this.ctx;
+    c.setTransform(this.dpr,0,0,this.dpr,0,0);
+    c.clearRect(0,0,W,H);
+    this.scene.draw(c, this.t, this);
+  }
+  play(){ if(this.run) return; this.run = true; this.last = performance.now(); this.raf = requestAnimationFrame(n => this.tick(n)); }
+  pause(){ this.run = false; cancelAnimationFrame(this.raf); }
+  tick(now){
+    if(!this.run) return;
+    const dt = Math.min(0.05, (now - this.last)/1000);
+    this.last = now; this.t += dt;
+    this.scene.step(dt, this.t, this);
+    this.draw();
+    this.raf = requestAnimationFrame(n => this.tick(n));
+  }
+}
+
+// Boshqaruv elementlari
+function slider(box,label,min,max,step,val,fn,unit){
+  const w = $('label','sl',box);
+  $('span','',w,label+':');
+  const v = $('b','',w,val+(unit||''));
+  const i = $('input','',w);
+  i.type='range'; i.min=min; i.max=max; i.step=step; i.value=val;
+  i.oninput = () => { v.textContent = i.value + (unit||''); fn(+i.value); };
+  i.set = x => { i.value = x; v.textContent = (Math.round(x*100)/100) + (unit||''); };
+  return i;
+}
+function button(box,label,fn){ const b = $('button','',box,label); b.onclick = fn; return b; }
+function choose(btns,i){ btns.forEach((b,j) => b.classList.toggle('sel', i===j)); }
+
+/* ====================== 1-REJA ====================== */
+const PL = [ // [nomi, davri (yil), orbita radiusi (px), rang]
+  ['Merkuriy',0.241,35,'#94a3b8'],['Venera',0.615,60,'#f59e0b'],['Yer',1,85,'#3b82f6'],
+  ['Mars',1.881,112,'#ef4444'],['Yupiter',11.86,142,'#d97706']];
+
+const sc1 = {
+  mode:'helio', spd:1, sel:3, ty:0, trail:[],
+  reset(){ this.ty = 0; this.trail = []; },
+  hp(i){ const p = PL[i], a = 6.2832*this.ty/p[1]; return [p[2]*Math.cos(a), p[2]*Math.sin(a)]; },
+  rel(i){
+    const p = this.hp(i);
+    if(this.mode === 'helio') return p;
+    const e = this.hp(2);
+    return [(p[0]-e[0])*0.62, (p[1]-e[1])*0.62];
+  },
+  step(dt){
+    this.ty += dt*this.spd/6;
+    this.trail.push(this.rel(this.sel));
+    if(this.trail.length > 900) this.trail.shift();
+  },
+  draw(c,t){
+    const cx=300, cy=175, geo = this.mode==='geo';
+    if(!geo) PL.forEach(p => circ(c,cx,cy,p[2],null,TH.line,1));
+    else circ(c,cx,cy,85*0.62,null,TH.line,1);
+    // iz (traektoriya)
+    c.beginPath();
+    this.trail.forEach((q,i) => i ? c.lineTo(cx+q[0],cy+q[1]) : c.moveTo(cx+q[0],cy+q[1]));
+    c.strokeStyle = PL[this.sel][3]; c.lineWidth = 1.5; c.stroke();
+    if(!geo){
+      circ(c,cx,cy,11,AMBER); txt(c,'Quyosh',cx+13,cy-8,TH.fg,11);
+      PL.forEach((p,i) => { const q = this.hp(i); circ(c,cx+q[0],cy+q[1],i===this.sel||i===2?6:4,p[3]); txt(c,p[0],cx+q[0]+8,cy+q[1]-6,TH.fg,11); });
+    } else {
+      circ(c,cx,cy,7,BLUE); txt(c,'Yer',cx+9,cy-8,TH.fg,11);
+      const e = this.hp(2), s = [-e[0]*0.62, -e[1]*0.62];
+      circ(c,cx+s[0],cy+s[1],9,AMBER); txt(c,'Quyosh',cx+s[0]+11,cy+s[1]-6,TH.fg,11);
+      PL.forEach((p,i) => { if(i===2) return; const q = this.rel(i); circ(c,cx+q[0],cy+q[1],i===this.sel?6:4,p[3]); txt(c,p[0],cx+q[0]+8,cy+q[1]-6,TH.fg,11); });
+    }
+    txt(c, geo ? 'GEOTSENTRIK model (Ptolemey): markazda — Yer' : 'GELIOTSENTRIK model (Kopernik): markazda — Quyosh', 12, 20, TH.fg, 13);
+    txt(c, 't = ' + this.ty.toFixed(2) + ' yil', 12, 38, TH.muted, 12);
+    if(geo) txt(c,'Tanlangan sayyora yerdan qaraganda ba\'zan orqaga qaytadi (halqa)',12,H-10,TH.muted,11);
+    else txt(c,'Sayyoralar Quyosh atrofida doiraviy orbitada (soddalashtirilgan)',12,H-10,TH.muted,11);
+  }
+};
+function ui1(b,r){
+  const sel = $('select','',b);
+  PL.forEach((p,i) => { if(i!==2){ const o = $('option','',sel,p[0]); o.value = i; } });
+  sel.value = 3;
+  sel.onchange = () => { sc1.sel = +sel.value; sc1.trail = []; r.draw(); };
+  const set = m => { sc1.mode = m; sc1.trail = []; choose(bs, m==='geo'?0:1); r.draw(); };
+  const bs = [button(b,'Geotsentrik',() => set('geo')), button(b,'Geliotsentrik',() => set('helio'))];
+  choose(bs,1);
+  slider(b,'Tezlik',0.5,5,0.5,1,v => sc1.spd = v,'×');
+}
+const EV = [['Ptolemey','geotsentrik, ~150-y.'],['Ulug\'bek','rasadxona, XV asr'],['Kopernik','geliotsentrik, 1543'],['Galiley, Kepler','1609–1619'],['Nyuton','tortishish qonuni, 1687']];
+const an1 = {
+  reset(){}, step(){},
+  draw(c,t){
+    const p = clamp((t%18)/16,0,1), cx=300, cy=125, R=70, a = t*1.2;
+    const m = smooth((p-0.3)/0.4);
+    if(R*(1-m) > 2) circ(c,cx,cy,R*(1-m),null,TH.line,1);
+    if(R*m > 2) circ(c,cx,cy,R*m,null,TH.line,1);
+    const e = [cx + m*R*Math.cos(a), cy + m*R*Math.sin(a)];
+    const s = [cx + (1-m)*R*Math.cos(a+Math.PI), cy + (1-m)*R*Math.sin(a+Math.PI)];
+    circ(c,s[0],s[1],11,AMBER); circ(c,e[0],e[1],7,BLUE);
+    txt(c,'Quyosh',s[0]+13,s[1]-9,TH.fg,11); txt(c,'Yer',e[0]+9,e[1]-9,TH.fg,11);
+    txt(c, m<0.5 ? 'Geotsentrik model: Yer markazda' : 'Geliotsentrik model: Quyosh markazda', cx, 22, TH.fg, 13, 'center');
+    // xronologiya chizig'i
+    line(c,70,290,530,290,TH.line,3);
+    line(c,70,290,70+460*p,290,TH.accent,3);
+    EV.forEach((ev,i) => {
+      const x = 70 + 115*i, al = smooth((p - i/4)*8);
+      c.globalAlpha = 0.25 + 0.75*al;
+      circ(c,x,290,6,al>0.5?TH.accent:TH.line);
+      txt(c,ev[0],x,268,TH.fg,12,'center');
+      txt(c,ev[1],x,314,TH.muted,10,'center');
+      c.globalAlpha = 1;
+    });
+  }
+};
+
+/* ====================== 2-REJA ====================== */
+const rad = q => 8 + 2*Math.abs(q.q);
+const sc2 = {
+  ch:[], sgn:1, q:3, drag:-1, lines:[], dirty:true,
+  init(r){
+    const cv = r.cv;
+    cv.addEventListener('pointerdown', e => {
+      const p = r.pos(e); let h = -1;
+      this.ch.forEach((q,i) => { if(Math.hypot(p.x-q.x,p.y-q.y) < rad(q)+6) h = i; });
+      if(h >= 0) this.drag = h;
+      else { this.ch.push({x:p.x,y:p.y,q:this.sgn*this.q}); if(this.ch.length > 8) this.ch.shift(); this.dirty = true; }
+      cv.setPointerCapture(e.pointerId); r.draw();
+    });
+    cv.addEventListener('pointermove', e => {
+      if(this.drag < 0) return;
+      const p = r.pos(e), q = this.ch[this.drag];
+      if(!q) return;
+      q.x = clamp(p.x,10,W-10); q.y = clamp(p.y,10,H-10); this.dirty = true; r.draw();
+    });
+    const up = () => { this.drag = -1; };
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  },
+  reset(){ this.ch = [{x:200,y:170,q:3},{x:400,y:170,q:-3}]; this.dirty = true; },
+  step(){},
+  E(x,y){
+    let ex=0, ey=0;
+    for(const q of this.ch){
+      const dx=x-q.x, dy=y-q.y, r2=dx*dx+dy*dy+25, k=q.q/(r2*Math.sqrt(r2));
+      ex += k*dx; ey += k*dy;
+    }
+    return [ex,ey];
+  },
+  build(){
+    this.dirty = false; this.lines = [];
+    const pos = this.ch.filter(q => q.q > 0), src = pos.length ? pos : this.ch, dir = pos.length ? 1 : -1;
+    for(const s of src){
+      const n = Math.round(6 + 4*Math.abs(s.q));
+      for(let k=0;k<n;k++){
+        const a = 6.2832*k/n; let x = s.x + 10*Math.cos(a), y = s.y + 10*Math.sin(a);
+        const pts = [[x,y]];
+        for(let i=0;i<500;i++){
+          const [ex,ey] = this.E(x,y), m = Math.hypot(ex,ey);
+          if(m < 1e-9) break;
+          x += dir*ex/m*4; y += dir*ey/m*4; pts.push([x,y]);
+          if(x<0||x>W||y<0||y>H) break;
+          let hit = false;
+          for(const q of this.ch){ if(q!==s && Math.sign(q.q)!==Math.sign(s.q) && Math.hypot(x-q.x,y-q.y)<9){ hit = true; break; } }
+          if(hit) break;
+        }
+        this.lines.push(pts);
+      }
+    }
+  },
+  draw(c,t){
+    if(this.dirty) this.build();
+    c.setLineDash([6,5]); c.lineDashOffset = -t*30; c.strokeStyle = '#d97706'; c.lineWidth = 1.2;
+    for(const pts of this.lines){
+      c.beginPath(); pts.forEach((p,i) => i ? c.lineTo(p[0],p[1]) : c.moveTo(p[0],p[1])); c.stroke();
+    }
+    c.setLineDash([]);
+    // Kulon kuchi vektorlari
+    this.ch.forEach((a,i) => {
+      let fx=0, fy=0;
+      this.ch.forEach((b,j) => {
+        if(i===j) return;
+        const dx=a.x-b.x, dy=a.y-b.y, r2=dx*dx+dy*dy+1, r=Math.sqrt(r2), f=a.q*b.q/r2;
+        fx += f*dx/r; fy += f*dy/r;
+      });
+      const m = Math.hypot(fx,fy), L = Math.min(70, m*2e5);
+      if(L > 3) arrow(c,a.x,a.y,a.x+fx/m*(L+rad(a)),a.y+fy/m*(L+rad(a)),GREEN,3);
+    });
+    this.ch.forEach(q => {
+      circ(c,q.x,q.y,rad(q),q.q>0?RED:BLUE,'#fff',1.5);
+      txt(c,(q.q>0?'+':'−')+Math.abs(q.q),q.x,q.y+4,'#fff',12,'center');
+    });
+    txt(c,'Ekranni bosib zaryad qo\'ying, zaryadni sudrab ko\'chiring',10,18,TH.fg,12);
+    txt(c,'Sariq chiziqlar — maydon (E); yashil strelka — Kulon kuchi F = k·|q₁q₂|/r²',10,H-10,TH.muted,11);
+  }
+};
+function ui2(b,r){
+  const bs = [button(b,'＋ Musbat zaryad',() => { sc2.sgn = 1; choose(bs,0); }), button(b,'− Manfiy zaryad',() => { sc2.sgn = -1; choose(bs,1); })];
+  choose(bs,0);
+  slider(b,'Yangi zaryad |q|',1,5,1,3,v => sc2.q = v,' (nisbiy birlik)');
+  button(b,'Tozalash',() => { sc2.ch = []; sc2.dirty = true; r.draw(); });
+}
+const an2 = {
+  reset(){}, step(){},
+  draw(c,t){
+    const cy=170, x0=70, w=3, k=0.05, yq = 22*Math.sin(w*t);
+    for(let i=0;i<5;i++){
+      const r = (t*50 + i*70) % 350;
+      c.globalAlpha = Math.max(0, 0.45*(1-r/350));
+      circ(c,x0,cy+yq,r,null,BLUE,1.5);
+    }
+    c.globalAlpha = 1;
+    line(c,x0,cy,W-10,cy,TH.line,1);
+    for(let x=x0+16; x<W-10; x+=14){
+      const A = 46*Math.min(1,(x-x0)/40)*Math.sin(w*t - k*(x-x0));
+      arrow(c,x,cy,x,cy-A,RED,2);
+      arrow(c,x,cy,x+A*0.6,cy+A*0.45,BLUE,2);
+    }
+    line(c,x0,cy-70,x0,cy+70,TH.line,1);
+    circ(c,x0,cy+yq,9,RED,'#fff',1.5); txt(c,'+',x0,cy+yq+4,'#fff',12,'center');
+    txt(c,'Tebranuvchi zaryad elektromagnit to\'lqin chiqaradi',10,20,TH.fg,12);
+    txt(c,'E — elektr maydon (qizil)',10,H-44,RED,12);
+    txt(c,'B — magnit maydon (ko\'k)',10,H-28,BLUE,12);
+    txt(c,'c = λ·f ≈ 3·10⁸ m/s (vakuumda)',10,H-10,TH.muted,12);
+  }
+};
+
+/* ====================== 3-REJA ====================== */
+const FI = [
+  {n:'Kuchli',rel:'1',lg:0,rng:'~10⁻¹⁵ m (yadro ichida)',car:'glyuonlar',dist:'yadro o\'lchamidan katta masofada deyarli yo\'qoladi',ex:'protonlar va neytronlarni yadroda ushlab turadi',rpx:46,col:GREEN},
+  {n:'Elektromagnit',rel:'1/137 ≈ 7·10⁻³',lg:-2.14,rng:'cheksiz',car:'foton',dist:'F ∝ 1/r²',ex:'atom, molekula tuzilishi, yorug\'lik, elektr va magnit hodisalar',rpx:0,col:BLUE},
+  {n:'Kuchsiz',rel:'~10⁻⁶',lg:-6,rng:'~10⁻¹⁸ m',car:'W⁺, W⁻, Z⁰ bozonlari',dist:'juda qisqa masofada ta\'sir qiladi',ex:'radioaktiv (β) parchalanish',rpx:18,col:AMBER},
+  {n:'Gravitatsion',rel:'~10⁻³⁸',lg:-38,rng:'cheksiz',car:'graviton (gipotetik)',dist:'F = G·m₁m₂/r² ∝ 1/r²',ex:'sayyora, yulduz, galaktikalar harakati',rpx:0,col:PURPLE}];
+const sc3 = {
+  sel:0, info:null,
+  reset(){}, step(){},
+  setInfo(){
+    const f = FI[this.sel];
+    this.info.innerHTML = '<b>' + f.n + ' ta\'sir</b><br>Nisbiy kuchi: ' + f.rel + '<br>Ta\'sir doirasi: ' + f.rng + '<br>Masofaga bog\'liqligi: ' + f.dist + '<br>Tashuvchi zarra: ' + f.car + '<br>Misol: ' + f.ex;
+  },
+  draw(c,t){
+    txt(c,'Nisbiy kuch (logarifmik shkala, kuchli ta\'sir = 1)',12,20,TH.fg,12);
+    FI.forEach((f,i) => {
+      const y = 50 + i*66, len = Math.max(4, 300*(1+f.lg/40));
+      c.globalAlpha = i===this.sel ? 1 : 0.35;
+      txt(c,f.n + ' — ' + f.rel,20,y-6,TH.fg,12);
+      c.fillStyle = f.col; c.fillRect(20,y,len,20);
+      if(i===this.sel){ c.strokeStyle = TH.fg; c.lineWidth = 2; c.strokeRect(20,y,len,20); }
+      c.globalAlpha = 1;
+    });
+    line(c,350,35,350,320,TH.line,1);
+    const f = FI[this.sel], cx = 475, cy = 160, R = f.rpx || 105;
+    txt(c,'Ta\'sir doirasi (shartli)',cx,24,TH.fg,12,'center');
+    for(let j=0;j<3;j++){
+      const r = (t*40 + j*R/3) % R;
+      c.globalAlpha = 1 - r/R; circ(c,cx,cy,r,null,f.col,2.5);
+    }
+    c.globalAlpha = 1;
+    if(f.rpx){
+      c.setLineDash([4,4]); circ(c,cx,cy,f.rpx,null,TH.fg,1); c.setLineDash([]);
+      txt(c,'doira chegaralangan',cx,cy+f.rpx+18,TH.muted,11,'center');
+    } else {
+      arrow(c,cx+15,cy,cx+105,cy,f.col,2);
+      txt(c,'cheksiz masofagacha',cx,cy+125,TH.muted,11,'center');
+    }
+    circ(c,cx,cy,7,f.col,'#fff',1.5);
+    txt(c,f.rng,cx,H-10,TH.fg,11,'center');
+  }
+};
+function ui3(b,r){
+  const bs = FI.map((f,i) => button(b,f.n,() => { sc3.sel = i; choose(bs,i); sc3.setInfo(); r.draw(); }));
+  choose(bs,0);
+  sc3.info = $('div','info',b);
+  sc3.setInfo();
+}
+const an3 = {
+  reset(){}, step(){},
+  draw(c,t){
+    line(c,300,34,300,H-10,TH.line,1);
+    txt(c,'Yadro: kuchli ta\'sir',150,24,TH.fg,13,'center');
+    txt(c,'β⁻-parchalanish: kuchsiz ta\'sir',450,24,TH.fg,13,'center');
+    // --- yadro ---
+    const P = [[-19,-15,'p'],[19,-15,'n'],[-19,15,'n'],[19,15,'p']], cx = 150, cy = 150, pl = Math.sin(t*4);
+    const pos = P.map((q,i) => [cx+q[0]+1.5*Math.sin(t*9+i*2), cy+q[1]+1.5*Math.cos(t*8+i)]);
+    [[0,1],[1,3],[3,2],[2,0]].forEach(l => line(c,pos[l[0]][0],pos[l[0]][1],pos[l[1]][0],pos[l[1]][1],GREEN,4+1.5*pl));
+    arrow(c,pos[0][0],pos[0][1],pos[0][0]-34,pos[0][1]-34,RED,2.5);
+    arrow(c,pos[3][0],pos[3][1],pos[3][0]+34,pos[3][1]+34,RED,2.5);
+    P.forEach((q,i) => { circ(c,pos[i][0],pos[i][1],14,q[2]==='p'?RED:GRAY); txt(c,q[2],pos[i][0],pos[i][1]+4,'#fff',12,'center'); });
+    c.fillStyle = GREEN; c.fillRect(14,236,14,6); txt(c,'Kuchli ta\'sir (tortishish)',34,243,TH.fg,11);
+    arrow(c,14,262,28,262,RED,2.5); txt(c,'Elektromagnit itarilish (p–p)',34,266,TH.fg,11);
+    txt(c,'Yadroda kuchli ta\'sir itarilishdan',14,292,TH.muted,11);
+    txt(c,'ancha katta, shuning uchun yadro barqaror.',14,306,TH.muted,11);
+    // --- neytronning beta-parchalanishi ---
+    const u = (t%6)/6, bx = 450, by = 150;
+    if(u < 0.4){
+      circ(c,bx+1.5*Math.sin(t*12),by+1.5*Math.cos(t*10),20,GRAY); txt(c,'n',bx,by+4,'#fff',13,'center');
+    } else {
+      circ(c,bx,by,20,RED); txt(c,'p',bx,by+4,'#fff',13,'center');
+      const s = (u-0.4)/0.6;
+      circ(c,bx+s*120,by-s*85,5,BLUE); txt(c,'e⁻',bx+s*120+8,by-s*85-6,BLUE,12);
+      circ(c,bx+s*120,by+s*85,4,PURPLE); txt(c,'ν̄',bx+s*120+8,by+s*85+14,PURPLE,13);
+      if(u < 0.55){ c.globalAlpha = 1-(u-0.4)/0.15; circ(c,bx,by,34,null,AMBER,3); c.globalAlpha = 1; txt(c,'W⁻',bx,by-40,AMBER,12,'center'); }
+    }
+    txt(c,'n → p + e⁻ + ν̄',450,260,TH.fg,14,'center');
+    txt(c,'neytron → proton + elektron + antineytrino',450,280,TH.muted,11,'center');
+  }
+};
+
+/* ====================== 4-REJA ====================== */
+const OB = [
+  ['Kvark',-18,'#a855f7','< 10⁻¹⁸ m'],
+  ['Proton/neytron',-15,'#ef4444','~10⁻¹⁵ m'],
+  ['Atom yadrosi',-14.3,'#f97316','~10⁻¹⁵–10⁻¹⁴ m'],
+  ['Atom',-10,'#3b82f6','~10⁻¹⁰ m'],
+  ['Molekula',-9,'#22c55e','~10⁻⁹ m'],
+  ['Odam',0.2,'#06b6d4','~1,7 m'],
+  ['Yer',7.1,'#14b8a6','1,3·10⁷ m'],
+  ['Quyosh sistemasi',13,'#f59e0b','~10¹³ m'],
+  ['Somon yo\'li',21,'#8b5cf6','~10⁵ yorug\'lik yili ≈ 10²¹ m'],
+  ['Galaktikalar to\'dasi',23.5,'#ec4899','~10²³–10²⁴ m'],
+  ['Koinot (kuzatiladigan)',26.9,'#64748b','~10²⁷ m']];
+function drawScale(c,s,t){
+  const cx = 300, cy = 170; let best = 0, bd = 1e9;
+  OB.forEach((o,i) => { const d = Math.abs(o[1]-(s-0.5)); if(d < bd){ bd = d; best = i; } });
+  OB.forEach((o,i) => {
+    const r = 300*Math.pow(10,o[1]-s);
+    if(r < 2 || r > 3000) return;
+    c.globalAlpha = 0.13; circ(c,cx,cy,r,o[2]); c.globalAlpha = 1;
+    circ(c,cx,cy,r,null,o[2],i===best?3:1.5);
+    if(r > 8){ const a = t*0.6+i; circ(c,cx+r*Math.cos(a),cy+r*Math.sin(a),3,o[2]); }
+    if(r > 14 && r < 150){
+      const ang = -Math.PI/2 + 0.7*((i%3)-1);
+      txt(c,o[0],cx+r*Math.cos(ang),cy+r*Math.sin(ang)-4,TH.fg,11,'center');
+    }
+  });
+  line(c,cx-6,cy,cx+6,cy,TH.muted,1); line(c,cx,cy-6,cx,cy+6,TH.muted,1);
+  txt(c,'Ko\'rish maydonining kengligi ≈ 10'+sup(s.toFixed(1))+' m',10,20,TH.fg,13);
+  txt(c,'Eng yaqin ob\'ekt: '+OB[best][0]+' ('+OB[best][3]+')',10,H-10,TH.fg,12);
+}
+const sc4 = {
+  s:0.5, sl:null,
+  reset(){ this.s = 0.5; if(this.sl) this.sl.set(0.5); },
+  step(){},
+  draw(c,t){ drawScale(c,this.s,t); }
+};
+function ui4(b,r){
+  sc4.sl = slider(b,'Masshtab: 10^s m, s',-18,27,0.1,0.5,v => { sc4.s = v; r.draw(); },'');
+}
+const an4 = {
+  reset(){}, step(){},
+  draw(c,t){
+    const p = (t/14)%2, q = p<1 ? p : 2-p, s = 27 - 45*smooth(q);
+    drawScale(c,s,t);
+    line(c,585,20,585,320,TH.line,2);
+    circ(c,585,20+300*(27-s)/45,6,TH.accent);
+    txt(c,'Hamma darajada bir xil fizik qonunlar amal qiladi',10,40,TH.muted,12);
+  }
+};
+
+/* ====================== 5-REJA ====================== */
+const sc5 = {
+  mode:'pend', fr:false, th0:50, th:0, w:0, T:0, hist:[], b1:null, b2:null,
+  reset(){
+    this.th = this.th0*Math.PI/180; this.w = 0; this.T = 0; this.hist = [];
+    this.b1 = {x:2.5,v:2,m:2}; this.b2 = {x:7.5,v:-1,m:1};
+  },
+  coll(h){
+    const a = this.b1, b = this.b2;
+    if(this.fr){ [a,b].forEach(o => { const d = 1.2*h; o.v = Math.abs(o.v) <= d ? 0 : o.v - Math.sign(o.v)*d; }); }
+    a.x += a.v*h; b.x += b.v*h;
+    if(b.x - a.x <= 0.5 && a.v > b.v){
+      const e = this.fr ? 0.8 : 1, M = a.m+b.m, v1 = a.v, v2 = b.v;
+      a.v = ((a.m-e*b.m)*v1 + b.m*(1+e)*v2)/M;
+      b.v = ((b.m-e*a.m)*v2 + a.m*(1+e)*v1)/M;
+      const ov = 0.5-(b.x-a.x); a.x -= ov/2; b.x += ov/2;
+    }
+  },
+  energy(){
+    if(this.mode === 'pend'){ const ke = 0.5*this.w*this.w, pe = 9.8*(1-Math.cos(this.th)); return [ke,pe,ke+pe,0]; }
+    const ke = 0.5*this.b1.m*this.b1.v*this.b1.v + 0.5*this.b2.m*this.b2.v*this.b2.v, p = this.b1.m*this.b1.v + this.b2.m*this.b2.v;
+    return [ke/4.5, p/3, ke, p];
+  },
+  step(dt){
+    const n = Math.max(1,Math.ceil(dt/0.004)), h = dt/n;
+    for(let i=0;i<n;i++){
+      if(this.mode === 'pend'){ this.w += (-9.8*Math.sin(this.th) - (this.fr?0.5:0)*this.w)*h; this.th += this.w*h; }
+      else this.coll(h);
+    }
+    this.T += dt;
+    this.hist.push([this.T].concat(this.energy()));
+    const Tw = this.mode==='pend' ? 10 : 3;
+    if(this.T >= Tw){
+      this.T = 0; this.hist = [];
+      if(this.mode === 'coll'){ this.b1 = {x:2.5,v:2,m:2}; this.b2 = {x:7.5,v:-1,m:1}; }
+    }
+  },
+  graph(c,Tw,ymax,series){
+    const x0 = 50, y0 = 205, gw = 530, gh = 110;
+    line(c,x0,y0,x0,y0+gh,TH.fg,1); line(c,x0,y0+gh,x0+gw,y0+gh,TH.fg,1);
+    txt(c,'t (s)',x0+gw-24,y0+gh+14,TH.muted,11);
+    txt(c,String(Tw),x0+gw-4,y0+gh+14,TH.muted,10,'right');
+    series.forEach(s => {
+      c.beginPath();
+      this.hist.forEach((h,i) => {
+        const x = x0 + h[0]/Tw*gw, y = y0+gh - clamp(h[s.k]/ymax,0,1.05)*gh;
+        i ? c.lineTo(x,y) : c.moveTo(x,y);
+      });
+      c.strokeStyle = s.col; c.lineWidth = 2; c.stroke();
+    });
+    series.forEach((s,i) => { c.fillStyle = s.col; c.fillRect(x0+8+i*105,y0-14,10,4); txt(c,s.name,x0+22+i*105,y0-8,TH.fg,11); });
+  },
+  draw(c,t){
+    const e = this.energy();
+    if(this.mode === 'pend'){
+      const px = 300, py = 20, L = 130, bx = px + L*Math.sin(this.th), by = py + L*Math.cos(this.th);
+      line(c,px,py,px,py+L,TH.line,1);
+      line(c,px,py,bx,by,TH.fg,2); circ(c,px,py,4,TH.fg); circ(c,bx,by,13,BLUE);
+      txt(c,'KE = '+e[0].toFixed(2)+' J   PE = '+e[1].toFixed(2)+' J   E = '+e[2].toFixed(2)+' J',10,18,TH.fg,12);
+      txt(c,'m = 1 kg, L = 1 m, g = 9,8 m/s²',10,34,TH.muted,11);
+      const E0 = 9.8*(1-Math.cos(this.th0*Math.PI/180));
+      this.graph(c,10,1.05*E0,[{k:1,col:GREEN,name:'KE (J)'},{k:2,col:AMBER,name:'PE (J)'},{k:3,col:BLUE,name:'E = KE+PE'}]);
+    } else {
+      const yb = 100, X = x => 20 + 56*x;
+      line(c,20,yb+14,580,yb+14,TH.fg,2);
+      [this.b1,this.b2].forEach((b,i) => {
+        circ(c,X(b.x),yb,14,i?RED:BLUE);
+        txt(c,'m'+(i+1)+' = '+b.m+' kg',X(b.x),yb-24,TH.fg,11,'center');
+        arrow(c,X(b.x),yb,X(b.x)+b.v*18,yb,GREEN,3);
+        txt(c,'v = '+b.v.toFixed(2)+' m/s',X(b.x),yb+36,TH.muted,11,'center');
+      });
+      txt(c,'E = '+e[2].toFixed(2)+' J   p = '+e[3].toFixed(2)+' kg·m/s',10,18,TH.fg,12);
+      txt(c,this.fr?'Ishqalanish va noelastik zarba: E va p kamayadi':'Ishqalanishsiz, elastik zarba: E va p saqlanadi',10,34,TH.muted,11);
+      this.graph(c,3,1.1,[{k:1,col:BLUE,name:'E / E₀'},{k:2,col:PURPLE,name:'p / p₀'}]);
+    }
+  }
+};
+function ui5(b,r){
+  const bs = [
+    button(b,'Mayatnik',() => { sc5.mode = 'pend'; choose(bs,0); r.reset(); }),
+    button(b,'To\'qnashuv',() => { sc5.mode = 'coll'; choose(bs,1); r.reset(); })];
+  choose(bs,0);
+  const fb = button(b,'Ishqalanish: o\'chiq',() => {
+    sc5.fr = !sc5.fr; fb.textContent = 'Ishqalanish: ' + (sc5.fr ? 'yoqiq' : 'o\'chiq'); r.reset();
+  });
+  slider(b,'Boshlang\'ich burchak',20,80,5,50,v => { sc5.th0 = v; r.reset(); },'°');
+}
+const an5 = {
+  ang:0,
+  reset(){ this.ang = 0; },
+  step(dt,t){ this.ang += dt*6*smooth((t-3)/4); },
+  draw(c,t){
+    const stg = Math.floor(t/3)%4;
+    // Quyosh
+    const pulse = 26 + 2*Math.sin(t*3);
+    c.globalAlpha = 0.3; circ(c,60,85,pulse+10,AMBER); c.globalAlpha = 1;
+    circ(c,60,85,pulse,AMBER);
+    for(let i=0;i<12;i++){ const a = i*0.5236 + t*0.3; line(c,60+(pulse+4)*Math.cos(a),85+(pulse+4)*Math.sin(a),60+(pulse+14)*Math.cos(a),85+(pulse+14)*Math.sin(a),AMBER,2); }
+    // nur oqimi
+    [70,85,100].forEach(y => flow(c,100,172,y,t,AMBER));
+    // kollektor
+    c.fillStyle = '#1e3a8a'; c.fillRect(178,55,80,60);
+    if(stg===0){ c.strokeStyle = AMBER; c.lineWidth = 3; c.strokeRect(178,55,80,60); }
+    txt(c,'Kollektor',218,90,'#fff',12,'center');
+    // issiqlik oqimi
+    flow(c,262,328,85,t,RED);
+    // qozon
+    c.fillStyle = '#7f1d1d'; c.fillRect(334,55,80,60);
+    if(stg===1){ c.strokeStyle = RED; c.lineWidth = 3; c.strokeRect(334,55,80,60); }
+    for(let i=0;i<5;i++){ const yy = 112 - ((t*20 + i*13)%50); circ(c,345+i*16,yy,3,'rgba(255,255,255,0.7)'); }
+    txt(c,'Bug\' qozoni',374,50,TH.fg,11,'center');
+    // mexanik oqim
+    flow(c,418,462,85,t,GRAY);
+    // g'ildirak
+    circ(c,505,85,32,null,TH.fg,3);
+    if(stg>=2){ circ(c,505,85,36,null,GREEN,2); }
+    for(let i=0;i<6;i++){ const a = this.ang + i*1.0472; line(c,505,85,505+30*Math.cos(a),85+30*Math.sin(a),TH.fg,3); }
+    circ(c,505,85,4,TH.fg);
+    // yozuvlar
+    txt(c,'Quyosh nuri',60,150,TH.fg,11,'center');
+    txt(c,'Issiqlik',295,150,TH.fg,11,'center');
+    txt(c,'Bug\'',374,150,TH.fg,11,'center');
+    txt(c,'Mexanik energiya',505,150,TH.fg,11,'center');
+    txt(c,'Quyosh nuri → issiqlik → mexanik energiya',300,24,TH.fg,13,'center');
+    // energiya balansi (misol: FIK = 25 %)
+    const gw = 520*smooth((t%12)/3);
+    txt(c,'Energiya balansi (misol): 100 % = foydali ish + atrofga tarqalgan issiqlik',40,205,TH.fg,12);
+    c.fillStyle = GREEN; c.fillRect(40,215,gw*0.25,26);
+    c.fillStyle = RED; c.fillRect(40+gw*0.25,215,gw*0.75,26);
+    c.strokeStyle = TH.fg; c.lineWidth = 1; c.strokeRect(40,215,520,26);
+    txt(c,'A ≈ 25 %',40+65,232,'#fff',12,'center');
+    txt(c,'Q ≈ 75 %',40+130+195,232,'#fff',12,'center');
+    txt(c,'E_Quyosh = A + Q = const (energiya yo\'qolmaydi, faqat bir turdan boshqasiga o\'tadi)',40,275,TH.muted,12);
+    txt(c,'SI birligi: joul (J)',40,297,TH.muted,12);
+  }
+};
+
+/* ====================== 6-REJA ====================== */
+const sc6 = {
+  a:1, sl:null, tb:null, lastA:'',
+  gal:[{sep:0,n:null},{sep:40,n:'A'},{sep:90,n:'B'},{sep:150,n:'C'},{sep:-70,n:'D'},{sep:120,n:null},{sep:-130,n:null}],
+  dist(g){ return Math.abs(g.sep)*Math.PI/180*100*this.a; },
+  reset(){ this.a = 1; this.lastA = ''; if(this.sl) this.sl.set(1); },
+  step(dt){ this.a += dt*0.12; if(this.a > 3) this.a = 0.5; if(this.sl) this.sl.set(this.a); },
+  tab(){
+    const k = this.a.toFixed(2);
+    if(!this.tb || k === this.lastA) return;
+    this.lastA = k;
+    this.tb.innerHTML = this.gal.filter(g => g.n).map(g => {
+      const d = this.dist(g);
+      return '<tr><td>'+g.n+'</td><td>'+d.toFixed(0)+'</td><td>'+Math.round(d*70)+'</td></tr>';
+    }).join('');
+  },
+  draw(c,t){
+    this.tab();
+    const cx = 300, cy = 170, R = 48*this.a, phi0 = -Math.PI/2;
+    const g = c.createRadialGradient(cx,cy,R*0.1,cx,cy,R);
+    g.addColorStop(0,'rgba(96,165,250,0.05)'); g.addColorStop(1,'rgba(96,165,250,0.30)');
+    c.fillStyle = g; c.beginPath(); c.arc(cx,cy,R,0,6.2832); c.fill();
+    circ(c,cx,cy,R,null,TH.accent,2);
+    const us = [cx + R*Math.cos(phi0), cy + R*Math.sin(phi0)];
+    this.gal.forEach((q,i) => {
+      const f = phi0 + q.sep*Math.PI/180, x = cx + R*Math.cos(f), y = cy + R*Math.sin(f);
+      if(i){
+        line(c,us[0],us[1],x,y,TH.line,1);
+        if(q.n){
+          const v = this.dist(q)*70, L = Math.min(60, v*0.004), s = Math.sign(q.sep);
+          arrow(c,x,y,x - s*Math.sin(f)*L, y + s*Math.cos(f)*L, GREEN, 2.5);
+        }
+      }
+      c.save(); c.translate(x,y); c.rotate(f);
+      c.beginPath(); c.ellipse(0,0,9,4,0,0,6.2832); c.fillStyle = i ? PURPLE : AMBER; c.fill(); c.restore();
+      if(i === 0) txt(c,'Biz',x+12,y+4,TH.fg,12);
+      else if(q.n) txt(c,q.n,x+(Math.cos(f)>=0?12:-18),y+4,TH.fg,12);
+    });
+    txt(c,'Shar sirti — Koinotning modeli: sirt kengayadi, galaktikalar bir-biridan uzoqlashadi',10,18,TH.fg,12);
+    txt(c,'R = a·R₀,  a = '+this.a.toFixed(2)+'   (yashil strelka — uzoqlashish tezligi)',10,H-10,TH.muted,12);
+  }
+};
+function ui6(b,r){
+  sc6.sl = slider(b,'Kengayish a',0.5,3,0.05,1,v => { sc6.a = v; r.draw(); },'×');
+  const d = $('div','info',b);
+  d.innerHTML = '<table class="t"><thead><tr><th>Galaktika</th><th>d (Mpk)</th><th>v = H·d (km/s)</th></tr></thead><tbody></tbody></table><div style="margin-top:4px">H ≈ 70 km/s/Mpk. 1 Mpk (megaparsek) ≈ 3,09·10²² m.</div>';
+  sc6.tb = d.querySelector('tbody');
+}
+const R6 = rng(7), PT6 = [];
+for(let i=0;i<70;i++){
+  PT6.push({a:R6()*6.2832, d:Math.sqrt(R6()), col:['#f87171','#60a5fa','#fbbf24','#a78bfa','#34d399'][i%5], rot:R6()*3.14, sz:3+R6()*3});
+}
+const ST6 = [
+  ['Katta portlash','t = 0, juda zich va issiq'],
+  ['Kvarklar va elektronlar','~10⁻⁶ s'],
+  ['Proton va neytronlardan yadrolar','~3 daqiqa'],
+  ['Atomlar; reliktsion nurlanish','~380 000 yil'],
+  ['Birinchi yulduzlar','~200 mln yil'],
+  ['Galaktikalar','~1 mlrd yil'],
+  ['Bugungi Koinot','13,8 mlrd yil']];
+const an6 = {
+  reset(){}, step(){},
+  draw(c,t){
+    const cx = 300, cy = 145, p = clamp((t%24)/21,0,1), st = Math.min(6,Math.floor(p*7)), Rr = 10 + 130*smooth(p);
+    c.fillStyle = '#050a18'; c.beginPath(); c.arc(cx,cy,Rr,0,6.2832); c.fill();
+    if(st === 0){
+      const g = c.createRadialGradient(cx,cy,0,cx,cy,Rr+25);
+      g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.5,'rgba(251,146,60,0.8)'); g.addColorStop(1,'rgba(251,146,60,0)');
+      c.fillStyle = g; c.beginPath(); c.arc(cx,cy,Rr+25,0,6.2832); c.fill();
+    }
+    const n = [0,70,70,70,25,45,70][st];
+    for(let k=0;k<n;k++){
+      const q = PT6[k], x = cx + q.d*Rr*0.92*Math.cos(q.a) + Math.sin(t*3+k), y = cy + q.d*Rr*0.92*Math.sin(q.a) + Math.cos(t*2.6+k);
+      if(st === 1) circ(c,x,y,1.6,q.col);
+      else if(st === 2) circ(c,x,y,2.6,k%2?AMBER:RED);
+      else if(st === 3) circ(c,x,y,2,'#93c5fd');
+      else if(st === 4){ c.globalAlpha = 0.3; circ(c,x,y,6,'#fff'); c.globalAlpha = 1; circ(c,x,y,2,'#fff'); }
+      else {
+        c.save(); c.translate(x,y); c.rotate(q.rot);
+        c.beginPath(); c.ellipse(0,0,q.sz*(st===6?2.2:1.5),q.sz*0.6,0,0,6.2832);
+        c.fillStyle = q.col; c.globalAlpha = 0.85; c.fill(); c.restore(); c.globalAlpha = 1;
+      }
+    }
+    if(st === 3){ c.globalAlpha = 0.5 + 0.3*Math.sin(t*3); circ(c,cx,cy,Rr,null,'#fb923c',4); c.globalAlpha = 1; }
+    circ(c,cx,cy,Rr,null,TH.accent,1.5);
+    txt(c,ST6[st][0]+' — '+ST6[st][1],cx,304,TH.fg,13,'center');
+    line(c,30,324,570,324,TH.line,3);
+    line(c,30,324,30+540*p,324,AMBER,3);
+    for(let i=0;i<7;i++) circ(c,30+540*i/6,324,i<=st?5:3,i<=st?AMBER:TH.line);
+    txt(c,'Vaqt →',10,18,TH.muted,12);
+    if(st === 3) txt(c,'Reliktsion nurlanish — Katta portlash dalili',cx,H-34,TH.muted,11,'center');
+    if(st === 6) txt(c,'Fizik manzara doimo yangilanib boradi',cx,H-34,TH.muted,11,'center');
+  }
+};
+
+/* ====================== NAZORAT SAVOLLARI ====================== */
+function quiz(box,list){
+  list.forEach((it,n) => {
+    const d = $('div','q',box);
+    $('p','',d,(n+1)+'. '+it.q);
+    const ob = $('div','opts',d), fb = $('div','fb',d);
+    const bs = it.o.map((t,i) => {
+      const b = $('button','',ob,t);
+      b.onclick = () => {
+        bs.forEach((x,j) => { x.disabled = true; if(j === it.a) x.classList.add('ok'); });
+        if(i === it.a){ fb.textContent = '✅ To\'g\'ri! ' + (it.e||''); fb.style.color = 'var(--ok)'; }
+        else { b.classList.add('bad'); fb.textContent = '❌ Noto\'g\'ri. To\'g\'ri javob: ' + it.o[it.a] + '. ' + (it.e||''); fb.style.color = 'var(--bad)'; }
+      };
+      return b;
+    });
+  });
+}
+
+/* ====================== TABLAR MA'LUMOTI ====================== */
+const TABS = [
+  {
+    nav:'1 · Tasavvurlar tarixi', title:'1-reja. Olam haqidagi tasavvurlar tarixi',
+    theory:`<p><b>Geotsentrik tizim</b> (Ptolemey, milodiy II asr): Yer olamning markazida, Quyosh, Oy va sayyoralar uning atrofida aylanadi.</p>
+    <p><b>Geliotsentrik tizim</b> (N. Kopernik, 1543): markazda Quyosh, Yer va boshqa sayyoralar uning atrofida aylanadi.</p>
+    <p>G. Galiley teleskop kuzatuvlari (1609–1610) geliotsentrik tizimni qo'llab-quvvatladi. I. Kepler sayyoralar harakati qonunlarini topdi (1609–1619). I. Nyuton butun olam tortishish qonunini yaratdi (1687).</p>
+    <div class="formula">F = G·m₁·m₂ / r², &nbsp; G = 6,67·10⁻¹¹ N·m²/kg²</div>
+    <p>Samarqandda Ulug'bek rasadxonasi (XV asr) va uning yulduzlar katalogi astronomiya rivojiga katta hissa qo'shgan.</p>`,
+    sim:{scene:sc1,ui:ui1}, anim:{scene:an1},
+    quiz:[
+      {q:'Geotsentrik tizimda olamning markazida nima turadi?',o:['Quyosh','Yer','Oy','Yupiter'],a:1,e:'Bu Ptolemey tizimi.'},
+      {q:'Geliotsentrik tizim 1543-yilda kim tomonidan e\'lon qilingan?',o:['Ptolemey','Galiley','Kopernik','Nyuton'],a:2,e:'Kopernik Quyoshni markazga qo\'ydi.'}]
+  },
+  {
+    nav:'2 · Modda va maydon', title:'2-reja. Materiyaning ikki ko\'rinishi: modda va maydon',
+    theory:`<p><b>Modda</b> — atomlar, molekulalar va jismlar. <b>Maydon</b> — gravitatsion va elektromagnit maydon; jismlar maydon orqali o'zaro ta'sirlashadi.</p>
+    <div class="formula">Kulon qonuni: F = k·|q₁·q₂| / r², &nbsp; k = 9·10⁹ N·m²/C²</div>
+    <p>XIX asrda J. Maksvell elektromagnit maydon nazariyasini yaratdi. Yorug'lik — elektromagnit to'lqin.</p>
+    <div class="formula">c = λ·f ≈ 3·10⁸ m/s</div>`,
+    sim:{scene:sc2,ui:ui2}, anim:{scene:an2},
+    quiz:[
+      {q:'Yorug\'likning vakuumdagi tezligi taxminan qancha?',o:['3·10³ m/s','3·10⁵ m/s','3·10⁸ m/s','3·10¹² m/s'],a:2,e:'c ≈ 3·10⁸ m/s.'},
+      {q:'Elektromagnit maydon nazariyasini kim yaratgan?',o:['Xabbl','Maksvell','Kopernik','Galiley'],a:1,e:'XIX asrda Maksvell yaratgan.'}]
+  },
+  {
+    nav:'3 · Fundamental ta\'sirlar', title:'3-reja. Fundamental o\'zaro ta\'sirlar',
+    theory:`<p>To'rtta fundamental ta'sir bor: <b>gravitatsion</b>, <b>elektromagnit</b>, <b>kuchli</b> (yadroda) va <b>kuchsiz</b> (radioaktiv parchalanishda).</p>
+    <div class="formula">Nisbiy kuchlari: kuchli ≈ 1; elektromagnit ≈ 1/137; kuchsiz ≈ 10⁻⁶; gravitatsion ≈ 10⁻³⁸</div>
+    <p>S. Glashou, A. Salam va S. Vaynberg elektromagnit va kuchsiz ta'sirni «elektrokuchsiz» ta'sirga birlashtirdi (1967–1968). Barcha ta'sirlarni birlashtirish — fizikaning katta maqsadi.</p>`,
+    sim:{scene:sc3,ui:ui3}, anim:{scene:an3},
+    quiz:[
+      {q:'Qaysi fundamental ta\'sir eng kuchli?',o:['Gravitatsion','Elektromagnit','Kuchsiz','Kuchli'],a:3,e:'Uning nisbiy kuchi 1 ga teng.'},
+      {q:'Radioaktiv β-parchalanish uchun qaysi ta\'sir javobgar?',o:['Kuchsiz','Gravitatsion','Kuchli','Elektromagnit'],a:0,e:'Kuchsiz ta\'sir.'}]
+  },
+  {
+    nav:'4 · Ierarxiya va masshtab', title:'4-reja. Tabiat tuzilmalarining ierarxiyasi va masshtablari',
+    theory:`<p>Kvark → proton/neytron → atom yadrosi (~10⁻¹⁵ m) → atom (~10⁻¹⁰ m) → molekula → Yer (d ≈ 1,3·10⁷ m) → Quyosh sistemasi → Somon yo'li galaktikasi (~10⁵ yorug'lik yili) → galaktikalar to'dasi → Koinot.</p>
+    <div class="formula">1 yorug'lik yili ≈ 9,46·10¹⁵ m</div>
+    <p>Hamma darajada bir xil fizik qonunlar amal qiladi.</p>`,
+    sim:{scene:sc4,ui:ui4}, anim:{scene:an4},
+    quiz:[
+      {q:'Atomning o\'lchami taxminan qancha?',o:['10⁻¹⁵ m','10⁻¹⁰ m','10⁻⁶ m','10⁻² m'],a:1,e:'Atom ~10⁻¹⁰ m, yadro esa ~10⁻¹⁵ m.'},
+      {q:'Somon yo\'li nima?',o:['Yulduz','Sayyora','Galaktika','Galaktikalar to\'dasi'],a:2,e:'Bizning galaktikamiz.'}]
+  },
+  {
+    nav:'5 · Saqlanish qonunlari', title:'5-reja. Yagona qonunlar va saqlanish qonunlari',
+    theory:`<p>Energiya, impuls va elektr zaryadining saqlanish qonunlari makro- va mikrodunyoda, Yerda va kosmosda bir xil bajariladi.</p>
+    <div class="formula">E_k = m·v²/2, &nbsp; E_p = m·g·h, &nbsp; E = E_k + E_p = const (J)<br>p = m·v, &nbsp; Σp = const (kg·m/s)</div>
+    <p>Nyuton mexanikasi, termodinamika, elektromagnetizm, nisbiylik va kvant nazariyasi bir-birini to'ldiradi. Fizikaning vazifasi qonunlarni yagona manzaraga birlashtirishdir.</p>`,
+    sim:{scene:sc5,ui:ui5}, anim:{scene:an5},
+    quiz:[
+      {q:'Energiyaning saqlanish qonuni qayerda bajariladi?',o:['Faqat Yerda','Faqat kosmosda','Faqat mikrodunyoda','Hamma joyda'],a:3,e:'Fizika qonunlari yagona.'},
+      {q:'Ishqalanishda mexanik energiyaning kamaygan qismi nimaga aylanadi?',o:['Issiqlikka (ichki energiyaga)','Yo\'qolib ketadi','Impulsga','Elektr zaryadga'],a:0,e:'Energiya yo\'qolmaydi, issiqlikka o\'tadi.'}]
+  },
+  {
+    nav:'6 · Koinot kengayishi', title:'6-reja. Koinotning kengayishi va Katta portlash',
+    theory:`<p>E. Xabbl (1929) galaktikalarning bizdan uzoqlashayotganini aniqladi.</p>
+    <div class="formula">Xabbl qonuni: v = H·d, &nbsp; H ≈ 70 km/s/Mpk</div>
+    <p>Katta portlash nazariyasiga ko'ra Koinot taxminan 13,8 mlrd yil oldin paydo bo'lgan va kengayib kelmoqda. <b>Reliktsion nurlanish</b> — bu nazariyaning dalili. Fizik manzara doimo yangilanib boradi.</p>`,
+    sim:{scene:sc6,ui:ui6}, anim:{scene:an6},
+    quiz:[
+      {q:'Xabbl qonuniga ko\'ra galaktika qancha uzoq bo\'lsa, uning uzoqlashish tezligi…',o:['kichik bo\'ladi','katta bo\'ladi','o\'zgarmaydi','nolga teng bo\'ladi'],a:1,e:'v = H·d.'},
+      {q:'Katta portlash taxminan qachon bo\'lgan?',o:['13,8 mlrd yil oldin','138 mln yil oldin','4,6 mlrd yil oldin','1,38 trln yil oldin'],a:0,e:'Koinotning yoshi ≈ 13,8 mlrd yil.'}]
+  }
+];
+
+/* ====================== SAHIFANI YIG'ISH ====================== */
+const navEl = document.getElementById('nav'), mainEl = document.getElementById('main'), panels = [];
+TABS.forEach((T,i) => {
+  const nb = $('button','',navEl,T.nav);
+  nb.onclick = () => show(i);
+  const p = $('section','panel',mainEl);
+  $('h2','',p,T.title);
+  $('div','card theory',p,'<h3>Nazariy ma\'lumot</h3>'+T.theory);
+  const c1 = $('div','card',p,'<h3>Simulyatsiya</h3>');
+  const c2 = $('div','card',p,'<h3>Animatsiya</h3>');
+  const c3 = $('div','card',p,'<h3>Nazorat savollari</h3>');
+  const rs = [new Runner(c1,T.sim.scene,T.sim.ui), new Runner(c2,T.anim.scene,T.anim.ui)];
+  quiz(c3,T.quiz);
+  panels.push({nb:nb,p:p,rs:rs});
+});
+function show(i){
+  panels.forEach((x,j) => {
+    x.rs.forEach(r => r.pause());                 // oldingi tabdagi animatsiyalar to'xtaydi
+    x.p.classList.toggle('on', j===i);
+    x.nb.classList.toggle('on', j===i);
+  });
+  panels[i].rs.forEach(r => { r.reset(); r.play(); });
+  window.scrollTo(0,0);
+}
+// Och/to'q rejim almashganda qayta chizish
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { loadTheme(); runners.forEach(r => r.draw()); });
+show(0);
+</script>
+</body>
+</html>
