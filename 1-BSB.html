@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>9-sinf Fizika BSB-1 quiz</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1d2433;--mut:#667085;--pri:#3b5bdb;--ok:#2b9348;--no:#d62839;--bd:#dde3ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1b2030;--tx:#e8ebf3;--mut:#9aa3b5;--pri:#7c93ff;--ok:#4cc26a;--no:#ff6b78;--bd:#2c3348}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b2030;--tx:#e8ebf3;--mut:#9aa3b5;--pri:#7c93ff;--ok:#4cc26a;--no:#ff6b78;--bd:#2c3348}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:12px 0}
+h1{font-size:1.4rem;margin:.2em 0}h2{font-size:1.05rem;color:var(--pri);margin:22px 0 4px}
+.mut{color:var(--mut);font-size:.92rem}
+button{font:inherit;background:var(--pri);color:#fff;border:0;border-radius:10px;padding:12px 22px;cursor:pointer;font-weight:600}
+button.sec{background:transparent;color:var(--pri);border:1px solid var(--pri)}
+input[type=text],input[type=number],select{font:inherit;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);width:100%;max-width:100%}
+label.opt{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;margin:6px 0;cursor:pointer}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1 1 120px}
+.gr{display:flex;gap:10px;overflow-x:auto;padding:6px 0}
+.gr figure{margin:0;text-align:center;flex:0 0 auto;font-size:.85rem}
+svg{width:130px;height:105px;stroke:var(--tx);fill:none;stroke-width:2}
+svg text{fill:var(--tx);stroke:none;font-size:11px;font-style:italic}
+svg .ax{stroke-width:1.5}
+.bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--pri);width:0}
+.res{border-left:5px solid var(--bd)}.res.ok{border-color:var(--ok)}.res.no{border-color:var(--no)}.res.part{border-color:#f0a202}
+.big{font-size:2.6rem;font-weight:800;color:var(--pri);margin:0}
+.hide{display:none}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid var(--bd);padding:6px 12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div id="start" class="card" style="text-align:center">
+  <h1>⚛️ 9-sinf Fizika — BSB-1</h1>
+  <p class="mut">Gaz qonunlari bo'yicha o'zlashtirish darajasini aniqlash testi<br>5 bo'lim · maksimal ball: 50</p>
+  <button id="go">Testni boshlash</button>
+</div>
+<div id="quiz" class="hide">
+  <div class="card" style="position:sticky;top:env(safe-area-inset-top,0px);z-index:5;padding:10px 16px">
+    <div class="mut"><span id="cnt">0</span> / <span id="tot">0</span> savolga javob berildi</div>
+    <div class="bar"><i id="pb"></i></div>
+  </div>
+  <div id="qs"></div>
+  <div class="row" style="margin:16px 0"><button id="fin">Natijani ko'rish</button></div>
+</div>
+<div id="result" class="hide"></div>
+</div>
+<script>
+const G=(x,y,s,a,b)=>{const p={hyper:'<path d="M32 22Q38 72 108 80"/>',vert:'<path d="M62 28V68"/><text x="66" y="30">1</text><text x="66" y="72">2</text>',horiz:'<path d="M35 42H100"/><text x="28" y="40">1</text><text x="102" y="40">2</text>',line:'<path d="M24 82L104 22"/>',iso:'<path d="M24 82L100 20"/><text x="98" y="16">V₁</text><path d="M24 82L104 56"/><text x="104" y="52">V₂</text>'}[s];
+return `<svg viewBox="0 0 130 105"><path class="ax" d="M20 88H120M20 88V8"/><text x="122" y="98">${x}</text><text x="6" y="14">${y}</text><text x="8" y="98">O</text>${p}</svg>`};
+const n=s=>s.toLowerCase().replace(/[ʻʼ'’`‘]/g,'').replace(/\s+/g,'');
+const Q=[
+{s:'I. OCHIQ TEST',pts:2,t:'text',q:'a) Mayda erimaydigan zarrachalarning suyuqlik yoki gaz ichida tartibsiz harakati ….. deyiladi',ph:'Javobingiz',chk:v=>/br[ou]u?n/.test(n(v)),ans:'Broun harakati'},
+{s:'I. OCHIQ TEST',pts:2,t:'text',q:'b) Ideal gazning absolyut temperaturasi 3 marta ortganda, molekulalarining o\'rtacha kvadratik tezligi necha marta ortadi?',ph:'Masalan: 2 yoki √2',chk:v=>/√3|ildiz|1[.,]7[23]|sqrt|3\^\(?0[.,]5/.test(n(v)),ans:'√3 marta (≈1,73 marta), chunki v ~ √T'},
+{s:'I. OCHIQ TEST',pts:2,t:'text',q:'c) Gaz 1-holatdan 2-holatga rasmda ko\'rsatilgandek o\'tkazildi (V–T grafigi, T o\'zgarmaydi, V kamayadi). Bu qanday jarayon?',g:G('T','V','vert'),ph:'Jarayon nomi',chk:v=>/izotermik|temperaturao.?zgarmas/.test(n(v)),ans:'Izotermik jarayon (T = const, gaz siqilmoqda)'},
+{s:'I. OCHIQ TEST',pts:2,t:'text',q:'d) Grafikda bir xil massali ideal gaz uchun ikkita izoxora tasvirlangan (p–T). Gaz hajmlari taqqoslab, ular uchun to\'g\'ri munosabatni yozing.',g:G('T','p','iso'),ph:'Masalan: V₁ > V₂',chk:v=>{v=n(v).replace(/₁/g,'1').replace(/₂/g,'2');return /v1<v2|v2>v1|v1kichik/.test(v)},ans:'V₁ < V₂ (p = νRT/V; izoxora qanchalik tik bo\'lsa, hajm shunchalik kichik)'},
+{s:'II. MOSLASHTIRISH',pts:4,t:'match',q:'Gaz 1-holatdan 2-holatga o\'tkazildi (p–T grafigida gorizontal chiziq: p o\'zgarmaydi, T ortadi). Fizik kattaliklarni holat o\'zgarishlari bilan moslashtiring.',g:G('T','p','horiz'),items:['1 — Bosim','2 — Temperatura'],opts:{K:'K — ortadi',L:'L — kamayadi',M:'M — o\'zgarmaydi'},key:['M','K'],ans:'1 — M (bosim o\'zgarmaydi), 2 — K (temperatura ortadi)'},
+{s:'III. BIR NECHTA JAVOBLI TEST',pts:5,t:'multi',q:'a) Quyidagi grafiklarning qaysilari izoxorik jarayonni tasvirlaydi?',gs:[['1','V–T, giperbola',G('T','V','hyper')],['2','p–T, T = const',G('T','p','vert')],['3','p–V, V = const',G('V','p','vert')],['4','p–V, giperbola',G('V','p','hyper')],['5','V–T, V = const',G('T','V','horiz')]],opts:{1:'1-grafik',2:'2-grafik',3:'3-grafik',4:'4-grafik',5:'5-grafik'},key:['3','5'],ans:'3 va 5 (ikkala grafikda ham hajm o\'zgarmaydi)'},
+{s:'III. BIR NECHTA JAVOBLI TEST',pts:5,t:'multi',q:'b) Izotermik jarayon ifodalangan javob(lar)ni belgilang.',opts:{1:'T = const',2:'V = const',3:'p = const',4:'pV = const',5:'p/T = const'},key:['1','4'],ans:'1) T = const va 4) pV = const (Boyl–Mariott qonuni)'},
+{s:'IV. MASALA',pts:10,t:'num',q:'2,5 mol miqdordagi ideal gaz 300 K harorat va 2 atm bosim ostida qancha hajm (l) ni egallaydi? (R = 8,31 J/mol·K). Javobni litrda kiriting.',ph:'Hajm, litr',lo:30,hi:31.6,ans:'≈ 30,8 litr',sol:'Berilgan: ν = 2,5 mol; T = 300 K; p = 2 atm = 2·101325 Pa ≈ 2,03·10⁵ Pa.<br>Mendeleyev–Klapeyron: pV = νRT ⇒ V = νRT/p = 2,5·8,31·300 / 202650 ≈ 0,0308 m³ ≈ 30,8 l.'},
+{s:'V. TAHLIL VA XULOSA',pts:6,t:'single',q:'Farhod 80 ml li shprits ichidagi havoni isitdi (20 °C → 50 ml, 40 °C → 54 ml, 60 °C → 58 ml, 80 °C → 62 ml). a) Havoning hajmi uning temperaturasiga qanday bog\'liq?',tbl:1,opts:{a:'Temperatura ortishi bilan hajm kamayadi',b:'Temperatura ortishi bilan hajm ortadi (har 20 °C da taxminan 4 ml ga)',c:'Hajm temperaturaga bog\'liq emas',d:'Hajm temperaturaga teskari proporsional'},key:'b',ans:'Temperatura ortganda hajm ham chiziqli ortadi (har 20 °C ga ≈ 4 ml).'},
+{s:'V. TAHLIL VA XULOSA',pts:6,t:'single',q:'b) Buni qanday jarayon deyish mumkin, nima sababdan?',opts:{a:'Izotermik — chunki temperatura o\'zgarmaydi',b:'Izoxorik — chunki hajm o\'zgarmaydi',c:'Izobarik — chunki porshen erkin harakatlanadi, bosim (atmosfera bosimi) o\'zgarmaydi',d:'Adiabatik — chunki issiqlik almashinuvi yo\'q'},key:'c',ans:'Izobarik jarayon (p = const): V/T ≈ const (Gey-Lyussak qonuni).'},
+{s:'V. TAHLIL VA XULOSA',pts:6,t:'single',q:'c) Havo hajmining temperaturaga bog\'liqlik grafigini (V–T) tanlang.',gs:[['a','',G('T','V','hyper')],['b','',G('T','V','line')],['c','',G('T','V','horiz')]],opts:{a:'A — giperbola',b:'B — to\'g\'ri chiziq (ortuvchi)',c:'C — gorizontal chiziq'},key:'b',ans:'B — hajm temperaturaga to\'g\'ri chiziqli ortadi (izobara).'}
+];
+const $=id=>document.getElementById(id);
+let secLast='';
+function build(){
+ let h='';
+ Q.forEach((q,i)=>{
+  if(q.s!==secLast){h+=`<h2>${q.s}</h2>`;secLast=q.s}
+  h+=`<div class="card" id="c${i}"><div class="mut">${q.pts} ball</div><p style="margin:.3em 0 .6em">${q.q}</p>`;
+  if(q.tbl)h+='<table><tr><th>T (°C)</th><th>V (ml)</th></tr><tr><td>20</td><td>50</td></tr><tr><td>40</td><td>54</td></tr><tr><td>60</td><td>58</td></tr><tr><td>80</td><td>62</td></tr></table>';
+  if(q.g)h+=`<div class="gr"><figure>${q.g}</figure></div>`;
+  if(q.gs)h+='<div class="gr">'+q.gs.map(g=>`<figure>${g[2]}<br>${g[0].toUpperCase()}${g[1]?') '+g[1]:''}</figure>`).join('')+'</div>';
+  if(q.t==='text')h+=`<input type="text" id="a${i}" placeholder="${q.ph}" autocomplete="off">`;
+  if(q.t==='num')h+=`<input type="number" step="any" inputmode="decimal" id="a${i}" placeholder="${q.ph}">`;
+  if(q.t==='match')h+='<div class="row">'+q.items.map((it,j)=>`<div>${it}<select id="a${i}_${j}"><option value="">— tanlang —</option>${Object.entries(q.opts).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>`).join('')+'</div>';
+  if(q.t==='multi')h+=Object.entries(q.opts).map(([k,v])=>`<label class="opt"><input type="checkbox" name="a${i}" value="${k}">${v}</label>`).join('');
+  if(q.t==='single')h+=Object.entries(q.opts).map(([k,v])=>`<label class="opt"><input type="radio" name="a${i}" value="${k}">${v}</label>`).join('');
+  h+='</div>';
+ });
+ $('qs').innerHTML=h;$('tot').textContent=Q.length;
+}
+function ans(q,i){
+ if(q.t==='text'||q.t==='num')return $('a'+i).value.trim();
+ if(q.t==='match')return q.items.map((_,j)=>$('a'+i+'_'+j).value);
+ const c=[...document.querySelectorAll(`[name=a${i}]:checked`)].map(e=>e.value);
+ return q.t==='single'?(c[0]||''):c;
+}
+const filled=(q,a)=>Array.isArray(a)?a.some(x=>x):!!a;
+function prog(){let c=0;Q.forEach((q,i)=>{if(filled(q,ans(q,i)))c++});$('cnt').textContent=c;$('pb').style.width=c/Q.length*100+'%'}
+function grade(q,a){
+ let sc=0;
+ if(q.t==='text')sc=a&&q.chk(a)?q.pts:0;
+ if(q.t==='num'){const v=parseFloat(a.replace(',','.'));sc=v>=q.lo&&v<=q.hi?q.pts:0}
+ if(q.t==='match')sc=a.reduce((s,x,j)=>s+(x===q.key[j]?q.pts/2:0),0);
+ if(q.t==='single')sc=a===q.key?q.pts:0;
+ if(q.t==='multi'){const r=a.filter(x=>q.key.includes(x)).length,w=a.length-r;sc=Math.max(0,r-w)/q.key.length*q.pts}
+ return sc;
+}
+function show(q,a){
+ if(!filled(q,a))return '<i>javob berilmagan</i>';
+ if(q.t==='match')return a.map((x,j)=>`${j+1}: ${x||'—'}`).join(', ');
+ if(q.t==='multi')return a.join(', ');
+ if(q.t==='single')return q.opts[a];
+ return a;
+}
+function finish(){
+ let tot=0,max=0,h='';
+ Q.forEach((q,i)=>{const a=ans(q,i),s=grade(q,a);tot+=s;max+=q.pts;
+  const cl=s===q.pts?'ok':s>0?'part':'no';
+  h+=`<div class="card res ${cl}"><b>${i+1}. ${s===q.pts?'✅':s>0?'🟡':'❌'} ${+s.toFixed(1)} / ${q.pts}</b><div class="mut" style="margin:4px 0">${q.q.replace(/<[^>]+>/g,'')}</div>Sizning javobingiz: ${show(q,a)}<br><b>To'g'ri javob:</b> ${q.ans}${q.sol?'<br><div class="mut" style="margin-top:6px">'+q.sol+'</div>':''}</div>`});
+ tot=Math.round(tot*10)/10;const p=tot/max*100;
+ const msg=p>=86?'A\'lo! 🎉':p>=71?'Yaxshi 👍':p>=56?'Qoniqarli':'Yana takrorlang 📚';
+ $('result').innerHTML=`<div class="card" style="text-align:center"><p class="mut">Sizning natijangiz</p><p class="big">${tot} / ${max}</p><div>${Math.round(p)}% — ${msg}</div><div class="row" style="margin-top:14px"><button id="again">Qayta boshlash</button><button class="sec" id="back">Savollarga qaytish</button></div></div><h2>Batafsil tahlil</h2>${h}`;
+ $('quiz').classList.add('hide');$('result').classList.remove('hide');window.scrollTo(0,0);
+ $('again').onclick=()=>{secLast='';build();prog();$('result').classList.add('hide');$('quiz').classList.remove('hide');window.scrollTo(0,0)};
+ $('back').onclick=()=>{$('result').classList.add('hide');$('quiz').classList.remove('hide');window.scrollTo(0,0)};
+}
+$('go').onclick=()=>{secLast='';build();prog();$('start').classList.add('hide');$('quiz').classList.remove('hide');window.scrollTo(0,0)};
+$('qs').addEventListener('input',prog);$('qs').addEventListener('change',prog);
+$('fin').onclick=()=>{const c=+$('cnt').textContent;if(c<Q.length&&!confirm(`${Q.length-c} ta savolga javob berilmagan. Natijani ko'rasizmi?`))return;finish()};
+</script>
+</body>
+</html>
