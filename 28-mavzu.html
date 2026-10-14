@@ -144,4 +144,4 @@ function testView(){$('#main').innerHTML=`<div class="card"><h3>Test (5 ta savol
 function fin(){let s=0;TEST.forEach((q,i)=>{let ch=document.querySelector(`input[name=q${i}]:checked`);q[1].forEach((o,j)=>$(`#o${i}_${j}`).className='');$(`#o${i}_${q[2]}`).className='good';if(ch){if(+ch.value==q[2])s++;else $(`#o${i}_${ch.value}`).className='bad'}});
 let t=$('#tr');t.style.display='block';t.innerHTML=`Natija: ${s} / 5 ball<br><small>${s==5?'🏆 A\'lo!':s>=4?'👍 Yaxshi':s>=3?'🙂 Qoniqarli':'📖 Mavzuni takrorlang'}</small>`;t.scrollIntoView({behavior:'smooth'})}
 go(0);
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
