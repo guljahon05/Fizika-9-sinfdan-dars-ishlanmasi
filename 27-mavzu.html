@@ -145,4 +145,4 @@ function pick(i,j){ans[i]=j;for(let k=0;k<4;k++)$(`o${i}_${k}`).className=k==j?'
 function checkQuiz(){let s=0;Q.forEach((q,i)=>{for(let k=0;k<4;k++){let b=$(`o${i}_${k}`);b.className=k==q[2]?'good':(k==ans[i]?'bad':'')}if(ans[i]==q[2])s++});
 $('qres').className="res "+(s>=4?"ok":"no");$('qres').textContent=`Natija: ${s}/5 ball (${s*20}%) ${s==5?"🏆 Ajoyib!":s>=3?"👍 Yaxshi":"📚 Mavzuni takrorlang"}`}
 show(0);requestAnimationFrame(loop);
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
