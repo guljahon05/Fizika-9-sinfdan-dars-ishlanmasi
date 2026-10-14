@@ -122,4 +122,4 @@ const TS=[["Ichki yonuv dvigatelida yoqilg'i qayerda yonadi?",["Silindr ichida",
 let sc=0,an=0;$('tests').innerHTML='<div class=card><h3>📝 Test (5 ta savol)</h3>'+TS.map((q,i)=>`<div class=q id=q${i}><p><b>${i+1}.</b> ${q[0]}</p>${q[1].map((o,j)=>`<button onclick="ans(${i},${j})">${o}</button>`).join('')}</div>`).join('')+'<div class=out id=res>Natija: 0/5</div></div>';
 function ans(i,j){const d=$('q'+i);if(d.dataset.d)return;d.dataset.d=1;const b=d.querySelectorAll('button');b[TS[i][2]].classList.add('ok');if(j==TS[i][2])sc++;else b[j].classList.add('no');an++;$('res').textContent=`Natija: ${sc}/5`+(an==5?(sc==5?' 🏆 Ajoyib!':sc>=3?' 👍 Yaxshi!':' 📚 Mavzuni takrorlang'):'')}
 md3(0);up4();up5();kar();up6();tab(1);
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
