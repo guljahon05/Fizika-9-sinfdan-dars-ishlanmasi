@@ -162,4 +162,6 @@ document.querySelectorAll('.marks button').forEach(b=>b.onclick=()=>{$('#s3').va
 
 let last=performance.now();
 (function loop(n){const dt=Math.min(.05,(n-last)/1000);last=n;if(cur==1)sim1(dt);else if(cur==2)sim2(n/1000);else sim3(dt);requestAnimationFrame(loop)})(last);
-</script></body></html>
+</script>
+ <script src="menu.js"></script>
+</body></html>
