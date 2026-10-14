@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9-sinf fizika — BSB-1</title>
+<style>
+  :root {
+    --paper: #fdfdfb;
+    --page: #e9ecf3;
+    --ink: #1b2438;
+    --muted: #5b6579;
+    --line: #aab6d3;
+    --grid: #bcd6ea;
+    --accent: #1d4ea8;
+    --margin: #d9534f;
+    --field: #f3f6fd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1a2030;
+      --page: #11151f;
+      --ink: #e6eaf5;
+      --muted: #9aa5bf;
+      --line: #4a5675;
+      --grid: #2d4157;
+      --accent: #7fa8ff;
+      --margin: #e87b77;
+      --field: #222a3d;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 16px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar span { font-size: 15px; color: var(--muted); }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 16px; min-height: 44px;
+    background: var(--accent); color: #fff;
+    border: 0; border-radius: 8px;
+    font: inherit; font-size: 16px; font-weight: 700;
+    text-decoration: none; cursor: pointer;
+  }
+  .back-btn:hover { filter: brightness(1.1); }
+  .back-btn:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 2px;
+  }
+  .sheet {
+    max-width: 820px;
+    margin: 20px auto 40px;
+    padding: 32px 36px 40px 56px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-left: 3px double var(--margin);
+    border-radius: 4px;
+  }
+  .doc-head { text-align: center; font-weight: 700; font-size: 17px; margin: 0 0 22px; }
+  .id-row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; margin-bottom: 10px; }
+  .id-row label { display: flex; align-items: end; gap: 8px; }
+  .id-row input {
+    border: 0; border-bottom: 1.5px solid var(--ink); background: transparent;
+    font: inherit; color: var(--ink); padding: 2px 4px;
+  }
+  .id-row .grade { width: 52px; text-align: center; }
+  .id-row .fio { width: 340px; max-width: 100%; }
+  .id-row .score { width: 64px; text-align: center; }
+  .hint { font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+  .variant { text-align: center; font-weight: 700; font-size: 19px; margin: 22px 0 10px; }
+  h2 { font-size: 18px; margin: 28px 0 8px; }
+  .q { margin: 18px 0 4px; }
+  .q b.n { color: var(--accent); }
+  .section-title { font-weight: 700; margin-top: 8px; }
+
+  /* answer areas: ruled lines */
+  textarea.ans {
+    display: block; width: 100%;
+    margin: 6px 0 14px;
+    padding: 0 6px;
+    border: 0; border-bottom: 1.5px dotted var(--ink);
+    border-radius: 0;
+    background:
+      repeating-linear-gradient(to bottom, transparent 0, transparent 33px, var(--line) 33px, var(--line) 34px);
+    background-color: var(--field);
+    color: var(--ink);
+    font: inherit; line-height: 34px;
+    resize: vertical;
+    min-height: 40px;
+  }
+  textarea.l1 { height: 40px; }
+  textarea.l2 { height: 74px; }
+  textarea.l4 { height: 142px; }
+  textarea.solve { height: 300px; }
+  textarea.given { height: 260px; }
+
+  .fig { margin: 12px 0; max-width: 100%; overflow-x: auto; }
+  .fig svg { display: block; max-width: 100%; height: auto; }
+  svg text { fill: var(--ink); font-family: Georgia, serif; }
+  svg .ax { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+  svg .gr { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+  svg .pl { stroke: var(--ink); stroke-width: 2.5; }
+  svg .bl { stroke: #2aa7e8; stroke-width: 2.5; fill: none; }
+
+  /* Q2 table */
+  .match-wrap { overflow-x: auto; margin: 12px 0; }
+  table { border-collapse: collapse; }
+  th, td { border: 1.5px solid var(--ink); padding: 8px 14px; text-align: left; }
+  th { background: var(--field); }
+  td.k { font-weight: 700; text-align: center; }
+  .ans-table { margin: 14px 0; }
+  .ans-table th, .ans-table td { text-align: center; min-width: 64px; }
+  .ans-table select {
+    font: inherit; font-size: 17px; width: 64px; height: 40px;
+    background: var(--field); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 4px; text-align: center;
+  }
+  .two-col { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: flex-start; }
+
+  /* Q4 */
+  .solve-layout { display: grid; grid-template-columns: 200px 1fr; gap: 0 16px; margin-top: 8px; }
+  .solve-layout h3 { margin: 0 0 4px; font-size: 16px; }
+  .solve-layout textarea.ans { background-image: none; line-height: 1.5; }
+
+  /* Q5 */
+  .data-table { margin: 12px 0; }
+  .data-table td { text-align: center; }
+  .graph-paper {
+    width: 100%; height: 340px; margin: 10px 0 16px;
+    border: 1.5px solid var(--grid);
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  .note { font-size: 14px; color: var(--muted); }
+
+  .pts {
+    display: inline-block; margin-left: 8px; padding: 0 9px;
+    font-size: 14px; font-weight: 700; line-height: 22px;
+    color: var(--accent); border: 1.5px solid var(--accent); border-radius: 11px;
+    white-space: nowrap; vertical-align: baseline;
+  }
+  .pts.total { background: var(--accent); color: #fff; }
+  .score-sum { max-width: 100%; margin: 18px 0 0; font-size: 15px; color: var(--muted); }
+  .bottom-nav { text-align: center; margin-top: 36px; }
+
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .sheet { margin: 0; padding: 22px 16px 32px 24px; border-radius: 0; border-right: 0; }
+    .solve-layout { grid-template-columns: 1fr; }
+    .topbar span { display: none; }
+  }
+  @media print {
+    .topbar, .bottom-nav { display: none; }
+    body { background: #fff; }
+    .sheet { margin: 0; border: 0; max-width: none; }
+    textarea.ans { resize: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back-btn" id="backTop" href="index.html">&#8592; Mundarijaga qaytish</a>
+  <span>9-sinf fizika · BSB-1</span>
+</div>
+
+<main class="sheet">
+  <p class="doc-head">Umumta’lim maktab o‘quvchilari uchun 2026-2027 o‘quv yili uchun<br>
+    9-sinf o‘quvchilarining fizika fanidan nazorat o‘lchov materiallari</p>
+
+  <div class="id-row">
+    <label>9- <input class="grade" type="text" aria-label="Sinf harfi" maxlength="3"> sinf o‘quvchisi
+      <input class="fio" type="text" aria-label="F.I.SH."></label>
+  </div>
+  <p class="hint">F.I.SH.</p>
+  <div class="id-row">
+    <label>O‘quvchi to‘plagan umumiy ball: <input class="score" type="text" aria-label="To‘plangan ball"> (maksimal ball: 50)</label>
+  </div>
+
+  <p class="variant">BSB-1</p>
+
+  <!-- 1 -->
+  <p class="section-title">I. Quyida berilgan savollarga javob yozing. <span class="pts total">Jami: 8 ball</span> <span class="note">(har bir to‘g‘ri javobga 2 balldan)</span></p>
+
+  <p class="q"><b class="n">a)</b> Moddaning qaysi agregat holatida zarrachalar asosan muvozanat vaziyati atrofida tebranma harakat qiladi? <span class="pts">[2 ball]</span></p>
+  <textarea class="ans l1" aria-label="1-a javob"></textarea>
+
+  <p class="q"><b class="n">b)</b> Qanday agregat holatda diffuziya tezligi eng yuqori bo‘ladi? <span class="pts">[2 ball]</span></p>
+  <textarea class="ans l1" aria-label="1-b javob"></textarea>
+
+  <p class="q"><b class="n">c)</b> Molekulalar konsentratsiyasi formulasini yozing. <span class="pts">[2 ball]</span></p>
+  <textarea class="ans l1" aria-label="1-c javob"></textarea>
+
+  <p class="q"><b class="n">d)</b> Avagadro doimiysining qiymatini XBS da yozing. <span class="pts">[2 ball]</span></p>
+  <textarea class="ans l1" aria-label="1-d javob"></textarea>
+
+  <!-- 2 -->
+  <p class="q"><b class="n">2.</b> Gaz 1-holatdan 2-holatga rasmda ko‘rsatilgandek o‘tkazildi (rasmga qarang). Jadvalda berilgan fizik kattaliklarni holat o‘zgarishlari bilan moslashtiring. <span class="pts total">Jami: 4 ball</span> <span class="note">(har bir to‘g‘ri javob uchun 2 balldan)</span></p>
+
+  <div class="two-col">
+    <div class="fig">
+      <svg viewBox="0 0 260 170" width="260" role="img" aria-label="P–T grafigi: K nuqtadan L nuqtaga to‘g‘ri chiziq">
+        <defs>
+          <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#2aa7e8"/>
+          </marker>
+        </defs>
+        <line class="bl" x1="35" y1="150" x2="35" y2="15" marker-end="url(#ah)"/>
+        <line class="bl" x1="35" y1="150" x2="230" y2="150" marker-end="url(#ah)"/>
+        <text x="18" y="22" font-size="14" font-weight="700">P</text>
+        <text x="215" y="168" font-size="14" font-weight="700">T</text>
+        <circle cx="60" cy="125" r="3.5" fill="#2aa7e8"/>
+        <text x="47" y="142" font-size="13" font-weight="700">K</text>
+        <line class="bl" x1="60" y1="125" x2="135" y2="86" marker-end="url(#ah)"/>
+        <text x="140" y="84" font-size="13" font-weight="700">L</text>
+      </svg>
+    </div>
+
+    <div class="match-wrap">
+      <table>
+        <thead><tr><th colspan="2">Fizik kattaliklar</th><th colspan="2">Holat o‘zgarishlari</th></tr></thead>
+        <tbody>
+          <tr><td class="k">1</td><td>Temperatura</td><td class="k">K</td><td>ortadi</td></tr>
+          <tr><td class="k" rowspan="2">2</td><td rowspan="2">Hajm</td><td class="k">L</td><td>kamayadi</td></tr>
+          <tr><td class="k">M</td><td>o‘zgarmaydi</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <table class="ans-table">
+    <thead><tr><th>1</th><th>2</th></tr></thead>
+    <tbody><tr>
+      <td><select aria-label="1 uchun javob"><option value=""></option><option>K</option><option>L</option><option>M</option></select></td>
+      <td><select aria-label="2 uchun javob"><option value=""></option><option>K</option><option>L</option><option>M</option></select></td>
+    </tr></tbody>
+  </table>
+
+  <!-- 3 -->
+  <p class="q"><b class="n">3.</b> Ideal gaz birinchi holatdan ikkinchi holatga o‘tishi (m = const) grafikda keltirilgan. Grafikni tahlil qilib savollarga javob yozing. <span class="pts total">Jami: 10 ball</span></p>
+
+  <div class="fig">
+    <svg viewBox="0 0 320 260" width="320" role="img" aria-label="P(kPa) – V(l) grafigi: 1-nuqta (2; 2), 2-nuqta (5; 8)">
+      <!-- plot area: x 40..280 (V 0..6 => 40 px/l), y 220..30 (P 0..10 => 19 px/kPa) -->
+      <g>
+        <line class="gr" x1="80"  y1="30" x2="80"  y2="220"/>
+        <line class="gr" x1="120" y1="30" x2="120" y2="220"/>
+        <line class="gr" x1="160" y1="30" x2="160" y2="220"/>
+        <line class="gr" x1="200" y1="30" x2="200" y2="220"/>
+        <line class="gr" x1="240" y1="30" x2="240" y2="220"/>
+        <line class="gr" x1="280" y1="30" x2="280" y2="220"/>
+        <line class="gr" x1="40" y1="182" x2="280" y2="182"/>
+        <line class="gr" x1="40" y1="144" x2="280" y2="144"/>
+        <line class="gr" x1="40" y1="106" x2="280" y2="106"/>
+        <line class="gr" x1="40" y1="68"  x2="280" y2="68"/>
+        <line class="gr" x1="40" y1="30"  x2="280" y2="30"/>
+      </g>
+      <line class="ax" x1="40" y1="220" x2="40" y2="22"/>
+      <line class="ax" x1="40" y1="220" x2="300" y2="220"/>
+      <path d="M40 18 l-4 10 h8 z M306 220 l-10 -4 v8 z" fill="currentColor" style="fill:var(--ink)"/>
+      <text x="48" y="16" font-size="14" font-style="italic" font-weight="700">P(kPa)</text>
+      <text x="268" y="246" font-size="14" font-style="italic" font-weight="700">V(l)</text>
+      <!-- y labels -->
+      <text x="22" y="226" font-size="13" font-weight="700">0</text>
+      <text x="22" y="186" font-size="13" font-weight="700">2</text>
+      <text x="22" y="148" font-size="13" font-weight="700">4</text>
+      <text x="22" y="110" font-size="13" font-weight="700">6</text>
+      <text x="22" y="72"  font-size="13" font-weight="700">8</text>
+      <text x="14" y="34"  font-size="13" font-weight="700">10</text>
+      <!-- x labels -->
+      <text x="76"  y="238" font-size="13" font-weight="700">2</text>
+      <text x="156" y="238" font-size="13" font-weight="700">4</text>
+      <text x="236" y="238" font-size="13" font-weight="700">6</text>
+      <text x="36"  y="238" font-size="13" font-weight="700">0</text>
+      <!-- process: (2,2) -> (5,8) -->
+      <line class="pl" x1="80" y1="182" x2="200" y2="68"/>
+      <circle cx="80" cy="182" r="3.5" style="fill:var(--ink)"/>
+      <circle cx="200" cy="68" r="3.5" style="fill:var(--ink)"/>
+      <text x="76" y="200" font-size="13" font-weight="700">1</text>
+      <text x="206" y="68" font-size="13" font-weight="700">2</text>
+    </svg>
+  </div>
+
+  <p class="q"><b class="n">a)</b> Ideal gazning boshlang‘ich hajmi qiymati qancha bo‘lganini aniqlang. <span class="pts">[2 ball]</span></p>
+  <textarea class="ans l1" aria-label="3-a javob"></textarea>
+
+  <p class="q"><b class="n">b)</b> Gazning bosimi qanchaga o‘zgardi? <span class="pts">[3 ball]</span></p>
+  <textarea class="ans l1" aria-label="3-b javob"></textarea>
+
+  <p class="q"><b class="n">c)</b> Bu gazning temperaturasi necha marta o‘zgaradi? <span class="pts">[5 ball]</span></p>
+  <textarea class="ans l1" aria-label="3-c javob"></textarea>
+
+  <!-- 4 -->
+  <p class="q"><b class="n">4.</b> Masalani batafsil yeching. <span class="pts total">Jami: 12 ball</span></p>
+  <p>2,5 mol miqdordagi ideal gaz 300 K harorat va 2 atm bosim ostida qancha hajm (<i>l</i>) ni egallaydi? (R = 8,31 J/mol·K)</p>
+
+  <div class="solve-layout">
+    <div>
+      <h3>Berilgan:</h3>
+      <textarea class="ans given" aria-label="4-masala: Berilgan"></textarea>
+    </div>
+    <div>
+      <h3>Yechish:</h3>
+      <textarea class="ans solve" aria-label="4-masala: Yechish"></textarea>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <p class="q"><b class="n">5.</b> Gaz molekulalarining harakatini temperaturaga bog‘liqligi bo‘yicha tadqiqot o‘tkazildi. Tajriba davomida bir xil gazning turli temperaturalardagi molekulalarining o‘rtacha kvadratik tezligi aniqlandi va natijalar qayd etildi (jadvalda qarang). <span class="pts total">Jami: 16 ball</span></p>
+
+  <div class="match-wrap">
+    <table class="data-table">
+      <thead><tr><th>Temperatura (K)</th><th>Molekulalarning o‘rtacha kvadratik tezligi (m/s)</th></tr></thead>
+      <tbody>
+        <tr><td>150</td><td>290</td></tr>
+        <tr><td>300</td><td>410</td></tr>
+        <tr><td>600</td><td>580</td></tr>
+        <tr><td>1200</td><td>820</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="section-title">Grafik va jadval ma’lumotlarini tahlil qilib savollarga javob yozing</p>
+
+  <p class="q"><b class="n">a)</b> Gaz temperaturasi 600 K bo‘lganda molekulalar harakat tezligi qanday bo‘lgan? <span class="pts">[2 ball]</span></p>
+  <textarea class="ans l2" aria-label="5-a javob"></textarea>
+
+  <p class="q"><b class="n">b)</b> 300 K dan 1200 K gacha temperatura oshirilganda molekulalar tezligi necha marta o‘zgargan? <span class="pts">[3 ball]</span></p>
+  <textarea class="ans l2" aria-label="5-b javob"></textarea>
+
+  <p class="q"><b class="n">c)</b> Jadvaldagi ma’lumotlardan foydalanib gaz molekulalarining o‘rtacha kvadratik tezligi temperaturaga bog‘liqlik grafigini chizing. <span class="pts">[5 ball]</span></p>
+  <div class="graph-paper" role="img" aria-label="Grafik chizish uchun katakli maydon"></div>
+  <p class="note">Katakli maydon grafikni daftarda yoki chop etilgan varaqda qo‘lda chizish uchun qoldirilgan.</p>
+
+  <p class="q"><b class="n">d)</b> Agar gazning temperaturasi 4800 K ga yetkazilsa, molekulalar tezligi haqida qanday prognoz qilish mumkin? <span class="pts">[6 ball]</span></p>
+  <textarea class="ans l4" aria-label="5-d javob"></textarea>
+
+  <p class="score-sum">Umumiy maksimal ball: 50 (I — 8, 2 — 4, 3 — 10, 4 — 12, 5 — 16).</p>
+
+  <div class="bottom-nav">
+    <a class="back-btn" id="backBottom" href="index.html">&#8592; Mundarijaga qaytish</a>
+  </div>
+</main>
+
+<script>
+  // "Mundarijaga qaytish": agar sahifa mundarijadan ochilgan bo'lsa, shu sahifaga qaytadi,
+  // aks holda index.html (mundarija fayli) ochiladi.
+  (function () {
+    var TOC_URL = "index.html";
+    function goBack(e) {
+      try {
+        if (document.referrer && history.length > 1) {
+          e.preventDefault();
+          history.back();
+        }
+      } catch (err) { /* oddiy havola ishlaydi */ }
+    }
+    ["backTop", "backBottom"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) { el.setAttribute("href", TOC_URL); el.addEventListener("click", goBack); }
+    });
+  })();
+</script>
+</body>
+</html>
