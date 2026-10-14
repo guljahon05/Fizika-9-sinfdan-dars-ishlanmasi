@@ -192,4 +192,4 @@ TQ.forEach((t,i)=>{const d=document.createElement("div");d.className="card q";d.
  $("#tq").append(d)});
 go(1);
 let last=0;(function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;const o=cv["c"+cur];if(D[cur]&&o){const w=fit(o);o.x.clearRect(0,0,w,o.h);D[cur](o.x,w,o.h,ts/1000,dt)}requestAnimationFrame(loop)})(0);
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
