@@ -330,6 +330,6 @@ function clr(){document.querySelectorAll('.op').forEach(o=>o.classList.remove('o
 $('chk').onclick=()=>{let s=0;clr();QS.forEach((q,i)=>{const v=document.querySelector(`input[name=q${i}]:checked`);$(`o${i}_${q[2]}`).classList.add('ok');if(v){if(+v.value==q[2])s++;else $(`o${i}_${v.value}`).classList.add('no')}});
 $('res').textContent=`Natija: ${s} / 5 — `+(s==5?'Ajoyib!':s>=3?'Yaxshi, yana mashq qiling.':"Mavzuni qayta o'qib chiqing.")};
 $('rst').onclick=()=>{document.querySelectorAll('#qs input').forEach(i=>i.checked=false);clr();$('res').textContent=''};
-</script>
+</script><script src="menu.js"></script>
 </body>
 </html>
