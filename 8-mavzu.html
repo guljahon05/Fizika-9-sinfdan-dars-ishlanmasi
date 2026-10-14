@@ -168,4 +168,4 @@ $('#nav').innerHTML=P.map((q,i)=>`<button onclick="show(${i})">${i+1}. ${q.n}</b
 function loop(ts){const dt=Math.min((ts-last)/1000,.1)*K;last=ts;
  if(run&&cur<8){t+=dt;const T=P[cur].T(p);if(t>=T){t=T;run=false}draw()}requestAnimationFrame(loop)}
 show(0);requestAnimationFrame(loop);
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
