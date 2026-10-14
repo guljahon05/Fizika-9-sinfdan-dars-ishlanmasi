@@ -173,4 +173,4 @@ document.querySelectorAll('.q').forEach(q=>q.querySelectorAll('.opt').forEach(b=
 $('tk').onclick=()=>{let s=0;document.querySelectorAll('.q').forEach(q=>{const i=+q.dataset.q,a=TEST[i][2];q.querySelectorAll('.opt').forEach((b,j)=>{b.classList.remove('sel','ok','no');if(j==a)b.classList.add('ok');else if(pick[i]==j)b.classList.add('no');});if(pick[i]==a)s++;});
  const r=$('tr');r.style.display='block';r.className='out'+(s<3?' warn':'');r.textContent='Natija: '+s+' / 5 ball ('+s*20+'%)'+(s==5?' — Ajoyib! 🎉':s>=3?' — Yaxshi!':' — Mavzuni qayta o\'qing.');};
 show(0);
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
