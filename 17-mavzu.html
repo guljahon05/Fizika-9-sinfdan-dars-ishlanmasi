@@ -195,4 +195,4 @@ const Q=[["3 kg suv 10 °C dan 30 °C gacha isitilsa, Q qancha? (c = 4200 J/(kg�
 ["Quyidagilardan qaysi biri issiqlik uzatish usuli EMAS?",["Issiqlik o'tkazuvchanlik","Konveksiya","Nurlanish","Qaynash"],3]];
 $('#test').innerHTML=Q.map((q,i)=>`<div class="q card"><b>${i+1}. ${q[0]}</b>${q[1].map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${'ABCD'[j]}) ${o}</label>`).join('')}</div>`).join('');
 $('#chk').onclick=()=>{let s=0;const a=Q.map((q,i)=>{const c=document.querySelector(`input[name=q${i}]:checked`);if(c&&+c.value==q[2])s++;return `${i+1}-${'ABCD'[q[2]]}`});const r=$('#tr');r.style.display='block';r.innerHTML=`Natija: ${s}/5<br>To'g'ri javoblar: ${a.join(', ')}`};
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
