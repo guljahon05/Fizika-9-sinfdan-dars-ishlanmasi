@@ -160,4 +160,4 @@ function quiz(id,Q){const d=$(id);d.innerHTML='';Q.forEach((e,i)=>{const q=docum
 e.o.forEach((o,j)=>{const b=document.createElement('button');b.textContent=o;b.onclick=()=>{if(q.dataset.d)return;q.dataset.d=1;b.classList.add(j==e.a?'ok':'no');if(j!=e.a)q.children[e.a+1].classList.add('ok')};q.appendChild(b)});d.appendChild(q)});
 d.closest('section').querySelectorAll('details').forEach(x=>x.open=false)}
 quiz('qz1',Q1);quiz('qz2',Q2);upd1();reset2();loop();
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
