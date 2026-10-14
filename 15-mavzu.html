@@ -120,4 +120,4 @@ S.push({sec:5,f(){const c=V('c6'),m=V('m6'),dT=V('dT6'),Q=c*m*dT;BG(x6);for(let 
 let last=performance.now();
 (function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;S.forEach(s=>{if(s.sec==cur)s.f()});A.forEach(a=>{if(a.sec==cur)a.tick(dt)});requestAnimationFrame(loop)})(last);
 show(0);
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
