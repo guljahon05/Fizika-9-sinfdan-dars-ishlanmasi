@@ -191,4 +191,4 @@ function init(){const dark=matchMedia('(prefers-color-scheme:dark)').matches;doc
  $('#th').onclick=()=>{const d=document.documentElement;d.dataset.theme=d.dataset.theme=='dark'?'light':'dark';cols();$('#th').textContent=d.dataset.theme=='dark'?'☀️':'🌙'};
  $('#th').textContent=dark?'☀️':'🌙';cols();show(0);requestAnimationFrame(loop)}
 init();
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
