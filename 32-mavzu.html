@@ -138,4 +138,4 @@ $('#th').onclick=()=>{const d=document.documentElement;d.dataset.theme=d.dataset
 function vals(i){const v={};P[i].sim.c.forEach(c=>{v[c.id]=+document.querySelector(`[data-c="${i}${c.id}"]`).value});return v}
 let last=0;function loop(ts){DT=Math.min(.05,(ts-last)/1000||.016);last=ts;if(cur<6){const p=P[cur];p.S=p.S||{};p.A=p.A||{};const sx=$('#s'+cur).getContext('2d'),ax=$('#a'+cur).getContext('2d');sx.clearRect(0,0,360,240);sx.fillStyle=C.card;sx.fillRect(0,0,360,240);const o=p.sim.d(sx,vals(cur),p.S);$('#o'+cur).textContent=o||'';ax.fillStyle=C.card;ax.fillRect(0,0,360,240);p.an(ax,ts/1000,p.A)}requestAnimationFrame(loop)}
 cols();build();show(0);requestAnimationFrame(loop);
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
