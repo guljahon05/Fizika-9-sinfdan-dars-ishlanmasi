@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Izoxorik jarayon — 9-sinf fizika, 12-mavzu</title>
+<style>
+/* ===== Ranglar (och/to'q mavzu) ===== */
+:root{--bg:#f4f7fb;--card:#fff;--tx:#1b2430;--mut:#5b6777;--bd:#d5dde8;--wall:#8a94a3;
+--gas:#29b6f6;--pr:#e53935;--hot:#fb8c00;--cool:#81d4fa;--gr:#2e9e5b;--cv:#eef4fb;--ok:#2e9e5b;--bad:#e53935}
+[data-theme=dark]{--bg:#0f141b;--card:#18202b;--tx:#e8edf3;--mut:#9aa7b8;--bd:#2c3746;--wall:#a3acb9;--cv:#101722}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px}
+h1{font-size:18px;margin:0}h2{font-size:18px;margin:6px 0 10px}h3{font-size:15px;margin:0 0 8px}
+nav{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:var(--bg);border-bottom:1px solid var(--bd)}
+nav button{flex:0 0 auto}
+main{padding:10px;max-width:760px;margin:auto}
+.tip{background:var(--card);border-left:4px solid var(--hot);padding:8px 10px;margin:8px 10px;border-radius:8px;font-size:14px}
+.b{min-height:44px;padding:8px 14px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);font-size:15px;cursor:pointer}
+.b.on,.b.pri{background:var(--gas);color:#032;border-color:var(--gas);font-weight:600}
+.tab{display:none}.tab.on{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+.formula{border:2px solid var(--hot);border-radius:12px;padding:12px;margin-bottom:12px;text-align:center;font-size:19px;font-weight:600;background:var(--card)}
+canvas{width:100%;height:auto;background:var(--cv);border:1px solid var(--bd);border-radius:10px;display:block}
+label{display:block;margin:8px 0;font-size:14px;color:var(--mut)}
+input[type=range]{width:100%;height:34px}
+input[type=text]{width:100%;min-height:44px;padding:8px;font-size:16px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+.out{background:var(--cv);border-radius:10px;padding:8px 10px;margin-top:8px;font-size:15px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.res{margin-top:8px;font-weight:600}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.opt{display:block;width:100%;text-align:left;margin:6px 0}
+.opt.right{background:var(--ok);color:#fff}.opt.wrong{background:var(--bad);color:#fff}
+.sol{background:var(--cv);border-radius:10px;padding:8px 10px;margin-top:8px;display:none}
+.p{color:var(--pr)}.h{color:var(--hot)}.g{color:var(--gr)}
+</style>
+</head>
+<body>
+<header><h1>🌡️ Izoxorik jarayon · 9-sinf · 12-mavzu</h1><button class="b" id="th">🌙</button></header>
+<nav id="nav"></nav>
+<div class="tip">🔔 Eslatma: hisoblashda temperaturani doim <b>kelvinga</b> o'tkazing: <b>T (K) = t (°C) + 273</b></div>
+<main id="main"></main>
+
+<script>
+/* ================= Yordamchi funksiyalar ================= */
+const $=(s,e=document)=>e.querySelector(s);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const f=(x,d=1)=>(+x).toFixed(d).replace('.',',');           // o'nli vergul
+const TT=T=>f(T,0)+' K ('+f(T-273,0)+' °C)';                   // kelvin va Selsiy
+const SC={};const scenes=[];
+
+/* ================= Sahna: idish, molekulalar, manometr, termometr, grafik ================= */
+class Scene{
+ constructor(cv,o){this.cv=cv;this.c=cv.getContext('2d');this.m=[];
+  for(let i=0;i<28;i++){const a=Math.random()*6.283;this.m.push({x:Math.random(),y:Math.random(),vx:Math.cos(a),vy:Math.sin(a)})}
+  this.cfg(o);scenes.push(this)}
+ cfg(o){this.o=Object.assign({H:220,p0:100,T0:300,pmax:350,Ta:300,Tb:450,V:1,pp:0},o);
+  this.cv.width=360;this.cv.height=this.o.H;this.T=this.o.Ta;this.p=this.o.p0*this.T/this.o.T0;
+  this.dir=this.o.Tb>=this.o.Ta?1:-1;this.u=0;this.play=false;this.hits=[]}
+ set(T,p,V){if(T!==this.T)this.dir=T>this.T?1:-1;this.T=T;this.p=p;if(V)this.o.V=V}
+ hit(x,y){this.hits.push({x,y,t:.3});if(this.hits.length>25)this.hits.shift()}
+ tick(dt){const o=this.o;
+  if(o.anim&&this.play){this.u+=dt/(o.dur||6);let fr;
+   if(o.pp){const ph=this.u%2;fr=ph<1?ph:2-ph;this.dir=ph<1?1:-1}
+   else{if(this.u>=1){this.u=1;this.play=false}fr=this.u;this.dir=o.Tb>=o.Ta?1:-1}
+   this.T=o.Ta+(o.Tb-o.Ta)*fr;this.p=o.p0*this.T/o.T0}
+  if(!o.anim||this.play){const s=Math.sqrt(this.T/300); // tezlik ~ √T
+   for(const m of this.m){m.x+=m.vx*s*dt;m.y+=m.vy*s*dt;
+    if(m.x<0||m.x>1){m.vx*=-1;m.x=m.x<0?0:1;this.hit(m.x,m.y)}
+    if(m.y<0||m.y>1){m.vy*=-1;m.y=m.y<0?0:1;this.hit(m.x,m.y)}}}
+  this.hits.forEach(h=>h.t-=dt);this.hits=this.hits.filter(h=>h.t>0)}
+ draw(){
+  const c=this.c,o=this.o,T=this.T,p=this.p,tx=css('--tx'),wl=css('--wall'),g=o.graphs;
+  const bx=10,by=g?14:22,bh=g?140:150,bw=o.vvar?110*o.V:150;
+  c.clearRect(0,0,360,o.H);c.font='12px system-ui,sans-serif';
+  // gaz molekulalari (havorang)
+  c.fillStyle=css('--gas');
+  for(const m of this.m){c.beginPath();c.arc(bx+5+m.x*(bw-10),by+5+m.y*(bh-10),3.5,0,7);c.fill()}
+  // devorga urilish joylari (qizil)
+  for(const h of this.hits){c.fillStyle='rgba(229,57,53,'+Math.min(1,h.t*3)+')';c.beginPath();c.arc(bx+h.x*bw,by+h.y*bh,6,0,7);c.fill()}
+  // idish devori (kulrang) va qimirlamaydigan porshen
+  c.strokeStyle=wl;c.lineWidth=5;c.strokeRect(bx,by,bw,bh);
+  if(o.piston){c.fillStyle=wl;c.fillRect(bx-4,by-9,bw+8,9);c.fillRect(bx+bw/2-3,by-22,6,14)}
+  c.fillStyle=tx;c.fillText(o.vvar?'V = '+f(o.V)+' l':'V = const',bx,by+bh+17);
+  // termometr (to'q sariq / sovutishda och ko'k)
+  const hx=g?200:190,yb=by+bh-8,yt=by+12,fr=Math.max(0,Math.min(1,(T-200)/400));
+  c.strokeStyle=wl;c.lineWidth=2;c.strokeRect(hx,yt,14,yb-yt);
+  c.fillStyle=this.dir<0?css('--cool'):css('--hot');c.fillRect(hx+2,yb-(yb-yt)*fr,10,(yb-yt)*fr);
+  c.beginPath();c.arc(hx+7,yb+8,10,0,7);c.fill();
+  c.fillStyle=tx;c.fillText(f(T,0)+' K',hx-8,yb+30);c.fillText(f(T-273,0)+' °C',hx-8,yb+43);
+  // manometr (qizil strelka)
+  const gx=g?285:277,gy=by+62,R=46,pf=Math.min(1,p/o.pmax),an=(135+270*pf)*Math.PI/180;
+  c.strokeStyle=wl;c.lineWidth=3;c.beginPath();c.arc(gx,gy,R,0,7);c.stroke();c.lineWidth=1;
+  for(let k=0;k<=10;k++){const a=(135+27*k)*Math.PI/180;c.beginPath();c.moveTo(gx+(R-3)*Math.cos(a),gy+(R-3)*Math.sin(a));c.lineTo(gx+(R-9)*Math.cos(a),gy+(R-9)*Math.sin(a));c.stroke()}
+  c.strokeStyle=css('--pr');c.lineWidth=3;c.beginPath();c.moveTo(gx,gy);c.lineTo(gx+(R-10)*Math.cos(an),gy+(R-10)*Math.sin(an));c.stroke();
+  c.fillStyle=css('--pr');c.beginPath();c.arc(gx,gy,4,0,7);c.fill();c.fillText('p = '+f(p,0)+' kPa',gx-38,gy+R+16);
+  // issiqlik oqimi
+  if(o.heat&&(!o.anim||this.play)){const col=this.dir<0?css('--cool'):css('--hot'),ph=(performance.now()/600)%1;
+   c.strokeStyle=col;c.fillStyle=col;c.lineWidth=3;
+   for(let k=0;k<4;k++){const x=bx+22+k*36,y=this.dir<0?204+ph*12:218-ph*12,d=this.dir<0?8:-8;
+    c.beginPath();c.moveTo(x,y-d);c.lineTo(x,y+d);c.stroke();
+    c.beginPath();c.moveTo(x-5,y+d-d*.6);c.lineTo(x,y+d);c.lineTo(x+5,y+d-d*.6);c.stroke()}
+   c.fillText(this.dir<0?'Q ← gazdan chiqadi':'Q → gazga beriladi',190,232)}
+  // uchta grafik: p–T, p–V, V–T
+  if(g){const gw=100,gh=80,gy0=215,xs=[10,130,250],Tm=600,pm=o.pmax,sl=o.p0/o.T0;
+   const pa=sl*Math.min(o.Ta,o.Tb),pb=sl*Math.max(o.Ta,o.Tb);
+   const X=(i,v,m)=>xs[i]+gw*v/m,Y=(v,m)=>gy0+gh-gh*v/m;
+   const lab=['p–T','p–V','V–T'],xl=['T, K','V','T, K'];
+   for(let i=0;i<3;i++){c.strokeStyle=tx;c.lineWidth=1.2;c.beginPath();c.moveTo(xs[i],gy0);c.lineTo(xs[i],gy0+gh);c.lineTo(xs[i]+gw,gy0+gh);c.stroke();
+    c.fillStyle=tx;c.fillText(lab[i],xs[i]+2,gy0-4);c.fillText(xl[i],xs[i]+gw-30,gy0+gh+14)}
+   c.strokeStyle=css('--gr');c.lineWidth=2.5;
+   c.beginPath();c.moveTo(X(0,0,Tm),Y(0,pm));c.lineTo(X(0,Tm,Tm),Y(Math.min(pm,sl*Tm),pm));c.stroke();           // p–T: koordinata boshidan
+   c.beginPath();c.moveTo(X(1,1,2),Y(pa,pm));c.lineTo(X(1,1,2),Y(pb,pm));c.stroke();                           // p–V: vertikal
+   c.beginPath();c.moveTo(X(2,Math.min(o.Ta,o.Tb),Tm),Y(1,2));c.lineTo(X(2,Math.max(o.Ta,o.Tb),Tm),Y(1,2));c.stroke(); // V–T: gorizontal
+   c.fillStyle=css('--pr');
+   [[X(0,T,Tm),Y(p,pm)],[X(1,1,2),Y(p,pm)],[X(2,T,Tm),Y(1,2)]].forEach(q=>{c.beginPath();c.arc(q[0],q[1],4.5,0,7);c.fill()})}
+ }}
+let last=0;
+function loop(t){const dt=Math.min(.05,(t-last)/1000);last=t;
+ for(const s of scenes)if(s.cv.offsetParent){s.tick(dt);s.draw()}
+ requestAnimationFrame(loop)}
+
+/* ================= Simulyatsiya va animatsiyani ulash ================= */
+function mountSim(i,sp){
+ SC['s'+i].cfg(sp.sc);const box=$('#sl'+i);
+ box.innerHTML=sp.sl.map(x=>`<label>${x.l}: <b id="v${i}${x.id}"></b><input type="range" id="r${i}${x.id}" min="${x.min}" max="${x.max}" step="${x.s}" value="${x.v}"></label>`).join('');
+ const upd=()=>{const v={};
+  sp.sl.forEach(x=>{v[x.id]=+$('#r'+i+x.id).value;$('#v'+i+x.id).textContent=f(v[x.id],x.s<1?1:0)+' '+x.u});
+  const r=sp.calc(v);SC['s'+i].set(r.T,r.p,r.V);$('#o'+i).innerHTML=r.out};
+ box.querySelectorAll('input').forEach(e=>e.oninput=upd);upd()}
+function mountAnim(i,o){
+ const sc=SC['a'+i];sc.cfg(Object.assign({anim:1},o));
+ $('#st'+i).onclick=()=>{if(!sc.o.pp&&sc.u>=1)sc.cfg(sc.o);sc.play=true};
+ $('#sp'+i).onclick=()=>{sc.play=false};
+ $('#rs'+i).onclick=()=>{sc.cfg(sc.o);sc.play=true}}
+function mountTask(i,t){
+ $('#tq'+i).innerHTML=t.q;
+ $('#tk'+i).onclick=()=>{const v=parseFloat($('#in'+i).value.replace(',','.')),r=$('#tr'+i);
+  if(isNaN(v)){r.className='res bad';r.textContent='Son kiriting!';return}
+  const okk=Math.abs(v-t.a)<=t.tol;
+  r.className='res '+(okk?'ok':'bad');
+  r.innerHTML=okk?'✅ To\'g\'ri! '+t.h:'❌ Noto\'g\'ri. Yana urinib ko\'ring. Maslahat: '+t.hint}}
+
+/* ================= Reja ma'lumotlari ================= */
+const PL=[
+{n:'1-reja',title:'1-reja. Gaz holatining parametrlari va gaz jarayonlari',
+ theory:'Gaz holatini uchta kattalik belgilaydi: <b class="p">p</b> (bosim), <b>V</b> (hajm) va <b class="h">T</b> (temperatura). Gazning massasi va miqdori o\'zgarmas bo\'lsa, bu kattaliklar bir-biriga bog\'liq. Bitta parametr o\'zgarmay qoladigan jarayonlar <b>izojarayonlar</b> deyiladi: <b>izoxorik</b> (V = const), <b>izobarik</b> (p = const), <b>izotermik</b> (T = const).',
+ formula:'p · V / T = const &nbsp; (m = const)',
+ example:'Velosiped nasosida havoni siqsak, hajm kamayadi, bosim ortadi. Quyoshda qolgan shina qiziydi, uning ichidagi bosim ortadi.',
+ sim:{sc:{vvar:1,pmax:350},sl:[{id:'t',l:'Temperatura t',min:-73,max:327,v:27,s:1,u:'°C'},{id:'V',l:'Hajm V',min:.6,max:1.4,v:1,s:.1,u:'l'}],
+  calc:v=>{const T=v.t+273,p=100*(T/300)/v.V,sp=485*Math.sqrt(T/300);
+   return{T,p,V:v.V,out:`T = ${TT(T)}<br>V = ${f(v.V)} l → <b class="p">p ≈ ${f(p,0)} kPa</b><br>O'rtacha tezlik ≈ ${f(sp,0)} m/s · Molekulalar soni: 28 (chizmada)`}}},
+ anim:{pp:1,Ta:250,Tb:550,pmax:250,dur:5},
+ task:{q:'Gaz temperaturasi 127 °C. Uni kelvinda ifodalang (K).',a:400,tol:.5,h:'T = 127 + 273 = 400 K.',hint:'T = t + 273.'}},
+{n:'2-reja',title:'2-reja. Izoxorik jarayon tushunchasi',
+ theory:'«Izos» — teng, «xora» — joy (hajm). <b>Izoxorik jarayon</b> — gaz hajmi o\'zgarmas (V = const) bo\'lgan jarayon. U berk, qattiq devorli idishda gazni qizdirish yoki sovitishda sodir bo\'ladi. Bunda gazning massasi ham, hajmi ham o\'zgarmaydi. Qizdirilganda molekulalar tezlashadi, devorga kuchliroq uriladi va bosim ortadi.',
+ formula:'V = const &nbsp; (m = const)',
+ example:'Yopiq ballon, avtomobil shinasi, aerozol balloni, yopiq konserva bankasi.',
+ sim:{sc:{pmax:250},sl:[{id:'t',l:'Temperatura t (V qulflangan: 1 l)',min:-73,max:327,v:27,s:1,u:'°C'}],
+  calc:v=>{const T=v.t+273,p=100*T/300;return{T,p,out:`V = 1 l (o'zgarmaydi) 🔒<br>T = ${TT(T)}<br><b class="p">p ≈ ${f(p,0)} kPa</b> (T = 300 K da 100 kPa edi)`}}},
+ anim:{pp:1,Ta:300,Tb:500,pmax:250,dur:6},
+ task:{q:'Yopiq idishda V₁ = 5 l gaz qizdirildi. Hajm V₂ necha litr bo\'ladi?',a:5,tol:.01,h:'Izoxorik jarayonda V = const.',hint:'Hajm o\'zgarmaydi.'}},
+{n:'3-reja',title:'3-reja. Sharl qonuni',
+ theory:'Fransuz olimi <b>Jak Sharl</b> qonuni: massasi va hajmi o\'zgarmas gazning bosimi absolyut temperaturaga to\'g\'ri proporsional. Demak, T 2 marta ortsa, p ham 2 marta ortadi. Temperatura doim kelvinda olinadi: T = t + 273.',
+ formula:'p₁/T₁ = p₂/T₂ &nbsp;|&nbsp; p = p₀(1 + αt), α = 1/273 K⁻¹',
+ example:'Yozda quyoshda turgan avtomobil shinasidagi bosim qishdagiga nisbatan yuqori bo\'ladi.',
+ sim:{sc:{pmax:700},sl:[{id:'p',l:'Boshlang\'ich bosim p₁',min:50,max:300,v:100,s:10,u:'kPa'},{id:'a',l:'Boshlang\'ich t₁',min:-23,max:127,v:27,s:1,u:'°C'},{id:'b',l:'Oxirgi t₂',min:-23,max:327,v:127,s:1,u:'°C'}],
+  calc:v=>{const T1=v.a+273,T2=v.b+273,p2=v.p*T2/T1;
+   return{T:T2,p:p2,out:`T₁ = ${v.a}+273 = ${T1} K; T₂ = ${v.b}+273 = ${T2} K<br>p₂ = p₁·T₂/T₁ = ${v.p}·${T2}/${T1}<br><b class="p">p₂ ≈ ${f(p2,1)} kPa</b>`}}},
+ anim:{Ta:273,Tb:373,p0:100,T0:273,pmax:200,dur:6},
+ task:{q:'p₁ = 100 kPa, T₁ = 250 K. T₂ = 500 K bo\'lsa, p₂ = ? (kPa)',a:200,tol:.5,h:'p₂ = 100·500/250 = 200 kPa.',hint:'p₂ = p₁·T₂/T₁.'}},
+{n:'4-reja',title:'4-reja. Izoxorik jarayon grafiklari',
+ theory:'<b>p–T</b> grafigi: T kelvinda bo\'lsa, koordinata boshidan o\'tuvchi to\'g\'ri chiziq. <b>p–V</b> grafigi: V o\'qiga perpendikulyar vertikal to\'g\'ri chiziq. <b>V–T</b> grafigi: V = const bo\'lgani uchun T o\'qiga parallel gorizontal to\'g\'ri chiziq.',
+ formula:'p–T: p = (p₀/T₀)·T &nbsp;|&nbsp; p–V: V = const &nbsp;|&nbsp; V–T: V = const',
+ example:'Ballon qizdirilganda manometr strelkasi temperaturaga mos ravishda bir tekis siljiydi, bu p–T chizig\'ining o\'zi.',
+ sim:{sc:{H:320,graphs:1,pmax:250},sl:[{id:'t',l:'Temperatura t',min:-73,max:327,v:27,s:1,u:'°C'}],
+  calc:v=>{const T=v.t+273,p=100*T/300;return{T,p,out:`p–T: (${f(T,0)} K; ${f(p,0)} kPa)<br>p–V: (1 l; ${f(p,0)} kPa)<br>V–T: (${f(T,0)} K; 1 l)`}}},
+ anim:{H:320,graphs:1,pp:1,Ta:200,Tb:600,pmax:250,dur:8},
+ task:{q:'p₁ = 150 kPa, T₁ = 300 K. p–T chizig\'ining qiyaligi p/T necha kPa/K?',a:.5,tol:.01,h:'150/300 = 0,5 kPa/K.',hint:'p/T = 150/300.'}},
+{n:'5-reja',title:'5-reja. Izoxorik jarayonda energiya, ish va issiqlik',
+ theory:'Hajm o\'zgarmaydi (ΔV = 0), shuning uchun gaz ishi <b>A = p·ΔV = 0</b>. Termodinamikaning birinchi qonuni: Q = ΔU + A = ΔU. Berilgan issiqlik gazning ichki energiyasini oshiradi. Qizdirilganda ΔU &gt; 0, sovitilganda ΔU &lt; 0.',
+ formula:'A = p·ΔV = 0 &nbsp;|&nbsp; Q = ΔU',
+ example:'Yopiq idishdagi gaz qizdirilsa, porshen yoki devor qimirlamaydi, issiqlikning hammasi molekulalar energiyasini oshiradi.',
+ sim:{sc:{H:240,heat:1,piston:1,pmax:200},sl:[{id:'Q',l:'Issiqlik miqdori Q (ν = 0,2 mol)',min:-300,max:600,v:200,s:10,u:'J'}],
+  calc:v=>{const dT=v.Q/2.493,T=300+dT,p=100*T/300,Ek=0.0207*T;
+   return{T,p,out:`Q = ${v.Q} J; A = 0 J; <b class="h">ΔU = Q = ${v.Q} J</b><br>T = ${TT(T)}<br>O'rtacha kinetik energiya E<sub>k</sub> ≈ ${f(Ek,2)}·10⁻²¹ J`}}},
+ anim:{H:240,heat:1,piston:1,pp:1,Ta:300,Tb:480,pmax:200,dur:6},
+ task:{q:'Hajmi o\'zgarmas gazga Q = 800 J issiqlik berildi. ΔU = ? (J)',a:800,tol:.5,h:'A = 0, demak ΔU = Q = 800 J.',hint:'Q = ΔU + A, A = 0.'}},
+{n:'6-reja',title:'6-reja. Masalalar yechish va qo\'llanilishi',steps:1,
+ task:{q:'0 °C da ballondagi bosim 100 kPa. Ballon 91 °C gacha qizdirildi (V = const). p₂ = ? (kPa)',a:133.3,tol:1,h:'T₂ = 364 K; p₂ = 100·364/273 ≈ 133,3 kPa.',hint:'Avval kelvinga o\'ting: 273 K va 364 K.'}}
+];
+
+/* 6-reja: bosqichma-bosqich masalalar */
+const PR=[
+{t:'1-masala. Ballondagi gaz bosimi',g:'T₁ = 27 °C, p₁ = 200 kPa, T₂ = 127 °C',k:'p₂ = ?',
+ s:'1) Kelvinga: T₁ = 27+273 = 300 K; T₂ = 127+273 = 400 K.<br>2) p₂ = p₁·T₂/T₁ = 200·400/300 ≈ <b>266,7 kPa</b>.',
+ sl:[{id:'t',l:'T₂ (°C)',min:27,max:227,v:127,s:1,u:'°C'}],
+ calc:v=>{const T=v.t+273,p=200*T/300;return{T,p,out:`T₂ = ${T} K → p₂ = 200·${T}/300 = <b class="p">${f(p,1)} kPa</b>`}},
+ sc:{Ta:300,Tb:400,p0:200,T0:300,pmax:450}},
+{t:'2-masala. Bosim 1,5 marta ortishi',g:'V = const, p₂ = 1,5·p₁, T₁ = 300 K',k:'T₂ = ? ΔT = ?',
+ s:'p₂/p₁ = T₂/T₁ → T₂ = 1,5·300 = 450 K (177 °C).<br>ΔT = 450 − 300 = <b>150 K</b> (absolyut temperatura 1,5 marta ortishi kerak).',
+ sl:[{id:'k',l:'p₂/p₁ nisbati',min:1.1,max:2,v:1.5,s:.1,u:'marta'}],
+ calc:v=>{const T=300*v.k,p=100*v.k;return{T,p,out:`T₂ = ${f(v.k)}·300 = ${TT(T)}<br>ΔT = <b class="h">${f(T-300,0)} K</b>`}},
+ sc:{Ta:300,Tb:450,pmax:250}},
+{t:'3-masala. Idish qizdirilishi',g:'p₁ = 2·10⁵ Pa, p₂ = 3·10⁵ Pa, T₁ = 300 K',k:'T₂ = ?',
+ s:'T₂ = T₁·p₂/p₁ = 300·3/2 = <b>450 K</b> = 177 °C.',
+ sl:[{id:'p',l:'p₂ (·10⁵ Pa)',min:2,max:4,v:3,s:.1,u:'·10⁵ Pa'}],
+ calc:v=>{const T=150*v.p;return{T,p:100*v.p,out:`T₂ = 300·${f(v.p)}/2 = <b class="h">${TT(T)}</b>`}},
+ sc:{Ta:300,Tb:450,p0:200,T0:300,pmax:450}},
+{t:'4-masala. ΔU va Q ni topish',g:'ν = 2 mol, ΔT = 40 K, V = const (A = 0)',k:'ΔU = ? Q = ?',
+ s:'A = 0 → Q = ΔU.<br>ΔU = (3/2)·ν·R·ΔT = 1,5·2·8,31·40 ≈ <b>997 J</b>. Q = ΔU ≈ <b>997 J</b>.',
+ sl:[{id:'d',l:'ΔT',min:10,max:100,v:40,s:5,u:'K'}],
+ calc:v=>{const U=24.93*v.d,T=300+v.d;return{T,p:100*T/300,out:`A = 0 J; ΔU = 1,5·2·8,31·${v.d} = <b class="h">${f(U,0)} J</b>; Q = ΔU = ${f(U,0)} J`}},
+ sc:{H:240,heat:1,piston:1,Ta:300,Tb:340,pmax:200}}
+];
+const USE=['🚗 <b>Avtomobil shinasi:</b> yozda issiqda bosim ortadi, qishda kamayadi, shuning uchun bosimni mavsumga qarab tekshirish kerak.','♨️ <b>Bug\' qozoni:</b> berk qozonda qizdirilganda bosim ortadi, shuning uchun saqlash klapani qo\'yiladi.','🛢️ <b>Gaz ballonlari:</b> ularni issiqdan, quyoshdan va isitgichlardan uzoq saqlash kerak.','🔥 <b>Aerozol balloni:</b> uni olovga tashlash yoki qizdirish mumkin emas: bosim ortib, portlab ketadi!'];
+
+/* ================= Sahifani qurish ================= */
+const main=$('#main'),nav=$('#nav');
+const cardSA=i=>`<div class="card"><h3>🎚️ Simulyatsiya</h3><canvas id="s${i}"></canvas><div id="sl${i}"></div><div class="out" id="o${i}"></div></div>
+<div class="card"><h3>🎬 Animatsiya</h3><canvas id="a${i}"></canvas><div class="btns"><button class="b pri" id="st${i}">▶ Boshlash</button><button class="b" id="sp${i}">⏸ To'xtatish</button><button class="b" id="rs${i}">🔄 Qayta boshlash</button></div></div>`;
+const taskHTML=i=>`<div class="card"><h3>✍️ Mustaqil masala</h3><p id="tq${i}"></p><input type="text" id="in${i}" inputmode="decimal" placeholder="Javobni kiriting"><div class="btns"><button class="b pri" id="tk${i}">Tekshirish</button></div><div class="res" id="tr${i}"></div></div>`;
+
+PL.forEach((d,i)=>{
+ const s=document.createElement('section');s.className='tab';s.id='t'+i;
+ let h=`<h2>${d.title}</h2>`;
+ if(!d.steps){
+  h+=`<div class="card"><h3>📘 Nazariy ma'lumot</h3>${d.theory}</div><div class="formula">${d.formula}</div><div class="card"><h3>🌍 Hayotiy misol</h3>${d.example}</div>`+cardSA(i)+taskHTML(i);
+ }else{
+  h+=`<div class="card"><h3>📘 Bosqichma-bosqich masalalar</h3><div id="stp"></div></div>`+cardSA(i)
+   +`<div class="card"><h3>🏭 Qo'llanilishi</h3>${USE.map(u=>'<p>'+u+'</p>').join('')}</div>`+taskHTML(i);
+ }
+ s.innerHTML=h;main.appendChild(s);
+ const b=document.createElement('button');b.className='b';b.textContent=d.n;b.onclick=()=>show(i);nav.appendChild(b);
+});
+
+/* ================= Test tabi ================= */
+const QS=[
+{q:'Qaysi jarayon izoxorik deyiladi?',o:['V = const bo\'lgan','p = const bo\'lgan','T = const bo\'lgan','m o\'zgaradigan'],a:0},
+{q:'Sharl qonuni formulasi qaysi?',o:['p₁V₁ = p₂V₂','V₁/T₁ = V₂/T₂','p₁/T₁ = p₂/T₂','p₁/V₁ = p₂/V₂'],a:2},
+{q:'Izoxorik jarayonning p–T grafigi (T kelvinda) qanday?',o:['Giperbola','Koordinata boshidan o\'tuvchi to\'g\'ri chiziq','T o\'qiga parallel chiziq','Parabola'],a:1},
+{q:'Izoxorik jarayonda gaz bajargan ish nimaga teng?',o:['A > 0','A < 0','A = p·V','A = 0'],a:3},
+{q:'T₁ = 200 K da p₁ = 100 kPa. T₂ = 400 K bo\'lsa, p₂ = ?',o:['50 kPa','200 kPa','150 kPa','100 kPa'],a:1}];
+const tt=document.createElement('section');tt.className='tab';tt.id='t'+PL.length;main.appendChild(tt);
+const tb=document.createElement('button');tb.className='b';tb.textContent='Test';tb.onclick=()=>show(PL.length);nav.appendChild(tb);
+let score=0,done=0;
+function buildTest(){score=0;done=0;
+ tt.innerHTML='<h2>📝 Test</h2>'+QS.map((x,qi)=>`<div class="card"><b>${qi+1}. ${x.q}</b>`+x.o.map((t,oi)=>`<button class="b opt" data-q="${qi}" data-o="${oi}">${'ABCD'[oi]}) ${t}</button>`).join('')+'</div>').join('')+'<div class="card res" id="tres"></div>';
+ tt.querySelectorAll('.opt').forEach(bt=>bt.onclick=()=>{
+  const qi=+bt.dataset.q,oi=+bt.dataset.o,all=tt.querySelectorAll(`.opt[data-q="${qi}"]`);
+  all.forEach(e=>{e.disabled=true;if(+e.dataset.o===QS[qi].a)e.classList.add('right')});
+  if(oi===QS[qi].a)score++;else bt.classList.add('wrong');
+  if(++done===QS.length)$('#tres').innerHTML=`Natija: <b>${score} / ${QS.length}</b> ${score>=4?'🎉':'📚'}<div class="btns"><button class="b pri" id="rt">Qayta topshirish</button></div>`,$('#rt').onclick=buildTest});}
+buildTest();
+
+/* ================= Tablarni almashtirish ================= */
+function show(i){document.querySelectorAll('.tab').forEach((e,k)=>e.classList.toggle('on',k===i));
+ nav.querySelectorAll('button').forEach((e,k)=>e.classList.toggle('on',k===i));scrollTo(0,0)}
+
+/* ================= Sahnalarni ishga tushirish ================= */
+PL.forEach((d,i)=>{
+ SC['s'+i]=new Scene($('#s'+i),{});SC['a'+i]=new Scene($('#a'+i),{anim:1});
+ if(!d.steps){mountSim(i,d.sim);mountAnim(i,d.anim)}
+ mountTask(i,d.task)});
+
+/* 6-reja: "Keyingi qadam" mantig'i */
+let st=0;
+function step(){const q=PR[st];
+ $('#stp').innerHTML=`<h3>${q.t}</h3><p><b>Berilgan:</b> ${q.g}</p><p><b>Topish kerak:</b> ${q.k}</p>
+ <div class="btns"><button class="b" id="sb">Yechimni ko'rsatish</button><button class="b pri" id="sn">${st<PR.length-1?'Keyingi qadam ▶':'Boshidan ↺'}</button></div>
+ <div class="sol" id="sol"><b>Yechish:</b><br>${q.s}</div>`;
+ $('#sb').onclick=()=>{const e=$('#sol');e.style.display=e.style.display==='block'?'none':'block'};
+ $('#sn').onclick=()=>{st=(st+1)%PR.length;step()};
+ mountSim(5,{sc:q.sc,sl:q.sl,calc:q.calc});mountAnim(5,Object.assign({dur:5},q.sc))}
+step();
+
+/* ================= Mavzu tugmasi ================= */
+$('#th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme==='dark';
+ r.dataset.theme=d?'light':'dark';$('#th').textContent=d?'🌙':'☀️'};
+
+show(0);requestAnimationFrame(loop);
+</script>
+</body>
+</html>
