@@ -193,6 +193,6 @@ let cur=0;
 function show(i){cur=i;[...nav.children].forEach((b,k)=>b.classList.toggle('on',k==i));document.querySelectorAll('section').forEach((s,k)=>s.classList.toggle('on',k==i));scrollTo(0,0);nav.children[i].scrollIntoView({inline:'center',block:'nearest'});if(i==0)drawS1()}
 function loop(ms){if(cur<6){const cv=$('#a'+cur),c=cv.getContext('2d');c.clearRect(0,0,600,300);AN[cur](c,ms/1000)}requestAnimationFrame(loop)}
 setTheme(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');show(0);requestAnimationFrame(loop);
-</script>
+</script>a <script src="menu.js"></script>
 </body>
 </html>
