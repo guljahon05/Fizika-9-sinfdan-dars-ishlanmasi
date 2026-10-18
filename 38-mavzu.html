@@ -214,4 +214,4 @@ PL.forEach((x,i)=>{$('#main').append(x.s);const b=el('button','',names[i]);b.onc
 $('#th').onclick=()=>{const d=document.documentElement,dark=getComputedStyle(d).getPropertyValue('--bg').trim()=='#0f1b2a';d.dataset.th=dark?'l':'d';$('#th').textContent=dark?'🌙':'☀️';setK()};
 setK();show(0);
 let last=0;(function loop(ms){const t=ms/1000,dt=Math.min(.1,t-last);last=t;PL[cur].live.forEach(f=>f(t,dt));requestAnimationFrame(loop)})(0);
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
