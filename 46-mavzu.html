@@ -569,6 +569,6 @@ function setTheme(t){document.documentElement.setAttribute('data-theme',t);theme
 themeBtn.addEventListener('click',function(){setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
 if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)setTheme('dark');
 })();
-</script>
+</script><script src="menu.js"></script>
 </body>
 </html>
