@@ -196,4 +196,4 @@ function loop(){if(cur<6){const st=ST[cur];if(st.run){st.p=Math.min(1,st.p+.012)
 addEventListener('resize',()=>{if(cur<6)render(cur)});
 (function(){let t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';try{t=localStorage.getItem('th')||t}catch(_){}document.documentElement.dataset.theme=t;$('#th').textContent=t==='dark'?'☀️':'🌙'})();
 show(0);loop();
-</script></body></html>
+</script><script src="menu.js"></script></body></html>
