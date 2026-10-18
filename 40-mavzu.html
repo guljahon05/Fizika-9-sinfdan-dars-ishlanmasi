@@ -188,6 +188,6 @@ const root=document.documentElement;
 root.dataset.theme=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
 $('#th').onclick=()=>{root.dataset.theme=root.dataset.theme=='dark'?'light':'dark';if(cx&&!raf)draw(0)};
 render(0);
-</script>
+</script><script src="menu.js"></script>
 </body>
 </html>
