@@ -263,6 +263,6 @@ function show(i){cur=i;
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>show(+b.dataset.i));
 $('#th').onclick=()=>{const d=document.documentElement,dk=d.dataset.theme=='dark';d.dataset.theme=dk?'light':'dark';$('#th').textContent=dk?'🌙':'☀️'};
 show(0);requestAnimationFrame(loop);
-</script>
+</script><script src="menu.js"></script>
 </body>
 </html>
