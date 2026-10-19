@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>9-sinf Fizika — CHSB-1 DEMO</title>
+<style>
+:root{color-scheme:light;--bg:#f6f7fb;--card:#fff;--tx:#1b1f2a;--mu:#5d6577;--bd:#dde1ea;--ac:#2f5bea;--ok:#157f3b;--okb:#e3f6ea;--no:#b3261e;--nob:#fdeceb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12141a;--card:#1c1f28;--tx:#eceef4;--mu:#9aa2b5;--bd:#333847;--ac:#7c9bff;--ok:#5fd68a;--okb:#16301f;--no:#ff8a80;--nob:#3a1b19}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#12141a;--card:#1c1f28;--tx:#eceef4;--mu:#9aa2b5;--bd:#333847;--ac:#7c9bff;--ok:#5fd68a;--okb:#16301f;--no:#ff8a80;--nob:#3a1b19}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--mu);font-size:14px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:12px 0}
+.card.ok{border-color:var(--ok)}.card.no{border-color:var(--no)}
+.qh{display:flex;justify-content:space-between;gap:8px;font-weight:600;margin-bottom:6px}
+.pt{font-size:12px;color:var(--mu);white-space:nowrap;font-weight:500}
+.q{margin:0 0 8px;white-space:pre-line}
+.note{font-size:13px;color:var(--mu);margin:0 0 8px}
+label{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;margin:6px 0;cursor:pointer}
+label input{margin-top:4px}
+label.c{background:var(--okb);border-color:var(--ok)}
+label.w{background:var(--nob);border-color:var(--no)}
+.sol{display:none;margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--bg);font-size:14px;white-space:pre-line}
+.show .sol{display:block}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:8px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;border:0;border-radius:8px;padding:10px 16px;background:var(--ac);color:#fff;cursor:pointer}
+button.s{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+.prog{margin-left:auto;font-size:14px;color:var(--mu)}
+#res{display:none;text-align:center}
+.card{scroll-margin-top:70px}html{scroll-behavior:smooth}
+#toc h2{font-size:16px;margin:0 0 8px}
+.tg{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.tg a{text-align:center;padding:8px 0;border:1px solid var(--bd);border-radius:8px;text-decoration:none;color:var(--tx);font-weight:600}
+.tg a.ok{background:var(--okb);border-color:var(--ok);color:var(--ok)}
+.tg a.no{background:var(--nob);border-color:var(--no);color:var(--no)}
+.back{display:inline-block;margin-top:10px;font-size:14px;color:var(--ac);text-decoration:none}
+#res .big{font-size:34px;font-weight:700}
+#res .g{font-size:18px;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>9-sinf Fizika — CHSB-1 (DEMO)</h1>
+<div class="sub">Javoblarni belgilang va «Tekshirish» tugmasini bosing.</div>
+<div class="card"><label style="border:0;padding:0;margin:0;cursor:default">O‘quvchi F.I.SH.:&nbsp;<input id="nm" type="text" style="flex:1;min-width:0;font:inherit;padding:6px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)"></label></div>
+<div class="bar">
+<button id="chk">Tekshirish</button><button class="s" id="rst">Qayta boshlash</button>
+<span class="prog" id="prog">0 / 15</span>
+</div>
+<div id="toc" class="card"><h2>Mundarija</h2><div class="tg" id="tg"></div></div>
+<div id="res" class="card"></div>
+<div id="qs"></div>
+</div>
+<script>
+const NA='6,02·10²³';
+const Q=[
+{p:2,t:"Avagadro soni deb qanday fizik kattalikka aytiladi?",o:["12 g ugleroddagi atomlar soniga","bitta uglerod atomi massasining 1/12 qismiga","1 mol modda massasi","bitta atom massasining uglerod atomi massasining 1/12 qismiga nisbatiga"],a:0,s:"Avogadro soni — 12 g ugleroddagi atomlar soni (1 moldagi zarralar soni)."},
+{p:2,t:"Modda miqdori va bitta molekulaning massasini formulalar bilan moslashtiring.\n1. Modda miqdori   2. Bitta molekula massasi\nM. m/M    N. m/N    L. (m/M)·N_A",o:["1-M, 2-L","1-M, 2-N","1-N, 2-L","1-L, 2-N"],a:1,s:"ν = m/M; m₀ = m/N.",n:"PDFdagi L formulasi noaniq chiqqan; javob m₀ = m/N asosida berilgan."},
+{p:2,t:"“Ideal gaz”ga xos bo‘lmagan holatni belgilang:",o:["Molekulalari doim harakatda bo‘ladi","Molekulalar orasida bo‘shliq mavjud","Molekulalari o‘zaro ta’sirlashadi","Molekulalar devorga urilib bosim hosil qiladi"],a:2,s:"Ideal gazda molekulalar o‘zaro ta’sirlashmaydi."},
+{p:2,t:"Qaysi jarayonda temperatura o‘zgarmaydi?",o:["Izobarik","Izoxorik","Izotermik","Adiabatik"],a:2,s:"Izotermik — T = const."},
+{p:2.4,t:"Jadvaldagi ma’lumotlardan foydalanib 5 ta kislorod molekulasining umumiy massasini (kg) toping. N_A = 6,02·10²³ mol⁻¹ (O: 16,0 g/mol)",o:["2,66·10⁻²⁵","5,32·10⁻²⁶","3,32·10⁻²⁷","3,02·10⁻²⁶"],a:0,s:"M(O₂)=32 g/mol=0,032 kg/mol\nm₀=M/N_A=0,032/6,02·10²³≈5,32·10⁻²⁶ kg\n5m₀≈2,66·10⁻²⁵ kg"},
+{p:2.4,t:"22 g CO₂ gazining modda miqdori (mol) ni aniqlang. (M = 44 g/mol)",o:["0,5","1","2","4"],a:0,s:"ν = m/M = 22/44 = 0,5 mol"},
+{p:2.4,t:"Vodorod molekulalarining o‘rtacha kvadratik tezligi 600 m/s. Temperatura 4 marta oshirilsa, molekulalarning tezligi (m/s) qanday bo‘lib qoladi?",o:["300","600","1200","2400"],a:2,s:"v ~ √T → √4 = 2 marta ortadi: 600·2 = 1200 m/s"},
+{p:2.4,t:"20 g gaz 600 K temperaturada va 8,31 MPa bosimda 6 l hajmni egallaydi. Bu qanday gaz?",o:["kislorod","vodorod","geliy","azot"],a:1,s:"M = mRT/(pV) = 0,02·8,31·600/(8,31·10⁶·6·10⁻³) = 0,002 kg/mol = 2 g/mol → vodorod"},
+{p:2.4,t:"Absolyut harorat 353 K bo‘lgan joyda termometr necha gradusni ko‘rsatadi?",o:["60°C","70°C","80°C","90°C"],a:2,s:"t = T − 273 = 353 − 273 = 80°C"},
+{p:2.4,t:"Gazning hajmi 15 litr. Izotermik jarayonda bosim 5 marta ortsa, gazning hajmi (litr) qanday bo‘ladi?",o:["2","3","5","10"],a:1,s:"pV = const → V₂ = 15/5 = 3 l"},
+{p:2.4,t:"Ideal gazning birinchi nuqtadagi hajmi 2,4 litr bo‘lsa, ikkinchi nuqtadagi hajmi (litr) qanday bo‘ladi? (V(T) grafigi: 1-nuqta T=300 K, to‘g‘ri chiziq koordinata boshidan o‘tadi)",o:["2,4","1,2","6","3,6"],a:2,s:"Grafikdan ikkinchi nuqta T₂ = 750 K.\nV₂ = V₁·T₂/T₁ = 2,4·750/300 = 6 l",n:"Javob PDFdagi grafikdan o‘qib olindi (T₂ ≈ 750 K)."},
+{p:2.4,t:"Gazning bosimi o‘zgarmas hajmda 50 kPa dan 80 kPa gacha ortishi uchun temperaturasini necha marta orttirish kerak?",o:["0,8","1,6","2,4","3,2"],a:1,s:"p/T = const → T₂/T₁ = p₂/p₁ = 80/50 = 1,6"},
+{p:2.4,t:"13°C temperaturali gazning bosimi izoxorik ravishda 1,5 marta ortdi. Gazning oxirgi harorati (°C) qanday bo‘ladi?",o:["156","225","320","122"],a:0,s:"T₁ = 286 K; T₂ = 1,5·286 = 429 K → 429 − 273 = 156°C"},
+{p:2.4,t:"Gazning birinchi holatdan ikkinchi holatga o‘tganda bajargan ishini toping (J). (I: V=5 l, p=1000 Pa → II: V=1 l, p=3000 Pa, to‘g‘ri chiziq)",o:["0","8","–4","–8"],a:3,s:"Hajm kamayadi → ish manfiy.\n|A| = (1000+3000)/2 · (5−1)·10⁻³ = 2000·4·10⁻³ = 8 J\nA = −8 J"},
+{p:5,t:"Laboratoriyada ikki bir xil metall silindr ustida tajriba o‘tkazildi. 1-silindr gaz alangasida qizdirildi, 2-silindr esa bolg‘a bilan bir necha marta urildi. Oxirida ikkalasining temperaturasi oshdi. Qaysi fikrlar to‘g‘ri?\n1. 1-silindrning ichki energiyasi issiqlik almashinuvi hisobiga ortdi.\n2. 2-silindrning ichki energiyasi mexanik ish bajarilishi natijasida ortdi.\n3. 2-silindrning temperaturasi oshgan bo‘lsa ham uning ichki energiyasi o‘zgarmaydi.\n4. Ichki energiya faqat issiqlik uzatilishi natijasida o‘zgaradi.\n5. Ikkala silindrning ham ichki energiyasi o‘zgardi.",o:["1,2,3","1,2,5","2,3,4","3,4,5"],a:1,s:"Ichki energiya ham issiqlik almashinuvi, ham ish bajarilishi orqali o‘zgaradi. 3 va 4 noto‘g‘ri → 1, 2, 5."}
+];
+const L="ABCD",sel={};let done=false;
+const qs=document.getElementById('qs');
+document.getElementById('tg').innerHTML=Q.map((_,i)=>`<a href="#q${i}" id="t${i}">${i+1}</a>`).join('');
+Q.forEach((q,i)=>{
+ const d=document.createElement('div');d.className='card';d.id='q'+i;
+ d.innerHTML=`<div class="qh"><span>${i+1}-savol</span><span class="pt">${q.p} ball</span></div><p class="q">${q.t}</p>`+(q.n?`<p class="note">${q.n}</p>`:'')+
+ q.o.map((o,j)=>`<label><input type="radio" name="r${i}" value="${j}"><span><b>${L[j]})</b> ${o}</span></label>`).join('')+
+ `<div class="sol"></div><a class="back" href="#toc">↑ Mundarijaga qaytish</a>`;
+ qs.appendChild(d);
+ d.querySelectorAll('input').forEach(r=>r.onchange=()=>{if(done)return;sel[i]=+r.value;prog()});
+});
+function prog(){document.getElementById('prog').textContent=Object.keys(sel).length+' / '+Q.length}
+document.getElementById('chk').onclick=()=>{
+ if(done)return;
+ const un=Q.length-Object.keys(sel).length;
+ if(un&&!confirm(un+" ta savolga javob belgilanmagan. Baribir tekshiraymi?"))return;
+ done=true;let sc=0,max=0,ok=0;
+ Q.forEach((q,i)=>{
+  const d=document.getElementById('q'+i);max+=q.p;
+  const right=sel[i]===q.a;if(right){sc+=q.p;ok++}
+  d.classList.add(right?'ok':'no','show');document.getElementById('t'+i).className=right?'ok':'no';
+  const ls=d.querySelectorAll('label');
+  ls.forEach((l,j)=>{l.querySelector('input').disabled=true;if(j===q.a)l.classList.add('c');else if(j===sel[i])l.classList.add('w')});
+  d.querySelector('.sol').textContent='To‘g‘ri javob: '+L[q.a]+') '+q.o[q.a]+'\n'+q.s+(sel[i]===undefined?'\n(Javob belgilanmagan)':'');
+ });
+ sc=Math.round(sc*10)/10;
+ const r=document.getElementById('res');r.style.display='block';
+ const nm=document.getElementById('nm').value.trim();
+ const pc=sc/max*100;
+ r.innerHTML=(nm?`<div>${nm.replace(/</g,'&lt;')}</div>`:'')+`<div class="big">${sc} / ${max}</div><div class="g">To‘g‘ri javoblar: ${ok} / ${Q.length} (${pc.toFixed(0)}%)</div><div class="note" style="margin-top:6px">Savollar ballari: B-2 → 2 ball, Q-2,4 → 2,4 ball, M-5 → 5 ball</div>`;
+ r.scrollIntoView({behavior:'smooth',block:'start'});
+};
+document.getElementById('rst').onclick=()=>{location.reload()};
+</script>
+</body>
+</html>
