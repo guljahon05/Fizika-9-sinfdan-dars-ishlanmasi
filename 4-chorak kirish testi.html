@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9-sinf 4-chorak fizika — kirish testi</title>
+<style>
+:root{--bg:#f6f8fb;--card:#fff;--ink:#13203a;--mute:#5d6b85;--line:#d8dfeb;--acc:#1b4fd8;--accsoft:#e4ecff;--ok:#127a4a;--oksoft:#dcf4e8;--bad:#b42318;--badsoft:#fde3e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e1424;--card:#172038;--ink:#e8edf8;--mute:#9aa8c4;--line:#2a3658;--acc:#7aa2ff;--accsoft:#22305a;--ok:#5fd39a;--oksoft:#12362a;--bad:#ff8d82;--badsoft:#3d1c1a}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:680px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.5rem;line-height:1.25;margin:8px 0 4px}
+.kirish{font-size:2.3rem;font-weight:800;letter-spacing:.04em;line-height:1.1;color:var(--acc);margin:0 0 20px}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:14px 0 6px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.meta{display:flex;justify-content:space-between;color:var(--mute);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:16px}
+.chap{display:inline-block;background:var(--accsoft);color:var(--acc);font-size:.85rem;padding:3px 10px;border-radius:99px;margin-bottom:12px}
+.q{font-size:1.15rem;font-weight:650;margin:0 0 16px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:13px 14px;margin:0 0 10px;font:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--acc)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.opt.ok{background:var(--oksoft);border-color:var(--ok)}
+.opt.bad{background:var(--badsoft);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.exp{margin-top:6px;padding:12px 14px;border-left:4px solid var(--acc);background:var(--accsoft);border-radius:6px;font-size:.97rem}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:13px 22px;font:inherit;font-weight:650;cursor:pointer;margin-top:16px}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .btn{color:#0e1424}}
+.btn.alt{background:transparent;color:var(--acc);border:1.5px solid var(--acc)}
+.score{font-size:3rem;font-weight:800;margin:4px 0}
+.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
+.rev{margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px}
+.rev b{display:block;margin-bottom:4px}
+.split{display:flex;gap:10px;margin:12px 0 4px}
+.split div{flex:1;border-radius:10px;padding:10px 12px;font-weight:650}
+.split small{display:block;font-weight:400;font-size:.85rem}
+.split .g{background:var(--oksoft);color:var(--ok)}
+.split .w{background:var(--badsoft);color:var(--bad)}
+.cert{margin:16px 0;padding:16px;border:1.5px solid var(--ok);border-radius:12px;background:var(--oksoft)}
+.cert label{display:block;font-weight:650;margin-bottom:8px}
+.cert input{width:100%;font:inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.cert input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.cert canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:8px;margin-top:14px;background:#fff}
+.nocert{margin:12px 0;color:var(--mute)}
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:650;margin-bottom:6px}
+.field input{width:100%;font:inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.field input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.err{color:var(--bad);margin-top:10px;font-size:.95rem}
+.who{color:var(--mute);margin-bottom:4px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+  <h1>9-sinf 4-chorak fizika fanidan</h1>
+  <div class="kirish">KIRISH TESTI</div>
+
+  <div id="intro">
+    <section class="card">
+      <div class="field"><label for="fio">Ism-familiyangiz</label>
+        <input id="fio" type="text" maxlength="60" autocomplete="name" placeholder="Masalan: Ali Valiyev"></div>
+      <div class="field"><label for="sinf">Sinfingiz</label>
+        <input id="sinf" type="text" maxlength="20" placeholder="Masalan: 8-A"></div>
+      <div class="err hide" id="introerr"></div>
+      <button class="btn" id="begin" type="button">Testni boshlash</button>
+    </section>
+  </div>
+
+  <div id="quiz" class="hide">
+    <div class="meta"><span id="count">1 / 30</span><span id="live">To‘g‘ri: 0</span></div>
+    <div class="bar"><i id="fill"></i></div>
+    <section class="card">
+      <span class="chap" id="chap"></span>
+      <p class="q" id="q"></p>
+      <div id="opts"></div>
+      <div class="exp hide" id="exp"></div>
+      <button class="btn hide" id="next">Keyingi savol</button>
+    </section>
+  </div>
+
+  <div id="result" class="hide">
+    <section class="card">
+      <div class="who" id="who"></div>
+      <div>Natijangiz</div>
+      <div class="score" id="score"></div>
+      <div id="verdict"></div>
+      <div class="split"><div class="g"><small>To‘g‘ri</small><span id="nok"></span></div><div class="w"><small>Xato</small><span id="nbad"></span></div></div>
+      <div id="cert" class="cert hide">
+        <label>Tabriklaymiz! Siz sertifikat olishga loyiq bo‘ldingiz.</label>
+        <button class="btn" id="mk" type="button">Sertifikatni yaratish</button>
+        <div id="certmsg" class="nocert hide"></div>
+        <canvas id="canvas" class="hide" width="1600" height="1130"></canvas>
+        <button class="btn alt hide" id="dl" type="button">Rasm sifatida yuklab olish</button>
+      </div>
+      <div id="nocert" class="nocert hide"></div>
+      <h2 style="font-size:1.1rem;margin:20px 0 4px">Boblar bo‘yicha</h2>
+      <div id="bychap"></div>
+      <div id="review"></div>
+      <button class="btn" id="again">Qayta boshlash</button>
+    </section>
+  </div>
+</main>
+
+<script>
+var CHAPTERS=["Issiqlik mashinalari va tabiatni muhofaza qilish","Suyuqlikning xossalari. Ho‘llash. Kapillyar hodisalar","Kristall va amorf jismlar. Mexanik xossalari","Erish va qotish","Bug‘lanish, kondensatsiya, namlik. Atmosfera hodisalari","Yorug‘lik tezligi. Qaytish va sinish qonunlari"];
+// Har bir savolda birinchi variant — to‘g‘ri javob. Variantlar ekranda aralashtiriladi.
+var DATA=[
+[0,"Issiqlik dvigatellarining atrof-muhitga asosiy zararli ta’siri qaysi?",["Atmosferaga zararli gazlar va karbonat angidrid chiqarib, havoni ifloslantiradi","Havoni toza kislorod bilan boyitadi","Atmosfera bosimini nolga tushiradi","Tuproqni o‘g‘itlaydi"],"Yoqilg‘i yonganda chiqindi gazlar (CO₂, azot oksidlari va boshqalar) atmosferaga tushib, uni ifloslantiradi va issiqxona effektini kuchaytiradi."],
+[0,"Atmosfera ifloslanishini kamaytirishga qaysi chora yordam beradi?",["Dvigatellarga filtr va katalitik neytralizator o‘rnatish hamda quyosh va shamol energiyasidan foydalanish","Yoqilg‘i sarfini ko‘paytirish","Chiqindi gazlarni filtrsiz atmosferaga chiqarish","Ko‘proq ko‘mir yoqish"],"Chiqindilarni tozalash qurilmalari va muqobil energiya manbalari zararli moddalar miqdorini kamaytiradi."],
+
+[1,"Suyuqlikning xarakterli xossasi qaysi?",["Hajmini saqlaydi, shakli esa idish shakliga mos keladi","Shaklini ham, hajmini ham saqlaydi","Butun idishni to‘ldiradi va hajmini o‘zgartiradi","Faqat kristall tuzilishga ega bo‘ladi"],"Suyuqlik oquvchan: shakli idishga moslashadi, hajmi esa deyarli o‘zgarmaydi."],
+[1,"Suyuqlikning sirt taranglik kuchi qanday yo‘nalgan bo‘ladi?",["Suyuqlik sirtiga urinma bo‘ylab, sirtni qisqartirishga intiladi","Sirtga tik, suyuqlik ichiga","Sirtga tik, suyuqlikdan tashqariga","Doimo vertikal pastga"],"Sirt taranglik kuchi sirtni qisqartirishga intiladi va sirtga urinma yo‘nalgan."],
+[1,"Sirt taranglik koeffitsiyentining XBS dagi birligi qaysi?",["N/m","N·m","N/m²","J/kg"],"σ = F / l, shuning uchun birligi N/m."],
+[1,"Erkin tushayotgan suv tomchisi nima uchun sharsimon shaklga intiladi?",["Berilgan hajmda sharning sirt yuzi eng kichik bo‘lgani uchun","Shar eng og‘ir shakl bo‘lgani uchun","Havo uni doimo shar shaklida ushlab turgani uchun","Suv molekulalari shar shaklida bo‘lgani uchun"],"Sirt taranglik sirtni minimal qilishga intiladi, berilgan hajmdagi jismlar ichida eng kichik sirt yuziga shar ega."],
+[1,"Suyuqlik qattiq jismni qachon ho‘llaydi?",["Suyuqlik molekulalarining qattiq jism molekulalariga tortilishi o‘zaro tortilishidan kuchli bo‘lsa","Suyuqlik molekulalarining o‘zaro tortilishi qattiq jismga tortilishidan kuchli bo‘lsa","Suyuqlik juda sovuq bo‘lsa","Qattiq jism juda silliq bo‘lsa"],"Jism-suyuqlik tortilishi suyuqlikning o‘z ichidagi tortilishidan katta bo‘lsa, suyuqlik sirtga yoyiladi, ya’ni ho‘llaydi."],
+[1,"Ho‘llovchi suyuqlik ingichka kapillyar naychada qanday holatda bo‘ladi?",["Naychadagi sathi idishdagidan yuqoriga ko‘tariladi","Naychadagi sathi idishdagidan pastga tushadi","Idishdagi bilan bir xil sathda bo‘ladi","Naychaga umuman kirmaydi"],"Ho‘llovchi suyuqlikning menisk shakli botiq bo‘lib, u kapillyarda ko‘tariladi."],
+[1,"Kapillyar naychaning ichki radiusi kamaytirilsa, ho‘llovchi suyuqlikning ko‘tarilish balandligi qanday o‘zgaradi?",["Ortadi","Kamayadi","O‘zgarmaydi","Nolga teng bo‘ladi"],"Balandlik h = 2σ / (ρ·g·r), shuning uchun radius kichiklashsa, balandlik ortadi."],
+
+[2,"Kristall jismlarning xarakterli xususiyati qaysi?",["Zarralari tartibli joylashgan va aniq erish temperaturasiga ega","Zarralari betartib joylashgan","Erish temperaturasi yo‘q","Faqat suyuqlik holatida mavjud bo‘ladi"],"Kristallarda zarralar kristall panjara hosil qiladi va ular aniq temperaturada eriydi."],
+[2,"Quyidagilardan qaysi biri amorf jism?",["Shisha","Osh tuzi","Olmos","Mis"],"Shisha amorf jism: zarralari tartibsiz joylashgan, aniq erish temperaturasi yo‘q. Qolganlari kristall moddalar."],
+[2,"Monokristallarning ayrim xossalari yo‘nalishga qanday bog‘liq bo‘ladi?",["Turli yo‘nalishlarda turlicha (anizotropiya)","Barcha yo‘nalishlarda bir xil","Faqat vertikal yo‘nalishda o‘zgaradi","Yo‘nalishga umuman bog‘liq emas"],"Monokristallarning mexanik, optik va issiqlik xossalari yo‘nalishga qarab farq qiladi, bu anizotropiya deyiladi."],
+[2,"Quyidagilardan qaysi biri deformatsiya turi EMAS?",["Bug‘lanish","Cho‘zilish","Siqilish","Egilish"],"Bug‘lanish agregat holat o‘zgarishi. Cho‘zilish, siqilish, egilish, siljish va buralish deformatsiya turlaridir."],
+[2,"Guk qonuni qaysi formula bilan ifodalanadi? (k: bikrlik, Δl: uzayish)",["F = k · Δl","F = k / Δl","F = k · Δl²","F = k + Δl"],"Kichik elastik deformatsiyalarda elastiklik kuchi jismning uzayishiga to‘g‘ri proporsional."],
+
+[3,"Kristall moddaning erish temperaturasi uning qotish temperaturasi bilan qanday bog‘langan?",["Ular o‘zaro teng","Erish temperaturasi doim yuqori","Qotish temperaturasi doim yuqori","Ular o‘zaro bog‘liq emas"],"Bir xil bosimda kristall modda qaysi temperaturada erisa, o‘sha temperaturada qotadi."],
+[3,"Kristall jism erish jarayonida (to‘liq erib bo‘lguncha) uning temperaturasi qanday bo‘ladi?",["O‘zgarmaydi","Doimiy ortib boradi","Doimiy kamayib boradi","Avval ortadi, keyin tez kamayadi"],"Berilgan issiqlik kristall panjarani buzishga sarflanadi, shuning uchun erish davomida temperatura o‘zgarmaydi."],
+[3,"Moddaning solishtirma erish issiqligi nimani bildiradi?",["1 kg kristall moddani erish temperaturasida to‘liq suyuqlikka aylantirish uchun zarur issiqlik miqdorini","1 kg moddani 1 K ga isitish uchun zarur issiqlikni","1 kg suyuqlikni bug‘ga aylantirish uchun zarur issiqlikni","1 kg yoqilg‘i yonganda ajraladigan issiqlikni"],"λ — massasi 1 kg bo‘lgan kristall jismni erish temperaturasida eritish uchun kerak bo‘ladigan issiqlik miqdori."],
+[3,"Erish uchun zarur issiqlik miqdori qaysi formula bilan topiladi?",["Q = λ · m","Q = c · m · Δt","Q = q · m","Q = λ / m"],"Q = λ·m: solishtirma erish issiqligi va massaning ko‘paytmasi."],
+[3,"Muzning solishtirma erish issiqligi λ = 3,4·10⁵ J/kg. 0 °C dagi 2 kg muzni to‘liq eritish uchun qancha issiqlik kerak?",["6,8·10⁵ J","1,7·10⁵ J","3,4·10⁵ J","6,8·10⁴ J"],"Q = λ·m = 3,4·10⁵ · 2 = 6,8·10⁵ J = 680 kJ."],
+
+[4,"Bug‘lanish nima?",["Suyuqlik sirtidan molekulalarning uchib chiqishi","Suyuqlikning butun hajmi bo‘ylab qaynashi","Qattiq jismning suyuqlikka aylanishi","Bug‘ning qattiq holatga o‘tishi"],"Bug‘lanish har qanday temperaturada suyuqlik sirtidan ro‘y beradigan hodisadir."],
+[4,"Qaysi holatda suyuqlik tezroq bug‘lanadi?",["Temperatura yuqori, sirt yuzi katta va shamol bor","Temperatura past, sirt yuzi kichik va havo tinch","Idish yopiq bo‘lsa","Suyuqlik sovitilsa"],"Temperaturaning oshishi, sirt yuzining kattaligi va bug‘ni olib ketuvchi shamol bug‘lanishni tezlashtiradi."],
+[4,"To‘yingan bug‘ deb nimaga aytiladi?",["O‘z suyuqligi bilan dinamik muvozanatda bo‘lgan bug‘ga","Suyuqligi butunlay tugagan bug‘ga","Faqat 100 °C dagi bug‘ga","Faqat idishdan chiqib ketgan bug‘ga"],"To‘yingan bug‘da vaqt birligida suyuqlikdan chiqayotgan va unga qaytayotgan molekulalar soni teng bo‘ladi."],
+[4,"Havoning nisbiy namligi qaysi formula bilan topiladi? (p: havodagi bug‘ning bosimi, p₀: shu temperaturadagi to‘yingan bug‘ bosimi)",["φ = p / p₀ · 100%","φ = p₀ / p · 100%","φ = p · p₀","φ = p − p₀"],"Nisbiy namlik haqiqiy bug‘ bosimining to‘yingan bug‘ bosimiga nisbati bo‘lib, foizda ifodalanadi."],
+[4,"Havoning nisbiy namligini o‘lchash uchun qaysi asbobdan foydalaniladi?",["Psixrometr","Barometr","Dinamometr","Ampermetr"],"Psixrometr quruq va nam termometr ko‘rsatishlari farqidan nisbiy namlikni aniqlashga imkon beradi."],
+[4,"Tuman va bulutlar qaysi hodisa natijasida hosil bo‘ladi?",["Suv bug‘ining kondensatsiyalanishi","Suvning muzlashi bilan bir vaqtda erishi","Havoning erishi","Suvning bug‘lanmasdan qotishi"],"Havodagi suv bug‘i sovigach, mayda suv tomchilariga aylanadi (kondensatsiya)."],
+
+[5,"Yorug‘likning vakuumdagi tezligi taxminan qancha?",["3·10⁸ m/s","3·10⁶ m/s","340 m/s","3·10¹⁰ m/s"],"Yorug‘lik vakuumda c ≈ 3·10⁸ m/s tezlik bilan tarqaladi."],
+[5,"Yorug‘lik tezligini birinchi marta Yupiter yo‘ldoshlarini kuzatish asosida baholagan olim kim?",["Olaf Römer","Isaak Nyuton","Galileo Galiley","Albert Eynshteyn"],"Römer 1676-yilda Yupiter yo‘ldoshi tutilishlari vaqtidagi kechikishdan yorug‘lik tezligi chekli ekanini ko‘rsatgan."],
+[5,"Yorug‘likning qaytish qonuniga ko‘ra tushish burchagi bilan qaytish burchagi o‘zaro qanday bo‘ladi?",["Teng bo‘ladi","Qaytish burchagi doim katta bo‘ladi","Qaytish burchagi doim kichik bo‘ladi","Ular o‘zaro bog‘liq emas"],"Qaytish qonuni: tushish burchagi qaytish burchagiga teng, nur, normal va qaytgan nur bir tekislikda yotadi."],
+[5,"Yorug‘likning sinish qonuni qaysi formula bilan ifodalanadi? (α: tushish burchagi, β: sinish burchagi, n: nisbiy sindirish ko‘rsatkichi)",["sin α / sin β = n","sin α · sin β = n","α / β = n","cos α / cos β = n"],"Sinish qonuni: tushish burchagi sinusining sinish burchagi sinusiga nisbati ikki muhit uchun o‘zgarmas kattalikdir."],
+[5,"Yorug‘lik optik jihatdan siyrakroq muhitdan zichroq muhitga o‘tganda sinish burchagi tushish burchagiga nisbatan qanday bo‘ladi?",["Kichikroq","Kattaroq","Teng","Doim nolga teng"],"Zichroq muhitda yorug‘lik tezligi kichik, n > 1, shuning uchun nur normalga yaqinlashadi va β < α bo‘ladi."]
+];
+
+var order,idx,score,answers=[],locked,finished=false;
+var USER={name:"",grade:""};
+var $=function(i){return document.getElementById(i)};
+
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+function start(){
+  order=DATA.map(function(d){return{c:d[0],q:d[1],o:shuffle(d[2].map(function(t,k){return{t:t,ok:k===0}})),e:d[3]}});
+  idx=0;score=0;answers=[];finished=false;
+  $("intro").classList.add("hide");
+  $("quiz").classList.remove("hide");$("result").classList.add("hide");
+  show();
+}
+
+function show(){
+  var it=order[idx];locked=false;
+  $("count").textContent=(idx+1)+" / "+order.length;
+  $("live").textContent="To‘g‘ri: "+score+"  Xato: "+(idx-score);
+  $("fill").style.width=(idx/order.length*100)+"%";
+  $("chap").textContent=CHAPTERS[it.c];
+  $("q").textContent=it.q;
+  $("exp").classList.add("hide");$("next").classList.add("hide");
+  var box=$("opts");box.innerHTML="";
+  it.o.forEach(function(op,k){
+    var b=document.createElement("button");
+    b.className="opt";b.type="button";b.textContent=String.fromCharCode(65+k)+") "+op.t;
+    b.onclick=function(){pick(k)};
+    box.appendChild(b);
+  });
+}
+
+function pick(k){
+  if(locked)return;locked=true;
+  var it=order[idx],btns=$("opts").children;
+  it.o.forEach(function(op,i){
+    btns[i].disabled=true;
+    if(op.ok)btns[i].classList.add("ok");
+  });
+  var good=it.o[k].ok;
+  if(good)score++;else btns[k].classList.add("bad");
+  $("live").textContent="To‘g‘ri: "+score+"  Xato: "+(idx+1-score);
+  answers.push({c:it.c,q:it.q,good:good,right:it.o.filter(function(o){return o.ok})[0].t,mine:it.o[k].t,e:it.e});
+  $("live").textContent="To‘g‘ri: "+score;
+  $("exp").textContent=(good?"To‘g‘ri. ":"Noto‘g‘ri. ")+it.e;
+  $("exp").classList.remove("hide");
+  $("next").textContent=idx===order.length-1?"Natijani ko‘rish":"Keyingi savol";
+  $("next").classList.remove("hide");
+  $("next").focus();
+}
+
+function finish(){
+  finished=true;
+  $("who").textContent=USER.name+", "+USER.grade;
+  $("quiz").classList.add("hide");$("result").classList.remove("hide");
+  $("score").textContent=score+" / "+order.length;
+  var passed=score/order.length>PASS,need=Math.floor(order.length*PASS)+1;
+  $("cert").classList.toggle("hide",!passed);
+  $("canvas").classList.add("hide");$("dl").classList.add("hide");$("certmsg").classList.add("hide");
+  $("nocert").classList.toggle("hide",passed);
+  if(!passed)$("nocert").textContent="Sertifikat olish uchun kamida "+need+" ta to‘g‘ri javob kerak. Yana urinib ko‘ring.";
+  $("nok").textContent=score;$("nbad").textContent=order.length-score;
+  var p=score/order.length;
+  $("verdict").textContent=p>=0.85?"A’lo natija!":p>=0.7?"Yaxshi natija.":p>=0.5?"Qoniqarli. Xatolarni ko‘rib chiqing.":"Mavzularni qayta takrorlang.";
+  var by=CHAPTERS.map(function(){return[0,0]});
+  answers.forEach(function(a){by[a.c][1]++;if(a.good)by[a.c][0]++});
+  $("bychap").innerHTML=CHAPTERS.map(function(n,i){return'<div class="row"><span>'+n+'</span><b>'+by[i][0]+' / '+by[i][1]+'</b></div>'}).join("");
+  var wrong=answers.filter(function(a){return!a.good});
+  var r=$("review");r.innerHTML="";
+  if(wrong.length){
+    var h=document.createElement("h2");h.style.cssText="font-size:1.1rem;margin:20px 0 4px";h.textContent="Xato javoblar ("+wrong.length+")";r.appendChild(h);
+    wrong.forEach(function(a){
+      var d=document.createElement("div");d.className="rev";
+      var b=document.createElement("b");b.textContent=a.q;
+      var p1=document.createElement("div");p1.textContent="Sizning javobingiz: "+a.mine;
+      var p2=document.createElement("div");p2.textContent="To‘g‘ri javob: "+a.right;
+      d.appendChild(b);d.appendChild(p1);d.appendChild(p2);r.appendChild(d);
+    });
+  }
+  window.scrollTo(0,0);
+}
+
+
+var PASS=0.7; // sertifikat uchun chegara: 70% dan yuqori (30 ta savolda kamida 22 ta to‘g‘ri)
+
+function drawCert(name,grade){
+  var c=$("canvas"),W=1600,H=1130,g=c.getContext("2d");
+  var pct=Math.round(score/order.length*100);
+  var d=new Date(),pad=function(n){return(n<10?"0":"")+n};
+  var date=pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear();
+  g.fillStyle="#fffdf7";g.fillRect(0,0,W,H);
+  g.strokeStyle="#1b4fd8";g.lineWidth=14;g.strokeRect(40,40,W-80,H-80);
+  g.strokeStyle="#c8962b";g.lineWidth=4;g.strokeRect(70,70,W-140,H-140);
+  g.textAlign="center";
+  g.fillStyle="#13203a";g.font="bold 110px Georgia,serif";g.fillText("SERTIFIKAT",W/2,260);
+  g.fillStyle="#c8962b";g.fillRect(W/2-120,295,240,5);
+  g.fillStyle="#5d6b85";g.font="34px Georgia,serif";g.fillText("Ushbu sertifikat quyidagi shaxsga beriladi",W/2,400);
+  var size=96;g.font="italic bold "+size+"px Georgia,serif";
+  while(g.measureText(name).width>W-300&&size>36){size-=4;g.font="italic bold "+size+"px Georgia,serif"}
+  g.fillStyle="#1b4fd8";g.fillText(name,W/2,560);
+  g.fillStyle="#13203a";g.fillRect(250,595,W-500,3);
+  g.fillStyle="#5d6b85";g.font="34px Georgia,serif";g.fillText("Sinf: "+grade,W/2,650);g.fillStyle="#13203a";
+  g.font="40px Georgia,serif";g.fillText("9-sinf 4-chorak fizika fanidan kirish testini muvaffaqiyatli topshirdi",W/2,730);
+  g.fillStyle="#5d6b85";g.font="28px Georgia,serif";
+  g.fillText("Suyuqliklar, qattiq jismlar, agregat holat o‘zgarishi va yorug‘lik qonunlari (4-chorak)",W/2,785);
+  g.fillStyle="#13203a";g.font="bold 58px Georgia,serif";
+  g.fillText("Natija: "+score+" / "+order.length+" ("+pct+"%)",W/2,890);
+  g.fillStyle="#5d6b85";g.font="32px Georgia,serif";g.textAlign="left";g.fillText("Sana: "+date,180,990);
+  // muhr
+  var cx=W-280,cy=H-260;
+  g.strokeStyle="#c8962b";g.lineWidth=8;g.beginPath();g.arc(cx,cy,95,0,Math.PI*2);g.stroke();
+  g.lineWidth=3;g.beginPath();g.arc(cx,cy,78,0,Math.PI*2);g.stroke();
+  g.lineWidth=14;g.lineCap="round";g.lineJoin="round";g.beginPath();g.moveTo(cx-34,cy+2);g.lineTo(cx-8,cy+30);g.lineTo(cx+38,cy-28);g.stroke();
+}
+
+$("mk").onclick=function(){
+  drawCert(USER.name,USER.grade);
+  $("canvas").classList.remove("hide");$("dl").classList.remove("hide");
+  $("canvas").scrollIntoView({behavior:"smooth",block:"center"});
+};
+$("dl").onclick=function(){
+  $("canvas").toBlob(function(b){
+    var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="sertifikat.png";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  },"image/png");
+};
+
+$("next").onclick=function(){if(idx===order.length-1){finish()}else{idx++;show()}};
+$("again").onclick=function(){start();window.scrollTo(0,0)};
+$("begin").onclick=function(){
+  var n=$("fio").value.replace(/\s+/g," ").trim(),g=$("sinf").value.replace(/\s+/g," ").trim(),e=$("introerr");
+  if(!n||!g){e.textContent=!n?"Ism-familiyangizni yozing.":"Sinfingizni yozing.";e.classList.remove("hide");(!n?$("fio"):$("sinf")).focus();return}
+  e.classList.add("hide");USER.name=n;USER.grade=g;start();window.scrollTo(0,0);
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9-sinf 2-chorak fizika — kirish testi</title>
+<style>
+:root{--bg:#f6f8fb;--card:#fff;--ink:#13203a;--mute:#5d6b85;--line:#d8dfeb;--acc:#1b4fd8;--accsoft:#e4ecff;--ok:#127a4a;--oksoft:#dcf4e8;--bad:#b42318;--badsoft:#fde3e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e1424;--card:#172038;--ink:#e8edf8;--mute:#9aa8c4;--line:#2a3658;--acc:#7aa2ff;--accsoft:#22305a;--ok:#5fd39a;--oksoft:#12362a;--bad:#ff8d82;--badsoft:#3d1c1a}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:680px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.5rem;line-height:1.25;margin:8px 0 4px}
+.kirish{font-size:2.3rem;font-weight:800;letter-spacing:.04em;line-height:1.1;color:var(--acc);margin:0 0 20px}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:14px 0 6px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.meta{display:flex;justify-content:space-between;color:var(--mute);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:16px}
+.chap{display:inline-block;background:var(--accsoft);color:var(--acc);font-size:.85rem;padding:3px 10px;border-radius:99px;margin-bottom:12px}
+.q{font-size:1.15rem;font-weight:650;margin:0 0 16px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:13px 14px;margin:0 0 10px;font:inherit;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--acc)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.opt.ok{background:var(--oksoft);border-color:var(--ok)}
+.opt.bad{background:var(--badsoft);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.exp{margin-top:6px;padding:12px 14px;border-left:4px solid var(--acc);background:var(--accsoft);border-radius:6px;font-size:.97rem}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:13px 22px;font:inherit;font-weight:650;cursor:pointer;margin-top:16px}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .btn{color:#0e1424}}
+.btn.alt{background:transparent;color:var(--acc);border:1.5px solid var(--acc)}
+.score{font-size:3rem;font-weight:800;margin:4px 0}
+.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
+.rev{margin-top:14px;padding:12px 14px;border:1px solid var(--line);border-radius:10px}
+.rev b{display:block;margin-bottom:4px}
+.split{display:flex;gap:10px;margin:12px 0 4px}
+.split div{flex:1;border-radius:10px;padding:10px 12px;font-weight:650}
+.split small{display:block;font-weight:400;font-size:.85rem}
+.split .g{background:var(--oksoft);color:var(--ok)}
+.split .w{background:var(--badsoft);color:var(--bad)}
+.cert{margin:16px 0;padding:16px;border:1.5px solid var(--ok);border-radius:12px;background:var(--oksoft)}
+.cert label{display:block;font-weight:650;margin-bottom:8px}
+.cert input{width:100%;font:inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.cert input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.cert canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:8px;margin-top:14px;background:#fff}
+.nocert{margin:12px 0;color:var(--mute)}
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:650;margin-bottom:6px}
+.field input{width:100%;font:inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.field input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.err{color:var(--bad);margin-top:10px;font-size:.95rem}
+.who{color:var(--mute);margin-bottom:4px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+  <h1>9-sinf 2-chorak fizika fanidan</h1>
+  <div class="kirish">KIRISH TESTI</div>
+
+  <div id="intro">
+    <section class="card">
+      <div class="field"><label for="fio">Ism-familiyangiz</label>
+        <input id="fio" type="text" maxlength="60" autocomplete="name" placeholder="Masalan: Ali Valiyev"></div>
+      <div class="field"><label for="sinf">Sinfingiz</label>
+        <input id="sinf" type="text" maxlength="20" placeholder="Masalan: 8-A"></div>
+      <div class="err hide" id="introerr"></div>
+      <button class="btn" id="begin" type="button">Testni boshlash</button>
+    </section>
+  </div>
+
+  <div id="quiz" class="hide">
+    <div class="meta"><span id="count">1 / 30</span><span id="live">To‘g‘ri: 0</span></div>
+    <div class="bar"><i id="fill"></i></div>
+    <section class="card">
+      <span class="chap" id="chap"></span>
+      <p class="q" id="q"></p>
+      <div id="opts"></div>
+      <div class="exp hide" id="exp"></div>
+      <button class="btn hide" id="next">Keyingi savol</button>
+    </section>
+  </div>
+
+  <div id="result" class="hide">
+    <section class="card">
+      <div class="who" id="who"></div>
+      <div>Natijangiz</div>
+      <div class="score" id="score"></div>
+      <div id="verdict"></div>
+      <div class="split"><div class="g"><small>To‘g‘ri</small><span id="nok"></span></div><div class="w"><small>Xato</small><span id="nbad"></span></div></div>
+      <div id="cert" class="cert hide">
+        <label>Tabriklaymiz! Siz sertifikat olishga loyiq bo‘ldingiz.</label>
+        <button class="btn" id="mk" type="button">Sertifikatni yaratish</button>
+        <div id="certmsg" class="nocert hide"></div>
+        <canvas id="canvas" class="hide" width="1600" height="1130"></canvas>
+        <button class="btn alt hide" id="dl" type="button">Rasm sifatida yuklab olish</button>
+      </div>
+      <div id="nocert" class="nocert hide"></div>
+      <h2 style="font-size:1.1rem;margin:20px 0 4px">Boblar bo‘yicha</h2>
+      <div id="bychap"></div>
+      <div id="review"></div>
+      <button class="btn" id="again">Qayta boshlash</button>
+    </section>
+  </div>
+</main>
+
+<script>
+var CHAPTERS=["Molekulyar-kinetik nazariya. Molekulalarning o‘lchami va massasi","Modda miqdori. Molar massa","Ideal gas. Temperatura. Molekulalar tezligi","Gaz holat tenglamalari. Izojarayonlar","Ichki energiya. Termodinamik ish"];
+// Har bir savolda birinchi variant — to‘g‘ri javob. Variantlar ekranda aralashtiriladi.
+var DATA=[
+[0,"Quyidagi fikrlardan qaysi biri molekulyar-kinetik nazariyaning asosiy qoidasi EMAS?",["Modda uzluksiz bo‘lib, molekulalar orasida bo‘shliq yo‘q","Modda molekulalardan tashkil topgan","Molekulalar to‘xtovsiz va tartibsiz harakatda bo‘ladi","Molekulalar orasida o‘zaro tortishish va itarish kuchlari mavjud"],"Molekulalar orasida bo‘shliqlar bor. Qolgan uchta fikr nazariyaning asosiy qoidalaridir."],
+[0,"Broun harakati nimani isbotlaydi?",["Molekulalarning to‘xtovsiz va tartibsiz harakatda ekanini","Molekulalarning bir-biriga tortilishini","Moddaning uzluksiz tuzilganini","Suyuqlikda molekulalar bo‘lmasligini"],"Suyuqlikdagi mayda qattiq zarralar molekulalarning tartibsiz urilishlari tufayli betartib harakatlanadi."],
+[0,"Molekulalarning o‘lchami taxminan qanday tartibda bo‘ladi?",["10⁻¹⁰ m","10⁻³ m","10⁻⁶ m","10⁻¹⁵ m"],"Molekula diametri taxminan 10⁻¹⁰ m, ya’ni bir necha angstrem."],
+[0,"Moy tomchisi suv sirtida bir qavatli yupqa parda hosil qilsa, molekula diametri qanday baholanadi? (V: tomchi hajmi, S: parda yuzi)",["d = V / S","d = V · S","d = S / V","d = √(V / S)"],"Parda qalinligi bir molekula diametriga teng deb olinadi: hajm = yuz · qalinlik, shuning uchun d = V / S."],
+[0,"Bitta molekulaning massasi (m₀) qaysi formula bilan topiladi? (M: molar massa, N_A: Avogadro doimiysi)",["m₀ = M / N_A","m₀ = M · N_A","m₀ = N_A / M","m₀ = M² / N_A"],"1 moldagi molekulalar soni N_A ga teng, molar massa esa shu N_A ta molekulaning massasidir."],
+
+[1,"Modda miqdorining birligi qaysi?",["Mol","Kilogramm","Kelvin","Paskal"],"Modda miqdori XBS da mol bilan o‘lchanadi."],
+[1,"1 mol moddadagi molekulalar soni (Avogadro doimiysi) qancha?",["6,02·10²³ mol⁻¹","6,02·10¹⁹ mol⁻¹","1,6·10²³ mol⁻¹","8,31 mol⁻¹"],"N_A = 6,02·10²³ mol⁻¹."],
+[1,"Molar massaning XBS dagi birligi qaysi?",["kg/mol","mol/kg","kg·mol","J/mol"],"M = m / ν, shuning uchun birligi kg/mol (amalda ko‘pincha g/mol ishlatiladi)."],
+[1,"Suvning (H₂O) molar massasi qancha? (H = 1 g/mol, O = 16 g/mol)",["18 g/mol","16 g/mol","17 g/mol","34 g/mol"],"M = 2·1 + 16 = 18 g/mol = 0,018 kg/mol."],
+[1,"Massasi 64 g bo‘lgan kislorod (O₂, M = 32 g/mol) necha mol modda miqdoriga ega?",["2 mol","0,5 mol","32 mol","96 mol"],"ν = m / M = 64 / 32 = 2 mol."],
+
+[2,"Ideal gaz modelida qaysi taxminlar qabul qilinadi?",["Molekulalar o‘lchami hisobga olinmaydi va ular faqat to‘qnashganda ta’sirlashadi","Molekulalar orasida doimo kuchli tortishish bor","Molekulalar qo‘zg‘almas turadi","Gaz hajmi molekulalar hajmiga teng"],"Ideal gazda molekulalar moddiy nuqta deb olinadi va to‘qnashuvdan tashqari o‘zaro ta’sir hisobga olinmaydi."],
+[2,"Gazning idish devoriga bosimi nima sababdan hosil bo‘ladi?",["Molekulalarning devorga urilishlari tufayli","Molekulalarning bir-biriga tortilishi tufayli","Gaz og‘irligi tufayli faqat pastki devorda","Molekulalarning to‘xtab turishi tufayli"],"Son-sanoqsiz molekulalarning devorga urilishlari o‘rtacha kuch hosil qiladi, bu bosimdir."],
+[2,"Temperatura nimaning o‘lchovi hisoblanadi?",["Molekulalar ilgarilanma harakatining o‘rtacha kinetik energiyasining","Molekulalar sonining","Gaz hajmining","Molekulalar massasining"],"Gazning absolyut temperaturasi molekulalar o‘rtacha kinetik energiyasiga to‘g‘ri proporsional."],
+[2,"27 °C temperatura Kelvin shkalasida qancha bo‘ladi?",["300 K","246 K","27 K","273 K"],"T = t + 273 = 27 + 273 = 300 K."],
+[2,"Gaz qizdirilganda uning molekulalarining o‘rtacha tezligi qanday o‘zgaradi?",["Ortadi","Kamayadi","O‘zgarmaydi","Avval kamayib, keyin ortadi"],"Temperatura oshsa, molekulalarning o‘rtacha kinetik energiyasi va demak tezligi ortadi."],
+[2,"Gazning absolyut temperaturasi 4 marta oshirilsa, molekulalarning o‘rtacha kvadratik tezligi qanday o‘zgaradi?",["2 marta ortadi","4 marta ortadi","16 marta ortadi","2 marta kamayadi"],"Tezlik temperaturaning kvadrat ildiziga proporsional: v ~ √T, √4 = 2."],
+
+[3,"Mendeleyev–Klapeyron tenglamasi qaysi javobda to‘g‘ri yozilgan?",["pV = (m/M)·RT","pV = (M/m)·RT","p/V = νRT","pT = νRV"],"Ideal gaz holat tenglamasi: pV = νRT = (m/M)RT."],
+[3,"Universal gaz doimiysi R ning qiymati qancha?",["8,31 J/(mol·K)","6,02·10²³ J/(mol·K)","1,38·10⁻²³ J/K","9,8 J/(mol·K)"],"R = 8,31 J/(mol·K). 1,38·10⁻²³ J/K esa Boltsman doimiysi."],
+[3,"Izotermik jarayonda gazning qaysi parametri o‘zgarmas bo‘ladi?",["Temperatura","Bosim","Hajm","Massa va hajm bir vaqtda"],"Izotermik jarayon T = const sharoitida o‘tadi, bunda pV = const (Boyl–Mariott qonuni)."],
+[3,"Temperaturasi o‘zgarmas gazning bosimi 2 marta oshirilsa, uning hajmi qanday o‘zgaradi?",["2 marta kamayadi","2 marta ortadi","4 marta kamayadi","O‘zgarmaydi"],"pV = const bo‘lgani uchun bosim 2 marta ortsa, hajm 2 marta kamayadi."],
+[3,"Izobarik jarayonda gazning qaysi parametri o‘zgarmas bo‘ladi?",["Bosim","Temperatura","Hajm","Ichki energiya"],"Izobarik jarayonda p = const va V / T = const (Gey-Lyussak qonuni)."],
+[3,"Bosimi o‘zgarmas gazning absolyut temperaturasi 2 marta oshirilsa, uning hajmi qanday o‘zgaradi?",["2 marta ortadi","2 marta kamayadi","4 marta ortadi","O‘zgarmaydi"],"V / T = const, shuning uchun temperatura 2 marta ortsa, hajm ham 2 marta ortadi."],
+[3,"Izoxorik jarayon uchun qaysi munosabat o‘rinli?",["p / T = const","pV = const","V / T = const","p · T = const"],"Hajm o‘zgarmaganda gaz bosimi absolyut temperaturaga to‘g‘ri proporsional (Sharl qonuni)."],
+[3,"Hajmi o‘zgarmas idishdagi gazning bosimi 300 K da 100 kPa edi. Gaz 600 K gacha qizdirilsa, bosim qancha bo‘ladi?",["200 kPa","50 kPa","100 kPa","400 kPa"],"p₁/T₁ = p₂/T₂, shuning uchun p₂ = 100 · 600 / 300 = 200 kPa."],
+
+[4,"Jismning ichki energiyasi nima?",["Uni tashkil etgan barcha molekulalarning kinetik va potensial energiyalari yig‘indisi","Faqat molekulalarning potensial energiyasi","Jismning butun holda harakatlanish energiyasi","Jismning yer sirtidan balandlikdagi energiyasi"],"Ichki energiya molekulalarning tartibsiz harakat kinetik energiyasi va o‘zaro ta’sir potensial energiyasidan iborat."],
+[4,"Ideal gazning ichki energiyasi qaysi kattalikka bog‘liq?",["Faqat absolyut temperaturasiga","Faqat hajmiga","Faqat bosimiga","Idishning shakliga"],"Ideal gazda molekulalar o‘zaro ta’sirlashmaydi, shuning uchun ichki energiya faqat temperaturaga bog‘liq."],
+[4,"Jismning ichki energiyasini qanday usullar bilan o‘zgartirish mumkin?",["Ish bajarish va issiqlik uzatish orqali","Faqat ish bajarish orqali","Faqat jismni ko‘tarish orqali","Faqat uni tezlashtirish orqali"],"Ichki energiya ish bajarilganda yoki issiqlik almashinuvi sodir bo‘lganda o‘zgaradi."],
+[4,"Izobarik jarayonda gazning bajargan ishi qaysi formula bilan topiladi?",["A = p · (V₂ − V₁)","A = p / ΔV","A = V · ΔT","A = p + ΔV"],"Bosim o‘zgarmas bo‘lganda gazning ishi bosim va hajm o‘zgarishining ko‘paytmasiga teng."],
+[4,"Gaz o‘zgarmas 200 kPa bosimda 0,5 m³ dan 0,8 m³ gacha kengaydi. Gaz qancha ish bajargan?",["60 kJ","100 kJ","160 kJ","40 kJ"],"A = p·ΔV = 200 000 Pa · 0,3 m³ = 60 000 J = 60 kJ."],
+[4,"Gaz kengayganda uning bajargan ishi qanday bo‘ladi?",["Musbat","Manfiy","Nolga teng","Hajmga bog‘liq emas"],"Kengayishda gaz tashqi jismlarga ish bajaradi, shuning uchun gazning ishi musbat."]
+];
+
+var order,idx,score,answers=[],locked,finished=false;
+var USER={name:"",grade:""};
+var $=function(i){return document.getElementById(i)};
+
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+function start(){
+  order=DATA.map(function(d){return{c:d[0],q:d[1],o:shuffle(d[2].map(function(t,k){return{t:t,ok:k===0}})),e:d[3]}});
+  idx=0;score=0;answers=[];finished=false;
+  $("intro").classList.add("hide");
+  $("quiz").classList.remove("hide");$("result").classList.add("hide");
+  show();
+}
+
+function show(){
+  var it=order[idx];locked=false;
+  $("count").textContent=(idx+1)+" / "+order.length;
+  $("live").textContent="To‘g‘ri: "+score+"  Xato: "+(idx-score);
+  $("fill").style.width=(idx/order.length*100)+"%";
+  $("chap").textContent=CHAPTERS[it.c];
+  $("q").textContent=it.q;
+  $("exp").classList.add("hide");$("next").classList.add("hide");
+  var box=$("opts");box.innerHTML="";
+  it.o.forEach(function(op,k){
+    var b=document.createElement("button");
+    b.className="opt";b.type="button";b.textContent=String.fromCharCode(65+k)+") "+op.t;
+    b.onclick=function(){pick(k)};
+    box.appendChild(b);
+  });
+}
+
+function pick(k){
+  if(locked)return;locked=true;
+  var it=order[idx],btns=$("opts").children;
+  it.o.forEach(function(op,i){
+    btns[i].disabled=true;
+    if(op.ok)btns[i].classList.add("ok");
+  });
+  var good=it.o[k].ok;
+  if(good)score++;else btns[k].classList.add("bad");
+  $("live").textContent="To‘g‘ri: "+score+"  Xato: "+(idx+1-score);
+  answers.push({c:it.c,q:it.q,good:good,right:it.o.filter(function(o){return o.ok})[0].t,mine:it.o[k].t,e:it.e});
+  $("live").textContent="To‘g‘ri: "+score;
+  $("exp").textContent=(good?"To‘g‘ri. ":"Noto‘g‘ri. ")+it.e;
+  $("exp").classList.remove("hide");
+  $("next").textContent=idx===order.length-1?"Natijani ko‘rish":"Keyingi savol";
+  $("next").classList.remove("hide");
+  $("next").focus();
+}
+
+function finish(){
+  finished=true;
+  $("who").textContent=USER.name+", "+USER.grade;
+  $("quiz").classList.add("hide");$("result").classList.remove("hide");
+  $("score").textContent=score+" / "+order.length;
+  var passed=score/order.length>PASS,need=Math.floor(order.length*PASS)+1;
+  $("cert").classList.toggle("hide",!passed);
+  $("canvas").classList.add("hide");$("dl").classList.add("hide");$("certmsg").classList.add("hide");
+  $("nocert").classList.toggle("hide",passed);
+  if(!passed)$("nocert").textContent="Sertifikat olish uchun kamida "+need+" ta to‘g‘ri javob kerak. Yana urinib ko‘ring.";
+  $("nok").textContent=score;$("nbad").textContent=order.length-score;
+  var p=score/order.length;
+  $("verdict").textContent=p>=0.85?"A’lo natija!":p>=0.7?"Yaxshi natija.":p>=0.5?"Qoniqarli. Xatolarni ko‘rib chiqing.":"Mavzularni qayta takrorlang.";
+  var by=CHAPTERS.map(function(){return[0,0]});
+  answers.forEach(function(a){by[a.c][1]++;if(a.good)by[a.c][0]++});
+  $("bychap").innerHTML=CHAPTERS.map(function(n,i){return'<div class="row"><span>'+n+'</span><b>'+by[i][0]+' / '+by[i][1]+'</b></div>'}).join("");
+  var wrong=answers.filter(function(a){return!a.good});
+  var r=$("review");r.innerHTML="";
+  if(wrong.length){
+    var h=document.createElement("h2");h.style.cssText="font-size:1.1rem;margin:20px 0 4px";h.textContent="Xato javoblar ("+wrong.length+")";r.appendChild(h);
+    wrong.forEach(function(a){
+      var d=document.createElement("div");d.className="rev";
+      var b=document.createElement("b");b.textContent=a.q;
+      var p1=document.createElement("div");p1.textContent="Sizning javobingiz: "+a.mine;
+      var p2=document.createElement("div");p2.textContent="To‘g‘ri javob: "+a.right;
+      d.appendChild(b);d.appendChild(p1);d.appendChild(p2);r.appendChild(d);
+    });
+  }
+  window.scrollTo(0,0);
+}
+
+
+var PASS=0.7; // sertifikat uchun chegara: 70% dan yuqori (30 ta savolda kamida 22 ta to‘g‘ri)
+
+function drawCert(name,grade){
+  var c=$("canvas"),W=1600,H=1130,g=c.getContext("2d");
+  var pct=Math.round(score/order.length*100);
+  var d=new Date(),pad=function(n){return(n<10?"0":"")+n};
+  var date=pad(d.getDate())+"."+pad(d.getMonth()+1)+"."+d.getFullYear();
+  g.fillStyle="#fffdf7";g.fillRect(0,0,W,H);
+  g.strokeStyle="#1b4fd8";g.lineWidth=14;g.strokeRect(40,40,W-80,H-80);
+  g.strokeStyle="#c8962b";g.lineWidth=4;g.strokeRect(70,70,W-140,H-140);
+  g.textAlign="center";
+  g.fillStyle="#13203a";g.font="bold 110px Georgia,serif";g.fillText("SERTIFIKAT",W/2,260);
+  g.fillStyle="#c8962b";g.fillRect(W/2-120,295,240,5);
+  g.fillStyle="#5d6b85";g.font="34px Georgia,serif";g.fillText("Ushbu sertifikat quyidagi shaxsga beriladi",W/2,400);
+  var size=96;g.font="italic bold "+size+"px Georgia,serif";
+  while(g.measureText(name).width>W-300&&size>36){size-=4;g.font="italic bold "+size+"px Georgia,serif"}
+  g.fillStyle="#1b4fd8";g.fillText(name,W/2,560);
+  g.fillStyle="#13203a";g.fillRect(250,595,W-500,3);
+  g.fillStyle="#5d6b85";g.font="34px Georgia,serif";g.fillText("Sinf: "+grade,W/2,650);g.fillStyle="#13203a";
+  g.font="40px Georgia,serif";g.fillText("9-sinf 2-chorak fizika fanidan kirish testini muvaffaqiyatli topshirdi",W/2,730);
+  g.fillStyle="#5d6b85";g.font="28px Georgia,serif";
+  g.fillText("Molekulyar fizika va termodinamika asoslari (2-chorak)",W/2,785);
+  g.fillStyle="#13203a";g.font="bold 58px Georgia,serif";
+  g.fillText("Natija: "+score+" / "+order.length+" ("+pct+"%)",W/2,890);
+  g.fillStyle="#5d6b85";g.font="32px Georgia,serif";g.textAlign="left";g.fillText("Sana: "+date,180,990);
+  // muhr
+  var cx=W-280,cy=H-260;
+  g.strokeStyle="#c8962b";g.lineWidth=8;g.beginPath();g.arc(cx,cy,95,0,Math.PI*2);g.stroke();
+  g.lineWidth=3;g.beginPath();g.arc(cx,cy,78,0,Math.PI*2);g.stroke();
+  g.lineWidth=14;g.lineCap="round";g.lineJoin="round";g.beginPath();g.moveTo(cx-34,cy+2);g.lineTo(cx-8,cy+30);g.lineTo(cx+38,cy-28);g.stroke();
+}
+
+$("mk").onclick=function(){
+  drawCert(USER.name,USER.grade);
+  $("canvas").classList.remove("hide");$("dl").classList.remove("hide");
+  $("canvas").scrollIntoView({behavior:"smooth",block:"center"});
+};
+$("dl").onclick=function(){
+  $("canvas").toBlob(function(b){
+    var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="sertifikat.png";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  },"image/png");
+};
+
+$("next").onclick=function(){if(idx===order.length-1){finish()}else{idx++;show()}};
+$("again").onclick=function(){start();window.scrollTo(0,0)};
+$("begin").onclick=function(){
+  var n=$("fio").value.replace(/\s+/g," ").trim(),g=$("sinf").value.replace(/\s+/g," ").trim(),e=$("introerr");
+  if(!n||!g){e.textContent=!n?"Ism-familiyangizni yozing.":"Sinfingizni yozing.";e.classList.remove("hide");(!n?$("fio"):$("sinf")).focus();return}
+  e.classList.add("hide");USER.name=n;USER.grade=g;start();window.scrollTo(0,0);
+};
+</script>
+</body>
+</html>
